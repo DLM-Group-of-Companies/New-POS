@@ -1,0 +1,77 @@
+﻿@page
+@model NLI_POS.Pages.Offices.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container-fluid p-2 rounded bg-light">
+    <span class="float-end" title="Close"><i class="fas fa-times-circle fa-xl" onclick="window.location = '/Patients';"></i> </span>
+    <div class=" align-items-center justify-content-center ">
+        <h4>Office</h4>
+        <hr />
+        <div class="row">
+            <div class="col-md-4">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="OfficeCountry.CountryId" class="control-label"></label>
+                        <select asp-for="OfficeCountry.CountryId" class="form-control" asp-items="ViewBag.CountryId">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="OfficeCountry.CountryId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <span class="text-danger">*</span>
+                        <label asp-for="OfficeCountry.Name" class="control-label"></label>
+                        <input asp-for="OfficeCountry.Name" class="form-control" />
+                        <span asp-validation-for="OfficeCountry.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="OfficeCountry.Address" class="control-label"></label>
+                        <textarea asp-for="OfficeCountry.Address" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="OfficeCountry.Address" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="OfficeCountry.Email" class="control-label"></label>
+                        <input asp-for="OfficeCountry.Email" class="form-control" />
+                        <span asp-validation-for="OfficeCountry.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="OfficeCountry.ContactNo" class="control-label"></label>
+                        <input asp-for="OfficeCountry.ContactNo" class="form-control" />
+                        <span asp-validation-for="OfficeCountry.ContactNo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="OfficeCountry.Remarks" class="control-label"></label>
+                        <input asp-for="OfficeCountry.Remarks" class="form-control" />
+                        <span asp-validation-for="OfficeCountry.Remarks" class="text-danger"></span>
+                    </div>
+                    <div class="form-group form-check form-switch">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" asp-for="OfficeCountry.isActive" /> @Html.DisplayNameFor(model => model.OfficeCountry.isActive)
+                        </label>
+                    </div>
+
+
+                    <input asp-for="OfficeCountry.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
+                    <input asp-for="OfficeCountry.EncodedBy" type="hidden" value="ARMAN" />
+
+
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
