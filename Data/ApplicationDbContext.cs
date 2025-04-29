@@ -14,5 +14,7 @@ namespace NLI_POS.Data
         public DbSet<CustClass> CustClass { get; set; }
         public DbSet<Country> Country { get; set; }
         public DbSet<OfficeCountry> OfficeCountry { get; set; }
+        public DbSet<ProductType> ProductTypes { get; set; }
+        public DbSet<Product> Products { get; set; }
     }
 }

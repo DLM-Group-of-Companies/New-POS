@@ -1,0 +1,102 @@
+﻿@page
+@model NLI_POS.Pages.Products.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].ProductCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].ProductDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].ProductCategory)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].SKU)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].IsActive)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].EncodeDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].EncodedBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].UpdateDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].UpdateddBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products[0].ProductTypes)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Products) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SKU)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsActive)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EncodeDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EncodedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdateDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdateddBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductTypes.Name)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
