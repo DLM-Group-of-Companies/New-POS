@@ -11,8 +11,8 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250424180942_Update5")]
-    partial class Update5
+    [Migration("20250502195857_update3")]
+    partial class update3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -298,16 +298,14 @@ namespace NLI_POS.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("CustClass")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("CustClass")
+                        .HasColumnType("int");
 
                     b.Property<string>("CustCode")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
@@ -328,7 +326,6 @@ namespace NLI_POS.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("LandlineNo")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
@@ -343,16 +340,14 @@ namespace NLI_POS.Migrations
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("MobileNo")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
                     b.Property<string>("Nationality")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("OfficeId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("OfficeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("PostalCode")
                         .HasColumnType("longtext");
@@ -360,16 +355,82 @@ namespace NLI_POS.Migrations
                     b.Property<string>("Province")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdateddBy")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustClass");
+
+                    b.HasIndex("OfficeId");
+
+                    b.ToTable("Customer");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryStock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("OfficeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockQty")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OfficeId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("InventoryStocks");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryStockAuditTrail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("EncodedBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("OfficeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrderNo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("TransactionType")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customer");
+                    b.HasIndex("OfficeId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("InventoryStockAuditTrails");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OfficeCountry", b =>
@@ -430,6 +491,111 @@ namespace NLI_POS.Migrations
                     b.ToTable("OfficeCountry");
                 });
 
+            modelBuilder.Entity("NLI_POS.Models.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EncodeDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EncodedBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<decimal>("MemPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProducTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductCategory")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("ProductCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("ProductDescription")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<decimal>("RegPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("StaffPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdateddBy")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProducTypeId");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.ProductType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime>("EncodeDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EncodedBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdateddBy")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductTypes");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -481,6 +647,63 @@ namespace NLI_POS.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NLI_POS.Models.Customer", b =>
+                {
+                    b.HasOne("NLI_POS.Models.CustClass", "CustClasses")
+                        .WithMany()
+                        .HasForeignKey("CustClass")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NLI_POS.Models.OfficeCountry", "OfficeCountry")
+                        .WithMany()
+                        .HasForeignKey("OfficeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustClasses");
+
+                    b.Navigation("OfficeCountry");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryStock", b =>
+                {
+                    b.HasOne("NLI_POS.Models.OfficeCountry", "Office")
+                        .WithMany()
+                        .HasForeignKey("OfficeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NLI_POS.Models.Product", "Products")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Office");
+
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryStockAuditTrail", b =>
+                {
+                    b.HasOne("NLI_POS.Models.OfficeCountry", "Office")
+                        .WithMany()
+                        .HasForeignKey("OfficeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NLI_POS.Models.Product", "Products")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Office");
+
+                    b.Navigation("Products");
+                });
+
             modelBuilder.Entity("NLI_POS.Models.OfficeCountry", b =>
                 {
                     b.HasOne("NLI_POS.Models.Country", "Country")
@@ -490,6 +713,17 @@ namespace NLI_POS.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.Product", b =>
+                {
+                    b.HasOne("NLI_POS.Models.ProductType", "ProductTypes")
+                        .WithMany()
+                        .HasForeignKey("ProducTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductTypes");
                 });
 #pragma warning restore 612, 618
         }

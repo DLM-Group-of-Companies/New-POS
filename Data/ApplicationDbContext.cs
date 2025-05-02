@@ -16,5 +16,7 @@ namespace NLI_POS.Data
         public DbSet<OfficeCountry> OfficeCountry { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<InventoryStock> InventoryStocks { get; set; }
+        public DbSet<InventoryStockAuditTrail> InventoryStockAuditTrails { get; set; }
     }
 }

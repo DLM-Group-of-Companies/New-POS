@@ -9,7 +9,7 @@ namespace NLI_POS.Models
         public int Id { get; set; }
 
         [Display(Name = "Product Code")]
-        [StringLength(10)]
+        [StringLength(20)]
         public string ProductCode { get; set; }
 
         [Display(Name = "Product Name")]
@@ -29,7 +29,16 @@ namespace NLI_POS.Models
         public string ProductCategory { get; set; }
 
         public string SKU { get; set; }
-        public int Quantity { get; set; }
+
+        [Display(Name = "Unit Cost")]
+        public decimal UnitCost { get; set; }
+        [Display(Name = "Regular Price")]
+        public decimal RegPrice { get; set; }
+        [Display(Name = "Member Price")]
+        public decimal MemPrice { get; set; }
+        [Display(Name = "Staff Price")]
+        public decimal StaffPrice { get; set; }
+
         public bool IsActive { get; set; }
 
         public DateTime EncodeDate { get; set; }

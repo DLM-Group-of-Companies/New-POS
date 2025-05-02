@@ -10,93 +10,191 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
-<table class="table">
+<table id="ProductTable" class="table">
     <thead>
         <tr>
+            <th hidden></th>
             <th>
-                @Html.DisplayNameFor(model => model.Products[0].ProductCode)
+                @Html.DisplayNameFor(model => model.Product[0].ProductCode)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Products[0].ProductName)
+                @Html.DisplayNameFor(model => model.Product[0].ProductName)
+            </th>
+            @*             <th>
+            @Html.DisplayNameFor(model => model.Product[0].ProductDescription)
+            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.Product[0].ProductTypes)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Products[0].ProductDescription)
+                @Html.DisplayNameFor(model => model.Product[0].ProductCategory)
+            </th>
+            @*              <th>
+            @Html.DisplayNameFor(model => model.Product[0].SKU)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Products[0].ProductCategory)
+            @Html.DisplayNameFor(model => model.Product[0].UnitCost)
+            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.Product[0].RegPrice)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Products[0].SKU)
+                @Html.DisplayNameFor(model => model.Product[0].MemPrice)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Products[0].Quantity)
+                @Html.DisplayNameFor(model => model.Product[0].StaffPrice)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Products[0].IsActive)
+                @Html.DisplayNameFor(model => model.Product[0].IsActive)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Products[0].EncodeDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Products[0].EncodedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Products[0].UpdateDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Products[0].UpdateddBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Products[0].ProductTypes)
-            </th>
+
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Products) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductCode)
+        @foreach (var item in Model.Product)
+        {
+            <tr>
+                <td hidden>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>                    
+                    @Html.DisplayFor(modelItem => item.ProductCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                @*                 <td>
+            @Html.DisplayFor(modelItem => item.ProductDescription)
+            </td> *@
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductTypes.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductCategory)
+                </td>
+                @*33               <td>
+            @Html.DisplayFor(modelItem => item.SKU)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductCategory)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SKU)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EncodeDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EncodedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdateDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdateddBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductTypes.Name)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+            @Html.DisplayFor(modelItem => item.UnitCost)
+            </td> *@
+                <td>
+                    @Html.DisplayFor(modelItem => item.RegPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MemPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StaffPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    @* <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a> *@
+@*                     @if (User.IsInRole("ADMIN"))
+                    { *@
+                        <a class="details btn btn-outline-danger btn-sm rounded-circle m-1" title="Delete" href="javascript:;"><i class="fas fa-trash-alt"></i> </a>
+                    @* } *@
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<script type="text/javascript">
+    var vBrID;
+    var selRow;
+    $(function () {
+        $("#ProductTable .details").click(function () {
+            vBrID = $(this).closest("tr").find("td").eq(0).html();
+            selRow = $(this).closest("tr");
+            alert(vBrID.trim())
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: '@Url.Page("Delete")',
+                data: { __RequestVerificationToken: gettoken(), id: vBrID.trim() },
+                // contentType: "application/json; charset=utf-8",
+                // dataType: "html",
+                success: function (response) {
+                     alert('response:' + response);
+                    $("#partialModal").find(".modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
+                    $("#partialModal").find(".modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-user-times"></i> Delete</button>');
+
+                    $("#partialModal").find(".modal-body").html(response);
+                    $("#partialModal").modal('show');
+                },
+                failure: function (response) {
+                    alert('failure:' + response.responseText);
+                },
+                error: function (response) {
+                    $("#partialModal").find(".modal-body").html(response);
+                    // alert('error:' + response.responseText);
+                    alert('Error encountered. This record may already have been deleted.');
+                }
+            });
+        });
+    });
+
+    function deleteRecord() {
+        // var vPatID = $(this).closest("tr").find("td").eq(0).html();
+        //alert(vPatID);
+
+        // Send AJAX request to check if the record exists
+        $.ajax({
+            // url: '/Patients/Create/PatientExists', // Adjust the URL to match your route
+            url: '@Url.Action("DeleteConfirmed")',
+            type: 'POST',
+            cache: false,
+            data: { __RequestVerificationToken: gettoken(), id: vBrID.trim() },
+            success: function (successDelete) {
+                if (successDelete) {
+                    toastr.options.closeButton = false;
+                    toastr.options.timeOut = 800;
+                    toastr.options.fadeOut = 1000;
+                    toastr.options.onHidden = function () { selRow.remove(); }
+                    toastr.success('Successfully deleted!');
+                    $("#partialModal").modal('hide');
+                }
+            },
+            error: function (xhr, status, error) {
+                //toastr.waring('@TempData["Message"]');
+                alert('An error occurred while deleting the record.');
+                alert('err:' + xhr.responseText);
+            }
+        });
+    }
+
+    function gettoken() {
+        var token = '@Html.AntiForgeryToken()';
+        token = $(token).val();
+        return token;
+    }
+
+</script>
+<script>
+    $('body').on('hidden.bs.modal', '.modal', function () {
+        $(this).removeData('bs.modal');
+        // alert('closed');
+    });
+</script>
+
+<script>
+    //For paging display fix
+    $(document).ready(function () {
+        $('ul.pagination > li.disabled > a').addClass('page-link');
+    });
+</script>
+
+<script type="text/javascript">
+
+    $(function () {
+        $("#pageSize").change(function () {
+            //alert($("#pageSize").val());
+            $("#form1").submit();
+        });
+    });
+</script>

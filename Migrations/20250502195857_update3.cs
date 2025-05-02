@@ -5,7 +5,7 @@
 namespace NLI_POS.Migrations
 {
     /// <inheritdoc />
-    public partial class update9 : Migration
+    public partial class update3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

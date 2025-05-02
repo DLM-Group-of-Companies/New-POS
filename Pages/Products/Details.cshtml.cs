@@ -19,7 +19,7 @@ namespace NLI_POS.Pages.Products
             _context = context;
         }
 
-        public Product Products { get; set; } = default!;
+        public Product Product { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,14 +28,14 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var products = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
-            if (products == null)
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
+            if (product == null)
             {
                 return NotFound();
             }
             else
             {
-                Products = products;
+                Product = product;
             }
             return Page();
         }

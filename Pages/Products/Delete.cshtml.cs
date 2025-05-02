@@ -20,7 +20,7 @@ namespace NLI_POS.Pages.Products
         }
 
         [BindProperty]
-        public Product Products { get; set; } = default!;
+        public Product Product { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,15 +29,15 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var products = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (products == null)
+            if (product == null)
             {
                 return NotFound();
             }
             else
             {
-                Products = products;
+                Product = product;
             }
             return Page();
         }
@@ -49,11 +49,11 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var products = await _context.Products.FindAsync(id);
-            if (products != null)
+            var product = await _context.Products.FindAsync(id);
+            if (product != null)
             {
-                Products = products;
-                _context.Products.Remove(Products);
+                Product = product;
+                _context.Products.Remove(Product);
                 await _context.SaveChangesAsync();
             }
 

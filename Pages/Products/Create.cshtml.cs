@@ -19,14 +19,39 @@ namespace NLI_POS.Pages.Products
             _context = context;
         }
 
+        public ProductCombo ProductCombo { get; set; }
+
+        [BindProperty]
+        public ProductCombo Product { get; set; }
+
         public IActionResult OnGet()
         {
-        ViewData["ProducTypeId"] = new SelectList(_context.ProductTypes, "Id", "Name");
+            ViewData["ProducTypeId"] = new SelectList(_context.ProductTypes, "Id", "Name");
+            ViewData["Product"] = new SelectList(_context.Products, "Id", "ProductName");
             return Page();
         }
 
+        public List<SelectListItem> GetProductList()
+        {
+            List<SelectListItem> SectionList = (from d in _context.Products
+                                                select new SelectListItem
+                                                {
+                                                    Text = d.ProductName,
+                                                    Value = d.Id.ToString()
+                                                }).ToList();
+
+            SectionList.Insert(0, new SelectListItem { Text = "--Select Product--", Value = "" });
+
+            return SectionList;
+        }
+
+        public IActionResult OnGetProductList()
+        {
+            return new JsonResult(GetProductList());
+        }
+
         [BindProperty]
-        public Product Products { get; set; } = default!;
+        public Product Product { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
@@ -36,7 +61,7 @@ namespace NLI_POS.Pages.Products
                 return Page();
             }
 
-            _context.Products.Add(Products);
+            _context.Products.Add(Product);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

@@ -28,6 +28,7 @@ namespace NLI_POS.Pages.Offices
         {
             ViewData["CountryId"] = new SelectList(_context.Country.Where(c => c.IsActive == true), "Id", "Name");
             ModelState.Remove("OfficeCountry.Country");
+            ModelState.Remove("OfficeCountry.Country");
             if (!ModelState.IsValid)
             {
                 return Page();

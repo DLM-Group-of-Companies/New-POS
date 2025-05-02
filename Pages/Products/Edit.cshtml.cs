@@ -21,7 +21,7 @@ namespace NLI_POS.Pages.Products
         }
 
         [BindProperty]
-        public Product Products { get; set; } = default!;
+        public Product Product { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,12 +30,12 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var products =  await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
-            if (products == null)
+            var product =  await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
+            if (product == null)
             {
                 return NotFound();
             }
-            Products = products;
+            Product = product;
            ViewData["ProducTypeId"] = new SelectList(_context.ProductTypes, "Id", "Name");
             return Page();
         }
@@ -49,7 +49,7 @@ namespace NLI_POS.Pages.Products
                 return Page();
             }
 
-            _context.Attach(Products).State = EntityState.Modified;
+            _context.Attach(Product).State = EntityState.Modified;
 
             try
             {
@@ -57,7 +57,7 @@ namespace NLI_POS.Pages.Products
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductsExists(Products.Id))
+                if (!ProductExists(Product.Id))
                 {
                     return NotFound();
                 }
@@ -70,7 +70,7 @@ namespace NLI_POS.Pages.Products
             return RedirectToPage("./Index");
         }
 
-        private bool ProductsExists(int id)
+        private bool ProductExists(int id)
         {
             return _context.Products.Any(e => e.Id == id);
         }

@@ -28,6 +28,12 @@
                         <span asp-validation-for="OfficeCountry.Name" class="text-danger"></span>
                     </div>
                     <div class="form-group">
+                        <span class="text-danger">*</span>
+                        <label asp-for="OfficeCountry.OffCode" class="control-label"></label>
+                        <input asp-for="OfficeCountry.OffCode" class="form-control" />
+                        <span asp-validation-for="OfficeCountry.OffCode" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
                         <label asp-for="OfficeCountry.Address" class="control-label"></label>
                         <textarea asp-for="OfficeCountry.Address" class="form-control" rows="3"></textarea>
                         <span asp-validation-for="OfficeCountry.Address" class="text-danger"></span>

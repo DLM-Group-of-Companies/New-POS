@@ -41,7 +41,15 @@ namespace NLI_POS.Pages.Customers
             ModelState.Remove("Customer.CustClasses");
 
             //-- Generate Customer ID
-            int lastID = _context.Customer.Max(p => p.Id) + 1;
+            int lastID = 0;
+            if (_context.Customer.Count() > 0)
+            {
+                 lastID = _context.Customer.Max(p => p.Id) + 1;
+            }
+            else
+            {
+                 lastID = 1;
+            }
             string lastIdPadded = lastID.ToString().PadLeft(6, '0');
             var off = Customer.OfficeId;
 
