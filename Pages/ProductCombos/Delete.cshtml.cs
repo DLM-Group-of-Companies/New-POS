@@ -9,7 +9,7 @@ using NLI_POS.Data;
 using NLI_POS.Models;
 using AspNetCoreHero.ToastNotification.Abstractions;
 
-namespace NLI_POS.Pages.Products
+namespace NLI_POS.Pages.ProductCombos
 {
     public class DeleteModel : PageModel
     {
@@ -19,11 +19,11 @@ namespace NLI_POS.Pages.Products
         public DeleteModel(NLI_POS.Data.ApplicationDbContext context, INotyfService toastNotification)
         {
             _context = context;
-            _toastNotification = toastNotification; 
+            _toastNotification = toastNotification;
         }
 
         [BindProperty]
-        public Product Products { get; set; } = default!;
+        public ProductCombo ProductCombo { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -32,15 +32,15 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var product = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
+            var productcombo = await _context.ProductCombos.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (product == null)
+            if (productcombo == null)
             {
                 return NotFound();
             }
             else
             {
-                Products = product;
+                ProductCombo = productcombo;
             }
             return Page();
         }
@@ -52,14 +52,14 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
+            var productcombo = await _context.ProductCombos.FindAsync(id);
+            if (productcombo != null)
             {
-                Products = product;
-                _context.Products.Remove(Products);
+                ProductCombo = productcombo;
+                _context.ProductCombos.Remove(ProductCombo);
                 await _context.SaveChangesAsync();
             }
-            _toastNotification.Success("Product has been deleted.",3);
+
             return RedirectToPage("./Index");
         }
     }

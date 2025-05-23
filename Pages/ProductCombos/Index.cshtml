@@ -1,0 +1,54 @@
+﻿@page
+@model NLI_POS.Pages.ProductCombos.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductCombo[0].ProductIdList)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductCombo[0].ProductsDesc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductCombo[0].QuantityList)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductCombo[0].Products)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.ProductCombo) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductIdList)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductsDesc)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuantityList)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Products.Id)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

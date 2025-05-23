@@ -1,73 +1,72 @@
 ﻿@page
+@using System.Text.Json
 @model NLI_POS.Pages.Products.CreateModel
 
 @{
     ViewData["Title"] = "Create Product";
+    var jsonData = JsonSerializer.Serialize(Model.ProductCombos);
 }
 
 <h4>Create Product</h4>
 <hr />
 
-<form method="post" asp-page-handler="Form1">
+<form method="post">
     <div class="row">
         <div class="col-md-12 p-2">
-            @* First Column - New Product *@
-
-
             <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label asp-for="Product.ProductCode" class="control-label"></label>
-                        <input asp-for="Product.ProductCode" class="form-control" />
-                        <span asp-validation-for="Product.ProductCode" class="text-danger small"></span>
+                        <label asp-for="Products.ProductCode" class="control-label"></label>
+                        <input asp-for="Products.ProductCode" class="form-control" />
+                        <span asp-validation-for="Products.ProductCode" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="col-md-8">
                     <div class="form-group">
-                        <label asp-for="Product.ProductName" class="control-label"></label>
-                        <input asp-for="Product.ProductName" class="form-control" />
-                        <span asp-validation-for="Product.ProductName" class="text-danger small"></span>
+                        <label asp-for="Products.ProductName" class="control-label"></label>
+                        <input asp-for="Products.ProductName" class="form-control" />
+                        <span asp-validation-for="Products.ProductName" class="text-danger small"></span>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label asp-for="Product.ProductDescription" class="control-label"></label>
-                        <input asp-for="Product.ProductDescription" class="form-control" />
-                        <span asp-validation-for="Product.ProductDescription" class="text-danger small"></span>
+                        <label asp-for="Products.ProductDescription" class="control-label"></label>
+                        <input asp-for="Products.ProductDescription" class="form-control" />
+                        <span asp-validation-for="Products.ProductDescription" class="text-danger small"></span>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label asp-for="Product.ProducTypeId" class="control-label"></label>
-                        <select asp-for="Product.ProducTypeId" class="form-control" asp-items="ViewBag.ProducTypeId">
+                        <label asp-for="Products.ProducTypeId" class="control-label"></label>
+                        <select asp-for="Products.ProducTypeId" class="form-control" asp-items="ViewBag.ProducTypeId">
                             <option value="">Select</option>
                         </select>
-                        <span asp-validation-for="Product.ProducTypeId" class="text-danger small"></span>
+                        <span asp-validation-for="Products.ProducTypeId" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label asp-for="Product.ProductCategory" class="control-label"></label>
-                        @* <input asp-for="Product.ProductCategory" class="form-control" /> *@
-                        <select asp-for="Product.ProductCategory" id="ProductCategory" class="form-control">
+                        <label asp-for="Products.ProductCategory" class="control-label"></label>
+                        @* <input asp-for="Products.ProductCategory" class="form-control" /> *@
+                        <select asp-for="Products.ProductCategory" id="ProductCategory" class="form-control">
                             <option value="">Select</option>
                             <option value="Regular">Regular</option>
                             <option value="Promo">Promo</option>
                             <option value="Freebie">Freebie</option>
                         </select>
-                        <span asp-validation-for="Product.ProductCategory" class="text-danger small"></span>
+                        <span asp-validation-for="Products.ProductCategory" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label asp-for="Product.SKU" class="control-label"></label>
-                        <input asp-for="Product.SKU" class="form-control" />
-                        <span asp-validation-for="Product.SKU" class="text-danger small"></span>
+                        <label asp-for="Products.SKU" class="control-label"></label>
+                        <input asp-for="Products.SKU" class="form-control" />
+                        <span asp-validation-for="Products.SKU" class="text-danger small"></span>
                     </div>
                 </div>
 
@@ -75,63 +74,44 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label asp-for="Product.UnitCost" class="control-label"></label>
-                        <input asp-for="Product.UnitCost" class="form-control" />
-                        <span asp-validation-for="Product.UnitCost" class="text-danger small"></span>
+                        <label asp-for="Products.UnitCost" class="control-label"></label>
+                        <input asp-for="Products.UnitCost" class="form-control" />
+                        <span asp-validation-for="Products.UnitCost" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label asp-for="Product.RegPrice" class="control-label"></label>
-                        <input asp-for="Product.RegPrice" class="form-control" />
-                        <span asp-validation-for="Product.RegPrice" class="text-danger small"></span>
+                        <label asp-for="Products.RegPrice" class="control-label"></label>
+                        <input asp-for="Products.RegPrice" class="form-control" />
+                        <span asp-validation-for="Products.RegPrice" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label asp-for="Product.MemPrice" class="control-label"></label>
-                        <input asp-for="Product.MemPrice" class="form-control" />
-                        <span asp-validation-for="Product.MemPrice" class="text-danger small"></span>
+                        <label asp-for="Products.MemPrice" class="control-label"></label>
+                        <input asp-for="Products.MemPrice" class="form-control" />
+                        <span asp-validation-for="Products.MemPrice" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label asp-for="Product.StaffPrice" class="control-label"></label>
-                        <input asp-for="Product.StaffPrice" class="form-control" />
-                        <span asp-validation-for="Product.StaffPrice" class="text-danger small"></span>
+                        <label asp-for="Products.StaffPrice" class="control-label"></label>
+                        <input asp-for="Products.StaffPrice" class="form-control" />
+                        <span asp-validation-for="Products.StaffPrice" class="text-danger small"></span>
                     </div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group form-check form-switch">
                     <label class="form-check-label">
-                        <input class="form-check-input" asp-for="Product.IsActive" /> Active
+                        <input class="form-check-input" asp-for="Products.IsActive" /> Active
                     </label>
 
                 </div>
             </div>
 
-            <input asp-for="Product.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
-            <input asp-for="Product.EncodedBy" type="hidden" value="ARMAN" />
-
-        </div>
-        <div id="comboColumn" class="col-md-5 p-2 border border-info rounded" style="display:none">
-            @*  2nd Column - Product Combination *@
-            <div class="p-2">
-            Product Combination
-            </div>
-            <div class="p-2">
-                <button id="btnAdd" type="button" class="btn btn-info">Add Product <i class="fas fa-plus-circle"></i></button>
-            </div>
-            <div class="row p-2  m-1 bg-secondary text-white">
-                <div class="col-8 col-md-8 p-2 border">Product</div>
-                <div class="col-3 col-md-3 p-2 border">Quantity</div>
-                <div class="col-1 col-md-1 p-2 border text-center"><i class="fas fa-trash-alt"></i></div>
-            </div>
-
-            <div id="newRow">
-                <input type="hidden" id="total" value="0" />
-            </div>
+            <input asp-for="Products.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
+            <input asp-for="Products.EncodedBy" type="hidden" value="ARMAN" />
 
         </div>
 
@@ -139,6 +119,7 @@
             <input type="submit" value="Create" class="btn btn-primary" />
         </div>
     </div>
+
 </form>
 
 
@@ -151,94 +132,4 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script>
-        $(function () {
-            $("#btnAdd").click(function () {
-                //using JQuery ajax to call the handler method and get the select list options.
-                var rowCount = parseInt($("#total").val());
-                rowCount++;
-                $("#total").val(rowCount);
-                $.ajax({
-                    type: "Get",
-                    url: "?handler=ProductList",
-                    success: function (data) {
-                        //add new select element:
-                        var newselect = "";
-                        newselect += "<select class='form-control' name='Product[" + (rowCount - 1) + "]'>"
-                        $.each(data, function (i, item) {
-                            newselect += `<option value="${item.value}">${item.text}</option>`;
-                        });
-                        newselect += "</select>";
-                        //generate the new form group
-                        var newitem = "";
-                        newitem += '<div class="row p-2   m-1" id="inputRow">';
-                        newitem += '<div class="col-8 border" >';
-                        newitem += "<div class='form-group'> " + newselect;
-                        newitem += '</div>';
-                        newitem += '</div>';
-                        newitem += '<div class="col-3 border" >';
-                        newitem += "<input type='number' name='[" + (rowCount - 1) + "].Qty' class='form-control'> </div>";
-                        // newitem += '</div>';
-                        newitem += '<div class="col-1 border  text-center" >';
-                        newitem += '<button id="removeRow" type="button" class="btn btn-danger"><i class="fas fa-minus-circle"></i></button>';
-                        newitem += '</div>';
-                        newitem += '</div>';
-                        //append the new elements to the main form.
-                        $("#newRow").append(newitem);
-                    },
-                    error: function (response) {
-                        alert(response.responseText);
-                    }
-                });
-            });
-        });
-
-
-        // $("#addRow").click(function () {
-        //     var rowCount = parseInt($("#total").val());
-        //     rowCount++;
-        //     $("#total").val(rowCount);
-        //     var html = '';
-        //     html += '<div class="row" id="inputRow">';
-        //     html += '<div class="col-7" >';
-        //     html += '<select name="Product[' + (rowCount - 1) + ']" class="form-control" asp-items="ViewBag.Product"><option value="">Select</option></select>';
-        //     // html += '<input type="text" name="[' + (rowCount - 1) + '].Name"  />';
-        //     html += '</div>';
-        //     html += '<div class="col-2" >';
-        //     html += '<input type="number" name="[' + (rowCount - 1) + '].Qty" class="form-control"></input>';
-        //     html += '</div">';
-        //     //add more inputs here...
-        //     html += '<div class="col-2">';
-        //     html += '<button id="removeRow" type="button" class="btn btn-danger">X</button>';
-        //     html += '</div>';
-        //     html += '</div>';
-
-        //     $('#newRow').append(html);
-        // });
-
-        $(document).on('click', '#removeRow', function () {
-            var rowCount = parseInt($("#total").val());
-            rowCount--;
-            $("#total").val(rowCount);
-            $(this).closest('#inputRow').remove();
-        });
-
-        // Show/Hide Combo Column
-        $(document).ready(function () {
-            $('#ProductCategory').on('change', function () {
-                if (this.value == 'Promo')
-                //.....................^.......
-                {
-                    $("#comboColumn").slideDown(500);
-                    $('.col-md-12').removeClass('col-md-12').addClass('col-md-7');
-
-                    
-                }
-                else {
-                    $("#comboColumn").hide();
-                    $('.col-md-7').removeClass('col-md-7').addClass('col-md-12');
-                }
-            });
-        });
-    </script>
 }

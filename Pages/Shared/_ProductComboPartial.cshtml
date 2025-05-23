@@ -1,0 +1,139 @@
+﻿@using NLI_POS.Models
+@model IList<ProductCombo>
+
+<p>
+    @* <a asp-page="Create">Create New</a> *@
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#myListModal">
+        Add Combination
+    </button>
+</p>
+<table id="ComboTable" class="table">
+    <thead>
+        <tr>
+            <th hidden>
+                @Html.DisplayNameFor(model => model[0].Id)
+            </th>
+            <th>
+                Combination
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductsDesc)
+                </td>
+
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a href="javascript:;" class="delete btn btn-danger btn-sm w-100 m-1" title="Delete"><i class="fas fa-trash-alt"></i> </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    var vID;
+    var selRow;
+    $(function () {
+        $("#ComboTable .delete").click(function () {
+            vID = $(this).closest("tr").find("td").eq(0).html();
+            selRow = $(this).closest("tr");
+            // alert(vID.trim())
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: '@Url.Page("/ProductCombos/Delete")',
+                data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
+                // contentType: "application/json; charset=utf-8",
+                // dataType: "html",
+                success: function (response) {
+                    // alert('response:' + response);
+                    $("#partialModal").find(".modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
+                    $("#partialModal").find(".modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-user-times"></i> Delete</button>');
+
+                    $("#partialModal").find(".modal-body").html(response);
+                    $("#partialModal").modal('show');
+                },
+                failure: function (response) {
+                    alert('failure:' + response.responseText);
+                },
+                error: function (response) {
+                    $("#partialModal").find(".modal-body").html(response);
+                    // alert('error:' + response.responseText);
+                    alert('Error encountered. This record may already have been deleted.');
+                }
+            });
+        });
+    });
+
+    function deleteRecord1() {
+        var id = vID;
+        //alert(id);
+        $.ajax({
+            type: "POST",
+            url: '@Url.Page("/ProductCombos/Delete")',
+            data: id,
+            success: function (response) {
+                if (response.success) {
+                    alert("Record deleted successfully!");
+                    // Optionally, refresh the page or update the UI
+                    window.location.reload();
+                } else {
+                    alert("Error deleting record: " + response.error);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("Error: " + status);
+            }
+        });
+    };
+
+    function deleteRecord() {
+        // var vPatID = $(this).closest("tr").find("td").eq(0).html();
+        alert(vID);
+
+        // Send AJAX request to check if the record exists
+        $.ajax({
+            //url: '/ProductCombos/Delete/', // Adjust the URL to match your route
+            url: '@Url.Page("/ProductCombos/Delete")',
+            type: 'POST',
+            cache: false,
+            // data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
+            data: { id: vID.trim() },
+            headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() }, //add the verification token to the header.
+            success: function (successDelete) {
+                if (successDelete) {
+                    toastr.options.closeButton = false;
+                    toastr.options.timeOut = 800;
+                    toastr.options.fadeOut = 1000;
+                    toastr.options.onHidden = function () { selRow.remove(); }
+                    toastr.success('Successfully deleted!');
+                    $("#partialModal").modal('hide');
+                }
+            },
+            error: function (xhr, status, error) {
+                //toastr.waring('@TempData["Message"]');
+                alert('An error occurred while deleting the record.');
+                alert('err:' + xhr.responseText);
+            }
+        });
+    }
+
+    function gettoken() {
+        var token = '@Html.AntiForgeryToken()';
+        token = $(token).val();
+        return token;
+    }
+
+</script>

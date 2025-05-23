@@ -105,22 +105,22 @@
 </table>
 
 <script type="text/javascript">
-    var vBrID;
+    var vID;
     var selRow;
     $(function () {
         $("#ProductTable .details").click(function () {
-            vBrID = $(this).closest("tr").find("td").eq(0).html();
+            vID = $(this).closest("tr").find("td").eq(0).html();
             selRow = $(this).closest("tr");
-            alert(vBrID.trim())
+            // alert(vID.trim())
             $.ajax({
                 cache: false,
                 type: "GET",
                 url: '@Url.Page("Delete")',
-                data: { __RequestVerificationToken: gettoken(), id: vBrID.trim() },
+                data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
                 // contentType: "application/json; charset=utf-8",
                 // dataType: "html",
                 success: function (response) {
-                     alert('response:' + response);
+                    // alert('response:' + response);
                     $("#partialModal").find(".modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
                     $("#partialModal").find(".modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-user-times"></i> Delete</button>');
 
@@ -141,15 +141,15 @@
 
     function deleteRecord() {
         // var vPatID = $(this).closest("tr").find("td").eq(0).html();
-        //alert(vPatID);
+        alert(vID);
 
         // Send AJAX request to check if the record exists
         $.ajax({
             // url: '/Patients/Create/PatientExists', // Adjust the URL to match your route
-            url: '@Url.Action("DeleteConfirmed")',
+            url: '@Url.Page("Delete")',
             type: 'POST',
             cache: false,
-            data: { __RequestVerificationToken: gettoken(), id: vBrID.trim() },
+            data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
             success: function (successDelete) {
                 if (successDelete) {
                     toastr.options.closeButton = false;

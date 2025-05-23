@@ -10,8 +10,10 @@ namespace NLI_POS.Models
         public int Id { get; set; }
 
         [ForeignKey("Products")]
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
+        public int ProductId { get; set; } //Main Product 
+        public string ProductIdList { get; set; } //Product Combination
+        public string ProductsDesc { get; set; }
+        public string QuantityList { get; set; }
 
         public virtual Product Products { get; set; }
     }

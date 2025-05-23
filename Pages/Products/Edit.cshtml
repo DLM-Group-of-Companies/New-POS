@@ -5,126 +5,358 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
 
-<h4>Product</h4>
+<h4>Edit Product</h4>
 <hr />
-<div class="container" style="margin-left: auto;  margin-right: auto;">
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label asp-for="Product.ProductCode" class="control-label"></label>
-                    <input asp-for="Product.ProductCode" class="form-control" />
-                    <span asp-validation-for="Product.ProductCode" class="text-danger"></span>
+
+<form method="post">
+
+    <div class="row">
+        <div class="col-md-12 p-2">
+            @* First Column - New Product *@
+
+
+            <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+            <div class="row">
+                <input asp-for="Products.Id" id="ProdMainID" type="hidden" />
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="Products.ProductCode" class="control-label"></label>
+                        <input asp-for="Products.ProductCode" class="form-control" />
+                        <span asp-validation-for="Products.ProductCode" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label asp-for="Products.ProductName" class="control-label"></label>
+                        <input asp-for="Products.ProductName" class="form-control" />
+                        <span asp-validation-for="Products.ProductName" class="text-danger small"></span>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-8">
-                <div class="form-group">
-                    <label asp-for="Product.ProductName" class="control-label"></label>
-                    <input asp-for="Product.ProductName" class="form-control" />
-                    <span asp-validation-for="Product.ProductName" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label asp-for="Products.ProductDescription" class="control-label"></label>
+                        <input asp-for="Products.ProductDescription" class="form-control" />
+                        <span asp-validation-for="Products.ProductDescription" class="text-danger small"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label asp-for="Product.ProductDescription" class="control-label"></label>
-                    <input asp-for="Product.ProductDescription" class="form-control" />
-                    <span asp-validation-for="Product.ProductDescription" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="Products.ProducTypeId" class="control-label"></label>
+                        <select asp-for="Products.ProducTypeId" class="form-control" asp-items="ViewBag.ProducTypeId">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="Products.ProducTypeId" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="Products.ProductCategory" class="control-label"></label>
+                        @* <input asp-for="Products.ProductCategory" class="form-control" /> *@
+                        <select asp-for="Products.ProductCategory" id="ProductCategory" class="form-control">
+                            <option value="">Select</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Promo">Promo</option>
+                            <option value="Freebie">Freebie</option>
+                        </select>
+                        <span asp-validation-for="Products.ProductCategory" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Products.SKU" class="control-label"></label>
+                        <input asp-for="Products.SKU" class="form-control" />
+                        <span asp-validation-for="Products.SKU" class="text-danger small"></span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="Products.UnitCost" class="control-label"></label>
+                        <input asp-for="Products.UnitCost" class="form-control" />
+                        <span asp-validation-for="Products.UnitCost" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="Products.RegPrice" class="control-label"></label>
+                        <input asp-for="Products.RegPrice" class="form-control" />
+                        <span asp-validation-for="Products.RegPrice" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="Products.MemPrice" class="control-label"></label>
+                        <input asp-for="Products.MemPrice" class="form-control" />
+                        <span asp-validation-for="Products.MemPrice" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="Products.StaffPrice" class="control-label"></label>
+                        <input asp-for="Products.StaffPrice" class="form-control" />
+                        <span asp-validation-for="Products.StaffPrice" class="text-danger small"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label asp-for="Product.ProducTypeId" class="control-label"></label>
-                    <select asp-for="Product.ProducTypeId" class="form-control" asp-items="ViewBag.ProducTypeId">
-                        <option value="">Select</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label asp-for="Product.ProductCategory" class="control-label"></label>
-                    @* <input asp-for="Product.ProductCategory" class="form-control" /> *@
-                    <select asp-for="Product.ProductCategory" class="form-control">
-                        <option value="">Select</option>
-                        <option value="Regular">Regular</option>
-                        <option value="Promo">Promo</option>
-                        <option value="Freebie">Freebie</option>
-                    </select>
-                    <span asp-validation-for="Product.ProductCategory" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="Product.SKU" class="control-label"></label>
-                    <input asp-for="Product.SKU" class="form-control" />
-                    <span asp-validation-for="Product.SKU" class="text-danger"></span>
+            <div class="col-md-2">
+                <div class="form-group form-check form-switch">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="Products.IsActive" /> Active
+                    </label>
+
                 </div>
             </div>
 
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label asp-for="Product.UnitCost" class="control-label"></label>
-                    <input asp-for="Product.UnitCost" class="form-control" />
-                    <span asp-validation-for="Product.UnitCost" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label asp-for="Product.RegPrice" class="control-label"></label>
-                    <input asp-for="Product.RegPrice" class="form-control" />
-                    <span asp-validation-for="Product.RegPrice" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label asp-for="Product.MemPrice" class="control-label"></label>
-                    <input asp-for="Product.MemPrice" class="form-control" />
-                    <span asp-validation-for="Product.MemPrice" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label asp-for="Product.StaffPrice" class="control-label"></label>
-                    <input asp-for="Product.StaffPrice" class="form-control" />
-                    <span asp-validation-for="Product.StaffPrice" class="text-danger"></span>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group form-check form-switch">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Product.IsActive" /> Active
-                </label>
+            <input asp-for="Products.EncodeDate" type="hidden" />
+            <input asp-for="Products.EncodedBy" type="hidden" />
+            <input asp-for="Products.UpdateDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
+            <input asp-for="Products.UpdateddBy" type="hidden" value="ARMAN" />
 
-            </div>
         </div>
+        <div id="comboColumn" class="col-md-5 p-2 border border-info rounded" style="display:none">
+            @*  2nd Column - Product Combination*@
+            <partial name="_ProductComboPartial" model="Model.ProductCombos"></partial>
 
-        <input asp-for="Product.EncodeDate" type="hidden"  />
-        <input asp-for="Product.EncodedBy" type="hidden" />
-        <input asp-for="Product.UpdateDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
-        <input asp-for="Product.UpdateddBy" type="hidden" value="ARMAN" />
+        </div>
 
         <div class="form-group">
             <input type="submit" value="Save" class="btn btn-primary" />
         </div>
-    </form>
-</div>
+    </div>
+
+    @Html.AntiForgeryToken()
+</form>
 
 
 <div>
-    <a asp-page="./Index">Back to List</a>
+    <a asp-page="Index">Back to List</a>
 </div>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myListModal">
+    Launch static backdrop modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="myListModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="myListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myListModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method='post' asp-page-handler='AddRow'>
+                <div class="modal-body">
+
+                    <div class="p-2">
+                        Product Combination
+                    </div>
+                    <div class="p-2">
+                        <button id="btnAdd" type="button" class="btn btn-info">Add Product <i class="fas fa-plus-circle"></i></button>
+                    </div>
+                    <div class="row bg-secondary text-white">
+                        <div class="col-8 col-md-8 p-2 border">Product</div>
+                        <div class="col-2 col-md-2 p-2 border">Quantity</div>
+                        <div class="col-2 col-md-2 p-2 border text-center"><i class="fas fa-grip-horizontal"></i></div>
+                        
+                    </div>
+
+                    <div id="newRow">
+                        <input type="hidden" id="encodedList" value="0" />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button> @* //onclick="saveListData()" *@
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        let myList = []; // Your list data in the modal
+        let ProductComboList = [];
+        let itemCount = 0;
+        var combText="";
+
+        $(function () {
+            $("#btnAdd").click(function () {
+                //using JQuery ajax to call the handler method and get the select list options.
+                var rowCount = parseInt($("#encodedList").val());
+                itemCount++;
+                rowCount++;  
+                var mainID = document.getElementById('ProdMainID').value;
+                //alert(mainID);
+                $("#encodedList").val(rowCount);
+                $.ajax({
+                    type: "GET",
+                    url: "?handler=ProductList",
+                    success: function (data) {
+                        //add new select element:
+                        var newselect = "";
+
+                        newitem += "<input type='hidden' id='ProductComboList[" + (rowCount) + "][0]' asp-for='ProductComboList[" + (rowCount) + "][0]' name='ProductComboList[" + (rowCount) + "][0]' value='" + mainID + "' > ";
+                        newselect += "<select id='ProductComboList[" + (rowCount) + "][1]' asp-for='ProductComboList[" + (rowCount) + "][1]' name='ProductComboList[" + (rowCount) + "][1]' class='form-control'  >"
+                        $.each(data, function (i, item) {
+                            newselect += `<option value="${item.value}">${item.text}</option>`;
+                        });
+                        newselect += "</select>";
+                        //generate the new form group
+                        var newitem = "";   
+                        newitem += '<div class="row p-1" id="inputRow">';
+                        newitem += '<div class="col-8 " >';
+                        newitem += "<div class='form-group'> " + newselect;
+                        newitem += '</div>';
+                        newitem += '</div>';
+                        newitem += '<div class="col-2 " >';
+                        newitem += "<input type='number' id='ProductComboList[" + (rowCount) + "][2]' asp-for='ProductComboList[" + (rowCount) + "][2]' name='ProductComboList[" + (rowCount) + "][2]' class='form-control'> </div>";
+                        newitem += '<div class="col-1 text-center" >';
+                        newitem += '<button id="removeRow" type="button" class="btn btn-danger btn-sm"><i class="fas fa-minus-circle"></i></button>';
+                        newitem += '</div>';
+                        newitem += '<div class="col-1 text-center" >';
+                        newitem += '<button id="addRow" type="button" onclick="getSelText(' + (rowCount) + ')" class="btn btn-success btn-sm" ><i class="fas fa-check"></i></button>';
+                        // newitem += '<input asp-for="CombDesc[' + (rowCount) + '] = '" type="hidden" value="ProductCombos[' + (rowCount) + '].ProductId" />';
+                        newitem += '</div>';
+                        newitem += '</div>';
+
+                        //append the new elements to the main form.
+                        $("#newRow").append(newitem);
+
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+
+        $(document).on('click', '#removeRow', function () {
+            var rowCount = parseInt($("#encodedList").val());
+            rowCount--;
+            $("#encodedList").val(rowCount);
+            $(this).closest('#inputRow').remove();
+        });
+
+        // Show/Hide Combo Column
+        $(document).ready(function () {
+
+            var fieldValue = $('#ProductCategory').val();
+            if (fieldValue == 'Promo')
+            //.....................^.......
+            {
+                $("#comboColumn").slideDown(500);
+                $('.col-md-12').removeClass('col-md-12').addClass('col-md-7');
+
+
+            }
+            else {
+                $("#comboColumn").hide();
+                $('.col-md-7').removeClass('col-md-7').addClass('col-md-12');
+            }
+
+            $('#ProductCategory').on('change', function () {
+                if (this.value == 'Promo')
+                //.....................^.......
+                {
+                    $("#comboColumn").slideDown(500);
+                    $('.col-md-12').removeClass('col-md-12').addClass('col-md-7');
+
+
+                }
+                else {
+                    $("#comboColumn").hide();
+                    $('.col-md-7').removeClass('col-md-7').addClass('col-md-12');
+                }
+            });
+        });
+
+        function saveListData() {
+
+            $('#myListModal').modal('hide');
+            displayListInParent(myList);
+        }
+
+        function displayListInParent(list) {
+            const myModelData = JsonSerializer.Serialize(Model);
+            console.log(myModelData);
+
+            displayDiv.innerHTML = '<strong>List Values:</strong><br>';
+            if (list && list.length > 0) {
+                list.forEach(item => {
+                    displayDiv.innerHTML += `- ${item}<br>`;
+                });
+            } else {
+                displayDiv.innerHTML += 'No list data.';
+            }
+        }
+
+        async function sendData(indx) {
+            // alert(indx);
+            //document.getElementById("ProductCombos[" + indx + "].ProductId").value = "Value from JavaScript";
+            //var pId = getElementById("ProductCombos[" + indx + "].ProductId").value;
+            //var pQty = getElementById("ProductCombos[" + indx + "].Quantity").value;
+            //data = { pId, pQty };
+
+            const response = await fetch("/Edit?handler=SendData", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": gettoken()
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            console.log(result);
+        }
+
+        function gettoken() {
+            var token = '@Html.AntiForgeryToken()';
+            token = $(token).val();
+            return token;
+        }
+
+        function getSelText(idx) {
+            //alert(idx);            
+            //alert(mainID);
+            var Qty = document.getElementById("ProductComboList[" + idx + "][2]").value;
+            var dropdownText = document.getElementById("ProductComboList[" + idx + "][1]");
+            //var selectedQty = dropdownQty.options[dropdownQty.selectedIndex].text;
+            var selectedText = dropdownText.options[dropdownText.selectedIndex].text;
+            if(combText==""){
+                combText += Qty + ' ' + selectedText;
+            }
+            else
+            {
+                combText += ', ' + Qty + ' ' + selectedText;
+            }
+             
+            // Get the selected text of the dropdown
+            //var selectedText = $("#ProductCombos[" + (idx) + "].ProductId option:selected").text();
+            // Set the input field value to the selected text
+            alert(combText);
+            const button1 = document.getElementById('addRow');
+            if (button1) {
+                button1.remove();
+            }
+            // $('#CombDesc').val(selectedText);
+        };
+        //rowCount++;
+    </script>
 }
+

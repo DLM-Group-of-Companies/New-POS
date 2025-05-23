@@ -7,23 +7,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
-using AspNetCoreHero.ToastNotification.Abstractions;
 
-namespace NLI_POS.Pages.Products
+namespace NLI_POS.Pages.Orders
 {
     public class DeleteModel : PageModel
     {
         private readonly NLI_POS.Data.ApplicationDbContext _context;
-        private readonly INotyfService _toastNotification;
 
-        public DeleteModel(NLI_POS.Data.ApplicationDbContext context, INotyfService toastNotification)
+        public DeleteModel(NLI_POS.Data.ApplicationDbContext context)
         {
             _context = context;
-            _toastNotification = toastNotification; 
         }
 
         [BindProperty]
-        public Product Products { get; set; } = default!;
+        public Order Order { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -32,15 +29,15 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var product = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
+            var order = await _context.Orders.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (product == null)
+            if (order == null)
             {
                 return NotFound();
             }
             else
             {
-                Products = product;
+                Order = order;
             }
             return Page();
         }
@@ -52,14 +49,14 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
+            var order = await _context.Orders.FindAsync(id);
+            if (order != null)
             {
-                Products = product;
-                _context.Products.Remove(Products);
+                Order = order;
+                _context.Orders.Remove(Order);
                 await _context.SaveChangesAsync();
             }
-            _toastNotification.Success("Product has been deleted.",3);
+
             return RedirectToPage("./Index");
         }
     }

@@ -6,10 +6,15 @@
     <title>@ViewData["Title"] - NLI_POS</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/NLI_POS.styles.css" asp-append-version="true" />
+    @* <link rel="stylesheet" href="~/NLI_POS.styles.css" asp-append-version="true" /> *@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://kit.fontawesome.com/cc42349d53.js" crossorigin="anonymous"></script>
+
+    <!-- Toastr -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
 </head>
 <body>
     <header>
@@ -32,7 +37,7 @@
                     <partial name="_LoginPartial" />
                 </div>
             </div>
-        </nav>
+        </nav>\
     </header>
     <div class="container">
         <main role="main" class="pb-3">
@@ -76,5 +81,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    @await Component.InvokeAsync("Notyf")
 </body>
 </html>

@@ -1,0 +1,101 @@
+﻿@page
+@model NLI_POS.Pages.Products.TestModel
+@{
+}
+<div class="modal fade" id="myListModal" tabindex="-1" role="dialog" aria-labelledby="myListModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myListModalLabel">Edit List Items</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="listItemsContainer">
+                </div>
+                <button type="button" class="btn btn-success" onclick="addListItem()">Add Item</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveListData()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="encodedList" asp-for="EncodedList" />
+
+<div id="displayedList"></div>
+
+@section Scripts {
+    <script>
+        let myList = []; // Your list data in the modal
+
+        function addListItem() {
+            const newItem = prompt("Enter new item:");
+            if (newItem) {
+                myList.push(newItem);
+                displayListInModal();
+            }
+        }
+
+        function displayListInModal() {
+            const container = document.getElementById('listItemsContainer');
+            container.innerHTML = '';
+            myList.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.textContent = `${index + 1}. ${item} `;
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('btn', 'btn-danger', 'btn-sm', 'ml-2');
+                deleteButton.onclick = () => {
+                    myList.splice(index, 1);
+                    displayListInModal();
+                };
+                itemDiv.appendChild(deleteButton);
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function saveListData() {
+            const encoded = JSON.stringify(myList);
+            document.getElementById('encodedList').value = encoded;
+            $('#myListModal').modal('hide');
+            displayListInParent(myList);
+        }
+
+        function displayListInParent(list) {
+            const displayDiv = document.getElementById('displayedList');
+            displayDiv.innerHTML = '<strong>List Values:</strong><br>';
+            if (list && list.length > 0) {
+                list.forEach(item => {
+                    displayDiv.innerHTML += `- ${item}<br>`;
+                });
+            } else {
+                displayDiv.innerHTML += 'No list data.';
+            }
+        }
+
+        $('#myListModal').on('show.bs.modal', function (event) {
+            const initialEncodedList = document.getElementById('encodedList').value;
+            if (initialEncodedList) {
+                myList = JSON.parse(initialEncodedList);
+                displayListInModal();
+            } else {
+                myList = [];
+                displayListInModal();
+            }
+        });
+
+        $('#myListModal').on('hidden.bs.modal', function (event) {
+            // The 'encodedList' value is now set.
+        });
+
+        document.getElementById('openListModalButton').addEventListener('click', function() {
+            $('#myListModal').modal('show');
+        });
+    </script>
+}
+
+<button type="button" class="btn btn-primary" id="openListModalButton">Edit List</button>

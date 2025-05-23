@@ -1,0 +1,168 @@
+﻿@page
+@model NLI_POS.Pages.Orders.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4>New Order</h4>
+<hr />
+<div class="container bg-light p-3 rounded border">
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <input type="hidden" asp-for="Order.OrderNo" />
+            <div class="col-lg-6 col-md-4 col-sm-12 col-12 form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Order.CustomerId" class="control-label"></label>
+                <select asp-for="Order.CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-12 form-group">
+                <label asp-for="Order.OfficeId" class="control-label"></label>
+                <select asp-for="Order.OfficeId" class="form-control" asp-items="ViewBag.OfficeId"></select>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12 col-12  form-group">
+                <label asp-for="Order.OrderDate" class="control-label"></label>
+                <input asp-for="Order.OrderDate" class="form-control" value="@DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="Order.OrderDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Order.OrderType" class="control-label"></label>
+                <select asp-for="Order.OrderType" class="form-control">
+                    <option value="">-- Select --</option>
+                    <option value="Member">Member</option>
+                    <option value="Non-Member">Non-Member</option>
+                    <option value="Staff">Staff</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.ItemNo" class="control-label"></label>
+                <input asp-for="Order.ItemNo" class="form-control" />
+                <span asp-validation-for="Order.ItemNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.ProductCategory" class="control-label"></label>
+                @* <input asp-for="Products.ProductCategory" class="form-control" /> *@
+                <select asp-for="Order.ProductCategory" id="ProductCategory" class="form-control">
+                    <option value="">Select</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Promo">Promo</option>
+                    <option value="Freebie">Freebie</option>
+                </select>
+                <span asp-validation-for="Order.ProductCategory" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.ProductId" class="control-label"></label>
+                <select id="ProductId" asp-for="Order.ProductId" class="form-control" asp-items="ViewBag.ProductId">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.Qty" class="control-label"></label>
+                <input id="Qty" asp-for="Order.Qty" class="form-control" />
+                <span asp-validation-for="Order.Qty" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.Amount" class="control-label"></label>
+                <input id="Amount" asp-for="Order.Amount" asp-format="{0:C2}" class="form-control" />
+                <span asp-validation-for="Order.Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.EncodeDate" class="control-label"></label>
+                <input asp-for="Order.EncodeDate" class="form-control" />
+                <span asp-validation-for="Order.EncodeDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.EncodedBy" class="control-label"></label>
+                <input asp-for="Order.EncodedBy" class="form-control" />
+                <span asp-validation-for="Order.EncodedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.UpdateDate" class="control-label"></label>
+                <input asp-for="Order.UpdateDate" class="form-control" />
+                <span asp-validation-for="Order.UpdateDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order.UpdateddBy" class="control-label"></label>
+                <input asp-for="Order.UpdateddBy" class="form-control" />
+                <span asp-validation-for="Order.UpdateddBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+        @Html.AntiForgeryToken()
+    </form>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        var amount = 0;
+        $(document).ready(function () {
+            $('#ProductId').change(function () {
+                var selectedProductId = $(this).val();
+                //alert(selectedProductId);
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "?handler=GetProducAmount",
+                    data: { __RequestVerificationToken: gettoken(), id: selectedProductId },
+                    dataType: 'json',
+                    // contentType: "application/json; charset=utf-8",
+                    // dataType: "html",
+                    success: function (response) {
+                        amount = response;
+                        var tot = $("#Qty").val() * amount;
+                        $("#Amount").val(tot);
+                    },
+                    failure: function (response) {
+                        alert('failure:' + response.responseText);
+                    },
+                    error: function (response) {
+                        $("#partialModal").find(".modal-body").html(response);
+                        // alert('error:' + response.responseText);
+                        alert('Error encountered. This record may already have been deleted.');
+                    }
+                });
+            });
+        });
+
+        // Get Token for authorization
+        function gettoken() {
+            var token = '@Html.AntiForgeryToken()';
+            token = $(token).val();
+            return token;
+        }
+
+        //Calcualte on input of quantity
+        $(document).ready(function () {
+            $("#Qty").on("input", function () {
+                var tot = $(this).val() * amount;
+                $("#Amount").val(tot);
+            });
+        });
+
+        $(function () {
+            $("#ProductCategory").on("change", function () {
+                var category = $(this).val();
+                $("#ProductId").empty();
+                $("#ProductId").append("<option value=''>Select</option>");
+                $.getJSON(`?handler=ProductList&ProdCat=${category}`, (data) => {
+                    $.each(data, function (i, item) {
+                        $("#ProductId").append(`<option value="${data[i].value}">${data[i].text}</option>`);
+                    });
+                });
+            });
+        });
+    </script>
+}

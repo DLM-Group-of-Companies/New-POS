@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 
-namespace NLI_POS.Pages.Products
+namespace NLI_POS.Pages.ProductCombos
 {
     public class DetailsModel : PageModel
     {
@@ -19,7 +19,7 @@ namespace NLI_POS.Pages.Products
             _context = context;
         }
 
-        public Product Products { get; set; } = default!;
+        public ProductCombo ProductCombo { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,14 +28,14 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            var product = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
+            var productcombo = await _context.ProductCombos.FirstOrDefaultAsync(m => m.Id == id);
+            if (productcombo == null)
             {
                 return NotFound();
             }
             else
             {
-                Products = product;
+                ProductCombo = productcombo;
             }
             return Page();
         }

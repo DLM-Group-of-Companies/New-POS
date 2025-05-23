@@ -19,15 +19,20 @@ namespace NLI_POS.Pages.Products
             _context = context;
         }
 
-        public ProductCombo ProductCombo { get; set; }
+        [BindProperty]
+        public Product Products { get; set; } = default!;
 
         [BindProperty]
-        public ProductCombo Product { get; set; }
+        public IList<ProductCombo> ProductCombos { get; set; }
 
-        public IActionResult OnGet()
+        //To Display existing combos
+        public ProductCombo ProductCombs { get; set; }
+
+        public IActionResult OnGet(int? Id)
         {
             ViewData["ProducTypeId"] = new SelectList(_context.ProductTypes, "Id", "Name");
-            ViewData["Product"] = new SelectList(_context.Products, "Id", "ProductName");
+            ViewData["Product"] = new SelectList(_context.Products.OrderBy(p=>p.ProductName), "Id", "ProductName");
+            ProductCombos = _context.ProductCombos.Where(p => p.ProductId == Id).ToList();
             return Page();
         }
 
@@ -50,21 +55,53 @@ namespace NLI_POS.Pages.Products
             return new JsonResult(GetProductList());
         }
 
-        [BindProperty]
-        public Product Product { get; set; } = default!;
+        public JsonResult OnPostSendData(List<ProductCombo> data)
+        {
+            // Process the data
+            return new JsonResult(new { success = true, received = data });
+        }
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            int arrayCount = ProductCombos.Count;
+            for(int i = 0; i < arrayCount; i++)
+            {
+                ModelState.Remove("ProductCombos[" + i + "].Products");                
+            }
+
+            ModelState.Remove("Products.ProductTypes");
+
+            
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            _context.Products.Add(Product);
+            
+            _context.Products.Add(Products);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            var lastId = Products.Id;
+
+            for(int j=0;j< arrayCount; j++)
+            {
+                ProductCombos[j].ProductId = lastId;
+            }
+            
+
+            _context.ProductCombos.AddRange(ProductCombos);
+            await _context.SaveChangesAsync();
+
+            if (Products.ProductCategory == "Promo")
+            {
+                return RedirectToPage("./Edit", new { id = Products.Id });
+            }
+            else
+            {
+                return RedirectToPage("./Index");
+            }
+           
         }
     }
 }

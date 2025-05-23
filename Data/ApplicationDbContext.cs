@@ -18,5 +18,7 @@ namespace NLI_POS.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<InventoryStock> InventoryStocks { get; set; }
         public DbSet<InventoryStockAuditTrail> InventoryStockAuditTrails { get; set; }
+        public DbSet<ProductCombo> ProductCombos { get; set; }
+        public DbSet<Order> Orders { get; set; }
     }
 }

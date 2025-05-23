@@ -12,99 +12,99 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.ProductCode)
+            @Html.DisplayNameFor(model => model.Products.ProductCode)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.ProductCode)
+            @Html.DisplayFor(model => model.Products.ProductCode)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.ProductName)
+            @Html.DisplayNameFor(model => model.Products.ProductName)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.ProductName)
+            @Html.DisplayFor(model => model.Products.ProductName)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.ProductDescription)
+            @Html.DisplayNameFor(model => model.Products.ProductDescription)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.ProductDescription)
+            @Html.DisplayFor(model => model.Products.ProductDescription)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.ProductCategory)
+            @Html.DisplayNameFor(model => model.Products.ProductCategory)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.ProductCategory)
+            @Html.DisplayFor(model => model.Products.ProductCategory)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.SKU)
+            @Html.DisplayNameFor(model => model.Products.SKU)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.SKU)
+            @Html.DisplayFor(model => model.Products.SKU)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.UnitCost)
+            @Html.DisplayNameFor(model => model.Products.UnitCost)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.UnitCost)
+            @Html.DisplayFor(model => model.Products.UnitCost)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.RegPrice)
+            @Html.DisplayNameFor(model => model.Products.RegPrice)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.RegPrice)
+            @Html.DisplayFor(model => model.Products.RegPrice)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.MemPrice)
+            @Html.DisplayNameFor(model => model.Products.MemPrice)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.MemPrice)
+            @Html.DisplayFor(model => model.Products.MemPrice)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.StaffPrice)
+            @Html.DisplayNameFor(model => model.Products.StaffPrice)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.StaffPrice)
+            @Html.DisplayFor(model => model.Products.StaffPrice)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.IsActive)
+            @Html.DisplayNameFor(model => model.Products.IsActive)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.IsActive)
+            @Html.DisplayFor(model => model.Products.IsActive)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.EncodeDate)
+            @Html.DisplayNameFor(model => model.Products.EncodeDate)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.EncodeDate)
+            @Html.DisplayFor(model => model.Products.EncodeDate)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.EncodedBy)
+            @Html.DisplayNameFor(model => model.Products.EncodedBy)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.EncodedBy)
+            @Html.DisplayFor(model => model.Products.EncodedBy)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.UpdateDate)
+            @Html.DisplayNameFor(model => model.Products.UpdateDate)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.UpdateDate)
+            @Html.DisplayFor(model => model.Products.UpdateDate)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.UpdateddBy)
+            @Html.DisplayNameFor(model => model.Products.UpdateddBy)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.UpdateddBy)
+            @Html.DisplayFor(model => model.Products.UpdateddBy)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Product.ProductTypes)
+            @Html.DisplayNameFor(model => model.Products.ProductTypes)
         </dt>
         <dd class="col-sm-6">
-            @Html.DisplayFor(model => model.Product.ProductTypes.Name)
+            @Html.DisplayFor(model => model.Products.ProductTypes.Name)
         </dd>
     </dl>
     
     <form method="post">
-        <input type="hidden" asp-for="Product.Id" />
+        <input type="hidden" asp-for="Products.Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-page="./Index">Back to List</a>
     </form>

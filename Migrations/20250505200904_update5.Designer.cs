@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NLI_POS.Data;
 
@@ -10,9 +11,11 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505200904_update5")]
+    partial class update5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -488,70 +491,6 @@ namespace NLI_POS.Migrations
                     b.ToTable("OfficeCountry");
                 });
 
-            modelBuilder.Entity("NLI_POS.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EncodeDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("EncodedBy")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("ItemNo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OfficeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("OrderNo")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("OrderType")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ProductCategory")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Qty")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("UpdateddBy")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("OfficeId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Orders");
-                });
-
             modelBuilder.Entity("NLI_POS.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -626,22 +565,18 @@ namespace NLI_POS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("MainProductId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ProductIdList")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ProductsDesc")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("QuantityList")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MainProductId");
 
                     b.HasIndex("ProductId");
 
@@ -804,33 +739,6 @@ namespace NLI_POS.Migrations
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("NLI_POS.Models.Order", b =>
-                {
-                    b.HasOne("NLI_POS.Models.Customer", "Customers")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NLI_POS.Models.OfficeCountry", "Office")
-                        .WithMany()
-                        .HasForeignKey("OfficeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NLI_POS.Models.Product", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customers");
-
-                    b.Navigation("Office");
-
-                    b.Navigation("Products");
-                });
-
             modelBuilder.Entity("NLI_POS.Models.Product", b =>
                 {
                     b.HasOne("NLI_POS.Models.ProductType", "ProductTypes")
@@ -844,11 +752,19 @@ namespace NLI_POS.Migrations
 
             modelBuilder.Entity("NLI_POS.Models.ProductCombo", b =>
                 {
+                    b.HasOne("NLI_POS.Models.Product", "MainProduct")
+                        .WithMany()
+                        .HasForeignKey("MainProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("NLI_POS.Models.Product", "Products")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MainProduct");
 
                     b.Navigation("Products");
                 });
