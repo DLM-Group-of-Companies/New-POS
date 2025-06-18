@@ -9,7 +9,7 @@
 <h4>Edit Product</h4>
 <hr />
 
-<form method="post">
+<form method="post" id="form">
 
     <div class="row">
         <div class="col-md-12 p-2">
@@ -139,11 +139,6 @@
     <a asp-page="Index">Back to List</a>
 </div>
 
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myListModal">
-    Launch static backdrop modal
-</button>
-
 <!-- Modal -->
 <div class="modal fade" id="myListModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="myListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -175,7 +170,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button> @* //onclick="saveListData()" *@
+                    <button type="button" id="btnSaveCombo" class="btn btn-primary">Save Changes</button> @* //onclick="saveListData()" *@
                 </div>
             </form>
         </div>
@@ -193,63 +188,174 @@
         let ProductComboList = [];
         let itemCount = 0;
         var combText="";
+        var newitem = "";
+        // $(function () {
+        //     $("#btnAdd").click(function () {
+        //         //using JQuery ajax to call the handler method and get the select list options.
+        //         var rowCount = parseInt($("#encodedList").val());
+        //         itemCount++;
+        //         rowCount++;  
+        //         var mainID = document.getElementById('ProdMainID').value;
+        //         //alert(mainID);
+        //         $("#encodedList").val(rowCount);
+        //         $.ajax({
+        //             type: "GET",
+        //             url: "?handler=ProductList",
+        //             success: function (data) {
+        //                 //add new select element:
+        //                 var newselect = "";
+                        
+        //                 newselect += "<select id='ProductComboList[" + (rowCount) + "][1]' asp-for='ProductComboList[" + (rowCount) + "][1]' name='ProductComboList[" + (rowCount) + "][1]' class='form-control'  >"
+        //                 $.each(data, function (i, item) {
+        //                     newselect += `<option value="${item.value}">${item.text}</option>`;
+        //                 });
+        //                 newselect += "</select>";
+        //                 //generate the new form group
+        //                 var newitem = "";
+        //                 newitem += '<div class="row p-1 inputRow" >';
+        //                 newitem += '<div class="col-8 " >';
+        //                 newitem += "<div class='form-group'> " + newselect;
+        //                 newitem += '</div>';
+        //                 newitem += '</div>';
+        //                 newitem += '<div class="col-2 " >';
+        //                 newitem += "<input type='hidden' id='ProductComboList[" + (rowCount) + "][0]' asp-for='ProductComboList[" + (rowCount) + "][0]' name='ProductComboList[" + (rowCount) + "][0]' value='" + mainID + "' > ";
+        //                 newitem += "<input type='number' id='ProductComboList[" + (rowCount) + "][2]' asp-for='ProductComboList[" + (rowCount) + "][2]' name='ProductComboList[" + (rowCount) + "][2]' class='form-control'> </div>";
+        //                 newitem += '<div class="col-1 text-center" >';
+        //                 newitem += '<button type="button" class="removeRow btn btn-danger btn-sm"><i class="fas fa-minus-circle"></i></button>';
+        //                 newitem += '</div>';
+        //                 newitem += '<div class="col-1 text-center" >';
+        //                 newitem += '<button id="addRow" type="button" onclick="getSelText(' + (rowCount) + ')" class="btn btn-success btn-sm" ><i class="fas fa-plus-circle"></i></button>';
+        //                 newitem += "<input type='hidden' id='ProductComboList[" + (rowCount) + "][3]' asp-for='ProductComboList[" + (rowCount) + "][3]' name='ProductComboList[" + (rowCount) + "][3]'  > ";
+        //                 // newitem += '<input asp-for="CombDesc[' + (rowCount) + '] = '" type="hidden" value="ProductCombos[' + (rowCount) + '].ProductId" />';
+        //                 newitem += '</div>';
+        //                 newitem += '</div>';
 
+        //                 //append the new elements to the main form.
+        //                 $("#newRow").append(newitem);
+
+        //             },
+        //             error: function (response) {
+        //                 alert(response.responseText);
+        //             }
+        //         });
+        //     });
+        // });
+
+        //let itemCount = 0;
+
+        function addProductComboRow() {
+            let rowCount = parseInt($("#encodedList").val());
+            itemCount++;
+            rowCount++;
+            let mainID = document.getElementById('ProdMainID').value;
+
+            $("#encodedList").val(rowCount);
+
+            $.ajax({
+                type: "GET",
+                url: "?handler=ProductList",
+                success: function (data) {
+                    let newselect = `<select id='ProductComboList[${rowCount}][1]'
+                                             asp-for='ProductComboList[${rowCount}][1]'
+                                             name='ProductComboList[${rowCount}][1]'
+                                             class='form-control'>`;
+
+                    $.each(data, function (i, item) {
+                        newselect += `<option value="${item.value}">${item.text}</option>`;
+                    });
+
+                    newselect += "</select>";
+
+                    let newitem = `
+                        <div class="row p-1 inputRow">
+                            <div class="col-8">
+                                <div class="form-group">${newselect}</div>
+                            </div>
+                            <div class="col-2">
+                                <input type="hidden" id="ProductComboList[${rowCount}][0]"
+                                       asp-for="ProductComboList[${rowCount}][0]"
+                                       name="ProductComboList[${rowCount}][0]"
+                                       value="${mainID}">
+                                <input type="number" id="ProductComboList[${rowCount}][2]"
+                                       asp-for="ProductComboList[${rowCount}][2]"
+                                       name="ProductComboList[${rowCount}][2]"
+                                       class="form-control">
+                            </div>
+                            <div class="col-1 text-center">
+                                <button type="button" class="removeRow btn btn-danger btn-sm">
+                                    <i class="fas fa-minus-circle"></i>
+                                </button>
+                            </div>
+                            <div class="col-1 text-center">
+                                        <button id="addRow" type="button" onclick="getSelText(${rowCount});addProductComboRow()"
+                                        class="btn btn-success btn-sm">
+                                    <i class="fas fa-plus-circle"></i>
+                                </button>
+                                <input type="hidden" id="ProductComboList[${rowCount}][3]"
+                                       asp-for="ProductComboList[${rowCount}][3]"
+                                       name="ProductComboList[${rowCount}][3]">
+                            </div>
+                        </div>`;
+
+                    $("#newRow").append(newitem);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        }
+
+        // Attach it on page load
         $(function () {
-            $("#btnAdd").click(function () {
-                //using JQuery ajax to call the handler method and get the select list options.
-                var rowCount = parseInt($("#encodedList").val());
-                itemCount++;
-                rowCount++;  
-                var mainID = document.getElementById('ProdMainID').value;
-                //alert(mainID);
-                $("#encodedList").val(rowCount);
-                $.ajax({
-                    type: "GET",
-                    url: "?handler=ProductList",
-                    success: function (data) {
-                        //add new select element:
-                        var newselect = "";
+            $("#btnAdd").click(addProductComboRow);
+            //$("#addRow").click(addProductComboRow);
+        });
 
-                        newitem += "<input type='hidden' id='ProductComboList[" + (rowCount) + "][0]' asp-for='ProductComboList[" + (rowCount) + "][0]' name='ProductComboList[" + (rowCount) + "][0]' value='" + mainID + "' > ";
-                        newselect += "<select id='ProductComboList[" + (rowCount) + "][1]' asp-for='ProductComboList[" + (rowCount) + "][1]' name='ProductComboList[" + (rowCount) + "][1]' class='form-control'  >"
-                        $.each(data, function (i, item) {
-                            newselect += `<option value="${item.value}">${item.text}</option>`;
-                        });
-                        newselect += "</select>";
-                        //generate the new form group
-                        var newitem = "";   
-                        newitem += '<div class="row p-1" id="inputRow">';
-                        newitem += '<div class="col-8 " >';
-                        newitem += "<div class='form-group'> " + newselect;
-                        newitem += '</div>';
-                        newitem += '</div>';
-                        newitem += '<div class="col-2 " >';
-                        newitem += "<input type='number' id='ProductComboList[" + (rowCount) + "][2]' asp-for='ProductComboList[" + (rowCount) + "][2]' name='ProductComboList[" + (rowCount) + "][2]' class='form-control'> </div>";
-                        newitem += '<div class="col-1 text-center" >';
-                        newitem += '<button id="removeRow" type="button" class="btn btn-danger btn-sm"><i class="fas fa-minus-circle"></i></button>';
-                        newitem += '</div>';
-                        newitem += '<div class="col-1 text-center" >';
-                        newitem += '<button id="addRow" type="button" onclick="getSelText(' + (rowCount) + ')" class="btn btn-success btn-sm" ><i class="fas fa-check"></i></button>';
-                        // newitem += '<input asp-for="CombDesc[' + (rowCount) + '] = '" type="hidden" value="ProductCombos[' + (rowCount) + '].ProductId" />';
-                        newitem += '</div>';
-                        newitem += '</div>';
+        /*Save Combo*/
+        $("#btnSaveCombo").click(function () {
+            //alert('save');
+            ProductComboList = []; // reset before collecting
 
-                        //append the new elements to the main form.
-                        $("#newRow").append(newitem);
+            $("#newRow .row").each(function (index) {
+                const productId = $(this).find("select").val();
+                const quantity = $(this).find("input[type='number']").val();
+                const mainId = $(this).find("input[type='hidden']").eq(0).val();
+                var combDesc = $(this).find("input[type='hidden']").eq(1).val();
+                ProductComboList.push([mainId, productId, quantity, combDesc]);
+            });
 
-                    },
-                    error: function (response) {
-                        alert(response.responseText);
+            $.ajax({    
+                type: "POST",
+                url: "?handler=AddRow",
+                data: JSON.stringify(ProductComboList),
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    'RequestVerificationToken': gettoken() // <- required for ASP.NET Core
+                },
+                success: function (response) {
+                    if (response) {
+                        toastr.options.closeButton = false;
+                        toastr.options.timeOut = 800;
+                        toastr.options.fadeOut = 1000;
+                        toastr.options.onHidden = function () { selRow.remove(); }
+                        toastr.success('Combination successfully added!');
+                        $("#myListModal").modal('hide');
+                        window.location.reload();
                     }
-                });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    // Handle errors
+                    console.log(errorThrown);
+                    alert('error:' + textStatus);
+                }
             });
         });
 
-        $(document).on('click', '#removeRow', function () {
+        $(document).on('click', '.removeRow', function () {
             var rowCount = parseInt($("#encodedList").val());
             rowCount--;
             $("#encodedList").val(rowCount);
-            $(this).closest('#inputRow').remove();
+            $(this).closest('.inputRow').remove();
         });
 
         // Show/Hide Combo Column
@@ -261,8 +367,6 @@
             {
                 $("#comboColumn").slideDown(500);
                 $('.col-md-12').removeClass('col-md-12').addClass('col-md-7');
-
-
             }
             else {
                 $("#comboColumn").hide();
@@ -275,8 +379,6 @@
                 {
                     $("#comboColumn").slideDown(500);
                     $('.col-md-12').removeClass('col-md-12').addClass('col-md-7');
-
-
                 }
                 else {
                     $("#comboColumn").hide();
@@ -305,14 +407,14 @@
             }
         }
 
-        async function sendData(indx) {
-            // alert(indx);
+        async function sendData() {
+           // alert(indx);
             //document.getElementById("ProductCombos[" + indx + "].ProductId").value = "Value from JavaScript";
             //var pId = getElementById("ProductCombos[" + indx + "].ProductId").value;
             //var pQty = getElementById("ProductCombos[" + indx + "].Quantity").value;
             //data = { pId, pQty };
 
-            const response = await fetch("/Edit?handler=SendData", {
+            const response = await fetch("Edit?handler=SendData", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -338,23 +440,38 @@
             var dropdownText = document.getElementById("ProductComboList[" + idx + "][1]");
             //var selectedQty = dropdownQty.options[dropdownQty.selectedIndex].text;
             var selectedText = dropdownText.options[dropdownText.selectedIndex].text;
-            if(combText==""){
-                combText += Qty + ' ' + selectedText;
-            }
-            else
-            {
-                combText += ', ' + Qty + ' ' + selectedText;
-            }
-             
+            //if(combText==""){
+                //combText += Qty + ' ' + selectedText;
+                combText = Qty + ' ' + selectedText;
+                document.getElementById("ProductComboList[" + idx + "][3]").value = combText;
+            //}
+            //else
+            //{
+            //    combText += ', ' + Qty + ' ' + selectedText;
+            //}             
+            
             // Get the selected text of the dropdown
             //var selectedText = $("#ProductCombos[" + (idx) + "].ProductId option:selected").text();
             // Set the input field value to the selected text
-            alert(combText);
+
+            // ProductComboList = []; // reset before collecting
+
+            // $("#newRow .row").each(function (index) {
+            //     const productId = $(this).find("select").val();
+            //     const quantity = $(this).find("input[type='number']").val();
+            //     const mainId = $(this).find("input[type='hidden']").val();
+
+            //     ProductComboList.push([mainId, productId, quantity]);
+            // });
+
+            //alert(combText);
             const button1 = document.getElementById('addRow');
             if (button1) {
                 button1.remove();
             }
             // $('#CombDesc').val(selectedText);
+            
+            return combText;
         };
         //rowCount++;
     </script>

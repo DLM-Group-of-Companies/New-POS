@@ -36,6 +36,10 @@ namespace NLI_POS.Models
         [Display(Name = "Product")]
         public int ProductId { get; set; }
 
+        [ForeignKey("ProductCombos")]
+        [Display(Name = "Product Combination")]
+        public int ComboId { get; set; }
+
         [Display(Name = "Quantity")]
         public int Qty { get; set; }
 
@@ -47,6 +51,7 @@ namespace NLI_POS.Models
         public string? UpdateddBy { get; set; }
 
         public virtual Product Products { get; set; }
+        public virtual ProductCombo ProductCombos { get; set; }
         public virtual Customer Customers { get; set; }
         public virtual OfficeCountry Office { get; set; }
 

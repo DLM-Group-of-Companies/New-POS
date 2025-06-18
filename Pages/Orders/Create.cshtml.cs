@@ -34,7 +34,21 @@ namespace NLI_POS.Pages.Orders
             ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
             ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
+            //ViewData["ProductCombos"] = new SelectList(_context.ProductCombos, "Id", "ProductsDesc");
             return Page();
+        }
+
+        public IActionResult OnGetCustomers()
+        {
+
+            List<SelectListItem> SectionList = (from c in _context.Customer
+                                                select new SelectListItem
+                                                {
+                                                    Text = c.CustCode + " | " + c.FirstName + " " + c.LastName,
+                                                    Value = c.Id.ToString()
+                                                }).ToList();
+  
+            return new JsonResult(SectionList);
         }
 
         public IActionResult OnGetProductList(string ProdCat)
@@ -51,8 +65,28 @@ namespace NLI_POS.Pages.Orders
             return new JsonResult(SectionList);
         }
 
+        public IActionResult OnGetProductComboList(int ProdId)
+        {
+            List<SelectListItem> SectionList = (from d in _context.ProductCombos.Where(p => p.ProductId == ProdId)
+                                                select new SelectListItem
+                                                {
+                                                    Text = d.ProductsDesc,
+                                                    Value = d.Id.ToString()
+                                                }).ToList();
+
+            if (SectionList.Count == 0)
+            {
+                SectionList.Insert(0, new SelectListItem { Text = "NA", Value = "" });
+            }
+
+
+            return new JsonResult(SectionList);
+        }
+
         public JsonResult OnGetGetProducAmount(int id)
         {
+            //ViewData["ProductCombos"] = new SelectList(_context.ProductCombos.Where(c=>c.ProductId==id), "Id", "ProductsDesc");
+
             var ProdAmount = _context.Products.FirstOrDefault(p=>p.Id==id);
 
             return new JsonResult( ProdAmount.RegPrice);

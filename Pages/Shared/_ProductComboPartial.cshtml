@@ -33,9 +33,9 @@
                 </td>
 
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                    <a href="javascript:;" class="delete btn btn-danger btn-sm w-100 m-1" title="Delete"><i class="fas fa-trash-alt"></i> </a>
+                    <a asp-page="./Edit" class=" btn btn-success btn-sm  m-1" asp-route-id="@item.Id"><i class="far fa-edit"></i></a> 
+                    @* <a asp-page="./Details" asp-route-id="@item.Id">Details</a> | *@
+                    <a href="javascript:;" class="delete btn btn-danger btn-sm  m-1" title="Delete"><i class="fas fa-trash-alt"></i> </a>
                 </td>
             </tr>
         }
