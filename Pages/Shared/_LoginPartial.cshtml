@@ -18,8 +18,8 @@ else
 {
         <ul class="navbar-nav flex-grow-1">
             <li class="nav-item dropdown ">
-                <a class="nav-link  dropdown-toggle" role="button" data-bs-toggle="dropdown" id="navbarSettMenu" aria-expanded="false" style="color: indianred;">
-                    <i class="fas fa-cogs fa-xl" title="Settings"></i> <span class="d-sm-none d-lg-inline-block">  SETTINGS</span>
+                <a class="nav-link  dropdown-toggle" role="button" data-bs-toggle="dropdown" id="navbarSettMenu" aria-expanded="false" >
+                    <i class="fas fa-cogs fa-xl" title="Settings"></i> <span class="d-sm-none d-lg-inline-block"> Settings </span>
 
                 </a>
                 <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarSettMenu">
@@ -31,10 +31,10 @@ else
             </li>
             </ul>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <a class="nav-link " asp-area="Identity" asp-page="/Account/Register" title="Register"><i class="fas fa-user-plus"></i> Register </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            <a class="nav-link " asp-area="Identity" asp-page="/Account/Login" title="Login"><i class="fas fa-sign-in-alt"></i> Login</a>
     </li>
 }
 </ul>

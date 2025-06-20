@@ -8,14 +8,15 @@ namespace NLI_POS.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        //[Required]
         [Display(Name = "Order No.")]
         public string OrderNo { get; set; }
 
         [Display(Name = "Order Date")]
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime OrderDate { get; set; } 
-        public int ItemNo { get; set; }
+
+        public int? ItemNo { get; set; }
 
         [ForeignKey("Customers")]
         [Display(Name = "Customer")]
@@ -30,20 +31,27 @@ namespace NLI_POS.Models
 
         [Display(Name = "Product Category")]
         [StringLength(20)]
-        public string ProductCategory { get; set; }
+        public string? ProductCategory { get; set; }
 
         [ForeignKey("Products")]
         [Display(Name = "Product")]
-        public int ProductId { get; set; }
+        public int? ProductId { get; set; }
 
         [ForeignKey("ProductCombos")]
         [Display(Name = "Product Combination")]
-        public int ComboId { get; set; }
+        public int? ComboId { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
+        public decimal? Price { get; set; }
 
         [Display(Name = "Quantity")]
-        public int Qty { get; set; }
+        public int? Qty { get; set; }
 
-        public decimal Amount { get; set; }
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
+        public decimal? Amount { get; set; }
+
+        [StringLength(500)]
+        public string? Notes { get; set; }
 
         public DateTime EncodeDate { get; set; } = DateTime.UtcNow.AddHours(8);
         public string EncodedBy { get; set; }

@@ -19,6 +19,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.AddSession();
 
 // Add ToastNotification
 builder.Services.AddNotyf(config =>
@@ -46,7 +47,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthorization();
 
 app.UseNotyf();

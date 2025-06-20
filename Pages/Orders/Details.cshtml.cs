@@ -20,6 +20,8 @@ namespace NLI_POS.Pages.Orders
         }
 
         public Order Order { get; set; } = default!;
+        public IList<Order> OrderList { get; set; } = default!;
+
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,7 +30,7 @@ namespace NLI_POS.Pages.Orders
                 return NotFound();
             }
 
-            var order = await _context.Orders.FirstOrDefaultAsync(m => m.Id == id);
+            var order = await _context.Orders.Include(o => o.Office).Include(o=>o.Customers).ThenInclude(c => c.CustClasses).FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
                 return NotFound();
@@ -37,6 +39,9 @@ namespace NLI_POS.Pages.Orders
             {
                 Order = order;
             }
+
+            var orderlist =  _context.Orders.Include(o=>o.Products).Where(m => m.OrderNo == order.OrderNo).ToList();
+            OrderList = orderlist;
             return Page();
         }
     }

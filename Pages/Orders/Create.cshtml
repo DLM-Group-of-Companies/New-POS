@@ -7,113 +7,188 @@
 
 <h4>New Order</h4>
 <hr />
-<div class="container bg-light p-3 rounded border">
+<form method="post">
 
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="row">
-            <input type="hidden" asp-for="Order.OrderNo" />
-            <div class="col-lg-6 col-md-4 col-sm-12 col-12 form-group">
-                <label asp-for="Order.OrderType" class="control-label"></label>
-                <select asp-for="Order.OrderType" id="OrderType" class="form-control">
-                    <option value="">-- Select --</option>
-                    <option value="Member">Member</option>
-                    <option value="Non-Member">Non-Member</option>
-                    <option value="Staff">Staff</option>
-                </select>
+    <div class="row ">
+        <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white m-2 pt-2 bg-opacity-75"></div>
+        <div class="col-lg-6 ">
+            <div class="container ">
+                <div class="row p-3 border border-info rounded">
+                    <div class="row pb-4">
+                        <input type="hidden" asp-for="Order.OrderNo" />
 
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-12 col-12 form-group">
-                <label asp-for="Order.OfficeId" class="control-label"></label>
-                <select asp-for="Order.OfficeId" class="form-control" asp-items="ViewBag.OfficeId"></select>
-            </div>
-            <div class="col-lg-2 col-md-2 col-sm-12 col-12  form-group">
-                <label asp-for="Order.OrderDate" class="control-label"></label>
-                <input asp-for="Order.OrderDate" class="form-control" value="@DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd")" />
-                <span asp-validation-for="Order.OrderDate" class="text-danger"></span>
+                        <div class="col-lg-7 col-md-7 col-sm-7 col-7 form-group">
+                            <label asp-for="Order.OfficeId" class="control-label"></label>
+                            <select asp-for="Order.OfficeId" class="form-control" asp-items="ViewBag.OfficeId"></select>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-1 form-group">
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-4  form-group">
+                            <label asp-for="Order.OrderDate" class="control-label"></label>
+                            <input asp-for="Order.OrderDate" class="form-control" value="@DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="Order.OrderDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row pb-4">
+                        @* <span class="text-danger small">*</span> *@
+                        <label asp-for="Order.CustomerId" class="control-label"></label>
+                        <div class="col-lg-12 input-group">
+
+
+                            <select asp-for="Order.CustomerId" id="CustomerId" class="form-control" asp-items="ViewBag.CustomerId">
+                                <option value="">-- Select Customer--</option>
+                            </select>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Order.CustomerId" class="text-danger small"></span>
+                    </div>
+                </div>
+                <input asp-for="Order.ItemNo" type="hidden" />
+                <br/>
+                <div class="row p-3 border border-warning rounded">
+                    <div class="row pb-4">
+                        <div class="col-lg-4 col-md-4 col-sm-12 col-12 form-group">
+                            <label asp-for="Order.ProductCategory" class="control-label"></label>
+                            @* <input asp-for="Products.ProductCategory" class="form-control" /> *@
+                            <select id="ProductCategory" asp-for="Order.ProductCategory" id="ProductCategory" data-name="ProductCategory" class="form-control">
+                                <option value="">Select</option>
+                                <option value="Regular">Regular</option>
+                                <option value="Promo">Promo</option>
+                                <option value="Freebie">Freebie</option>
+                            </select>
+                            <span asp-validation-for="Order.ProductCategory" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-8 col-md-8 col-sm-12 col-12 form-group">
+                            <label asp-for="Order.ProductId" class="control-label"></label>
+                            <select id="ProductId" asp-for="Order.ProductId" data-name="ProductId" class="form-control" asp-items="ViewBag.ProductId">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row pb-4">
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-12 form-group">
+                            <label asp-for="Order.ComboId" class="control-label"></label>
+                            <select id="ProductCombo" asp-for="Order.ComboId" data-name="ComboId" class="form-control" asp-items="ViewBag.ProductCombos">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-3 col-sm-4 col-4 form-group">
+                            <label asp-for="Order.Qty" class="control-label"></label>
+                            <input id="Qty" asp-for="Order.Qty" data-name="Qty" class="form-control" />
+                            <span asp-validation-for="Order.Qty" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-8 col-8 form-group">
+                            <input id="Price" asp-for="Order.Price" asp-format="{0:C2}" data-name="Price" type="hidden" />
+                            <label asp-for="Order.Amount" class="control-label"></label>
+                            <input id="Amount" asp-for="Order.Amount" asp-format="{0:C2}" data-name="Amount" class="form-control" />
+                            <span asp-validation-for="Order.Amount" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-none">
+                        <div class="form-group">
+                            <label asp-for="Order.EncodeDate" class="control-label"></label>
+                            <input asp-for="Order.EncodeDate" class="form-control" value="@DateTime.UtcNow.AddHours(8)" />
+                            <span asp-validation-for="Order.EncodeDate" class="text-danger small"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Order.EncodedBy" class="control-label"></label>
+                            <input asp-for="Order.EncodedBy" class="form-control" value="ARMAN" />
+                            <span asp-validation-for="Order.EncodedBy" class="text-danger small"></span>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row pt-3 pb-3">
+                    <button type="button" class="btn btn-primary" onclick="addProduct()"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="form-group">
-                <span class="text-danger">*</span>
-                <label asp-for="Order.CustomerId" class="control-label"></label>
-                <select asp-for="Order.CustomerId" id="CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
+        <div class="col-lg-6 ">
+            <!-- Area for Items selected -->
+            <div class="container">
+                <div class="row bg-dark ">
+                    <div class="p-2 bg-secondary bg-gradient text-white fw-bold">Cart: </div>
+                    <table id="cartTable" title="Cart" class="table table-striped table-dark table-sm small ">
+                        <!-- style="min-height: 300px;" -->
+                        <thead>
+                            <tr>
+                                <th scope="col">Product Items</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <td colspan="2"></td>
+                                <td scope="row"><strong>₱<span id="grandTotal">0</span></strong></td>
+                                <td></td>
+                            </tr>
+
+                        </tfoot>
+                    </table>
+
+                </div>
+                <div class="row">
+                    <hr />
+                    <div class="form-group">
+                        <label asp-for="Order.Notes" class="control-label"></label>
+                        <textarea asp-for="Order.Notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="form-group">
-                <label asp-for="Order.ItemNo" class="control-label"></label>
-                <input asp-for="Order.ItemNo" class="form-control" />
-                <span asp-validation-for="Order.ItemNo" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-12 col-12 form-group">
-                <label asp-for="Order.ProductCategory" class="control-label"></label>
-                @* <input asp-for="Products.ProductCategory" class="form-control" /> *@
-                <select asp-for="Order.ProductCategory" id="ProductCategory" class="form-control">
-                    <option value="">Select</option>
-                    <option value="Regular">Regular</option>
-                    <option value="Promo">Promo</option>
-                    <option value="Freebie">Freebie</option>
-                </select>
-                <span asp-validation-for="Order.ProductCategory" class="text-danger small"></span>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-12 col-12 form-group">
-                <label asp-for="Order.ProductId" class="control-label"></label>
-                <select id="ProductId" asp-for="Order.ProductId" class="form-control" asp-items="ViewBag.ProductId">
-                    <option value="">-- Select --</option>
-                </select>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-12 col-12 form-group">
-                <label asp-for="Order.ProductCombos" class="control-label"></label>
-                <select id="ProductCombo" asp-for="Order.ProductCombos" class="form-control" asp-items="ViewBag.ProductCombos">
-                    <option value="">-- Select --</option>
-                </select>
-            </div>
-        </div>
-        <div class="row">
-            <div class="form-group">
-                <label asp-for="Order.Qty" class="control-label"></label>
-                <input id="Qty" asp-for="Order.Qty" class="form-control" />
-                <span asp-validation-for="Order.Qty" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Order.Amount" class="control-label"></label>
-                <input id="Amount" asp-for="Order.Amount" asp-format="{0:C2}" class="form-control" />
-                <span asp-validation-for="Order.Amount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Order.EncodeDate" class="control-label"></label>
-                <input asp-for="Order.EncodeDate" class="form-control" />
-                <span asp-validation-for="Order.EncodeDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Order.EncodedBy" class="control-label"></label>
-                <input asp-for="Order.EncodedBy" class="form-control" />
-                <span asp-validation-for="Order.EncodedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Order.UpdateDate" class="control-label"></label>
-                <input asp-for="Order.UpdateDate" class="form-control" />
-                <span asp-validation-for="Order.UpdateDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Order.UpdateddBy" class="control-label"></label>
-                <input asp-for="Order.UpdateddBy" class="form-control" />
-                <span asp-validation-for="Order.UpdateddBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </div>
-        @Html.AntiForgeryToken()
-    </form>
-</div>
+    </div>
+    <div class="form-group float-end pt-2">
+        @* <input type="button" value="Save" class="btn btn-primary" onclick="saveOrder()" /> *@
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+    @Html.AntiForgeryToken()
+</form>
 
 <div>
     <a asp-page="Index">Back to List</a>
 </div>
+
+<!-- Customer Search Modal -->
+<div class="modal fade" id="customerSearchModal" tabindex="-1" aria-labelledby="customerSearchLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Search Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="customerSearchInput" class="form-control mb-3" placeholder="Enter name, customer ID, email, mobile..." />
+
+                <table class="table table-sm table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerSearchResults">
+                        <!-- Results injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     @{
@@ -125,9 +200,9 @@
         $(document).ready(function () {
             $('#ProductId').change(function () {
                 var selectedProductId = $(this).val();
-                alert(selectedProductId);
+                //alert(selectedProductId);
                 $("#ProductCombo").empty();
-                $("#ProductCombo").append("<option value=''>Select</option>");
+                $("#ProductCombo").append("<option value=''>--Select--</option>");
                 $.getJSON(`?handler=ProductComboList&ProdId=${selectedProductId}`, (data) => {
                     $.each(data, function (i, item) {
                         $("#ProductCombo").append(`<option value="${data[i].value}">${data[i].text}</option>`);
@@ -143,6 +218,7 @@
                     // dataType: "html",
                     success: function (response) {
                         amount = response;
+                        $("#Price").val(amount);
                         var tot = $("#Qty").val() * amount;
                         $("#Amount").val(tot);
                     },
@@ -161,9 +237,6 @@
 
         // Get Token for authorization
         function gettoken() {
-            // var token = '@Html.AntiForgeryToken()';
-            // token = $(token).val();
-            // return token;
             return $('input[name="__RequestVerificationToken"]').val();
         }
 
@@ -191,7 +264,7 @@
         $(function () {
             $("#OrderType").on("change", function () {
                 var type = $(this).val();
-                alert(type);
+                //alert(type);
                 $("#CustomerId").empty();
                 $("#CustomerId").append("<option value=''>Select</option>");
                 $.getJSON(`?handler=Customers`, (data) => {
@@ -201,5 +274,205 @@
                 });
             });
         });
+    </script>
+
+    <script>
+        let cart = [];
+
+        function addProduct() {
+            const validationSummary = document.querySelector('.validation-summary-errors');
+            if (validationSummary) {
+                validationSummary.innerHTML = ''; // Clear the error messages
+                validationSummary.style.display = 'none'; // Hide the summary div
+            }
+            const select = document.getElementById('ProductId');
+            const selectedOption = select.options[select.selectedIndex];
+            const selectedText = select.options[select.selectedIndex].text;
+            const productId = parseInt(select.value);
+            const price = parseFloat(document.getElementById('Price').value);
+            const quantity = parseInt(document.getElementById('Qty').value);
+
+            if (document.getElementById('CustomerId').value === "") {
+                //alert("Please select a customer.");
+                toastr.options.positionClass = "toast-bottom-right";
+                toastr.options.closeButton = false;
+                toastr.options.showDuration = 100;
+                toastr.options.hideDuration = 1000;
+                toastr.options.timeOut = 5000;
+                toastr.warning('Please select a customer.');
+                return;
+            }
+            if (selectedOption.value === "") {
+                toastr.options.positionClass = "toast-bottom-right";
+                toastr.options.closeButton = false;
+                toastr.options.showDuration = 100;
+                toastr.options.hideDuration = 1000;
+                toastr.options.timeOut = 5000;
+                toastr.warning('Please select a product.');
+                return;
+            }
+
+            const existing = cart.find(p => p.productId === productId);
+            if (existing) {
+                existing.quantity += quantity;
+            } else {
+                cart.push({ productId, selectedText, price, quantity });
+            }
+
+            syncCartWithServer();
+            updateCartTable();
+        }
+
+        function updateCartTable() {
+            const tbody = document.querySelector('#cartTable tbody');
+            tbody.innerHTML = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                                                <td >${item.selectedText}</td>
+                                                        <td>₱${item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td >
+                                                <td class="col-1">
+                                                                    <input type="number" min="1" value="${item.quantity}" maxlength="5" onchange="editQuantity(${item.productId}, this.value)" />
+                                                </td>
+                                                <td>₱${(item.price * item.quantity).toFixed(2)}</td>
+                                                        <td><button class="btn btn-danger btn-sm" title="Remove item" onclick="removeProduct(${item.productId})"><i class="fas fa-times"></i></button></td>
+                                            `;
+                tbody.appendChild(row);
+                total += item.price * item.quantity;
+            });
+
+            document.getElementById('grandTotal').innerText = total.toFixed(2);
+
+            document.getElementById("ProductCategory").value = "";
+            document.getElementById("ProductId").value = "";
+            document.getElementById("ProductCombo").value = "";
+            document.getElementById("Price").value = "";
+            document.getElementById("Qty").value = "";
+            document.getElementById("Amount").value = "";
+
+        }
+
+        function editQuantity(productId, newQty) {
+            const product = cart.find(p => p.productId === productId);
+            if (product) {
+                product.quantity = parseInt(newQty);
+                syncCartWithServer();
+                updateCartTable();
+            }
+        }
+
+        function removeProduct(productId) {
+            cart = cart.filter(p => p.productId !== productId);
+            fetch('?handler=RemoveProduct', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productId)
+            }).then(() => {
+                updateCartTable();
+            });
+        }
+
+        function syncCartWithServer() {
+            fetch('?handler=SyncCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': getRequestVerificationToken()
+                },
+                body: JSON.stringify(cart)
+            });
+        }
+
+        function saveOrder() {
+            if (!cart || cart.length === 0) {
+                //alert("Your cart is empty. Please add at least one product.");
+                toastr.options.positionClass = "toast-bottom-right";
+                toastr.options.closeButton = false;
+                toastr.options.showDuration = 100;
+                toastr.options.hideDuration = 1000;
+                toastr.options.timeOut = 5000;
+                toastr.warning('Your cart is empty. Please add at least one product.');
+                return;
+            }
+
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+
+            fetch('?handler=SaveOrder', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': getRequestVerificationToken()
+                },
+                body: formData
+            }).then(res => {
+                if (res.ok) {
+                    alert('Order saved successfully!');
+                    cart = [];
+                    updateCartTable();
+                } else {
+                    res.text().then(text => alert('Failed to save order: ' + text));
+                }
+            }).catch(err => {
+                alert('Network error: ' + err.message);
+            });
+        }
+        function getRequestVerificationToken() {
+            return document.querySelector('input[name="__RequestVerificationToken"]').value;
+        }
+    </script>
+
+    <script>
+        function openCustomerSearchModal() {
+            $('#customerSearchModal').modal('show');
+        }
+
+        // Live Customer search on input
+        $('#customerSearchInput').on('input', function () {
+            const keyword = $(this).val();
+            if (keyword.length < 2) return;
+
+            $.ajax({
+                url: '?handler=SearchCustomer',
+                method: 'GET',
+                data: { term: keyword },
+                success: function (data) {
+                    const tbody = $('#customerSearchResults');
+                    tbody.empty();
+
+                    if (data.length === 0) {
+                        tbody.append('<tr><td colspan="4">No results found.</td></tr>');
+                        return;
+                    }
+
+                    data.forEach(customer => {
+                        tbody.append(`
+                                                <tr>
+                                                <td>${customer.custcode}</td>
+                                                    <td>${customer.name}</td>
+                                                    <td>${customer.email}</td>
+                                                    <td>${customer.phone}</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>
+                                                            Select
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            `);
+                    });
+                }
+            });
+        });
+
+        // When customer is selected
+        function selectCustomer(customer) {
+            $('#Order_CustomerId').val(customer.id); // Update the select input
+            $('#customerSearchModal').modal('hide');
+
+            // Optionally populate other form fields if you have them:
+            $('#CustomerId').val(customer.id).change();
+            //$('#CustomerEmail').val(customer.email);
+        }
     </script>
 }

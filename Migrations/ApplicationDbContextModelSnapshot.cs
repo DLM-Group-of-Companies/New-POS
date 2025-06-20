@@ -494,10 +494,10 @@ namespace NLI_POS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Amount")
+                    b.Property<decimal?>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ComboId")
+                    b.Property<int?>("ComboId")
                         .HasColumnType("int");
 
                     b.Property<int>("CustomerId")
@@ -510,8 +510,12 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("ItemNo")
+                    b.Property<int?>("ItemNo")
                         .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<int>("OfficeId")
                         .HasColumnType("int");
@@ -527,15 +531,17 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("ProductCategory")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Qty")
+                    b.Property<int?>("Qty")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateDate")
@@ -813,9 +819,7 @@ namespace NLI_POS.Migrations
                 {
                     b.HasOne("NLI_POS.Models.ProductCombo", "ProductCombos")
                         .WithMany()
-                        .HasForeignKey("ComboId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ComboId");
 
                     b.HasOne("NLI_POS.Models.Customer", "Customers")
                         .WithMany()
@@ -831,9 +835,7 @@ namespace NLI_POS.Migrations
 
                     b.HasOne("NLI_POS.Models.Product", "Products")
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.Navigation("Customers");
 
