@@ -1,0 +1,40 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout))
+    {
+        Layout = (string)parentLayout;
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+
+    string eMail = Context.Request.Query["pEmail"];
+}
+<div class="container-fluid p-3 rounded bg-light">
+    <span class="float-end" title="Close"><i class="fas fa-times-circle fa-xl" onclick="window.location = '/';"></i> </span>
+@if (eMail == null)
+{
+    <h2>Manage your account</h2>
+
+    <h4>Change your account settings</h4>
+}
+else
+{
+    <h2>Manage account</h2>
+
+    <h4>Change account settings</h4>
+}
+
+<hr />
+<div class="row ">
+    <div class="col-md-3 ">
+        <partial name="_ManageNav" />
+    </div>
+    <div class="col-md-9">
+        @RenderBody()
+    </div>
+</div>
+</div>
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

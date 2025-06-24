@@ -2,50 +2,49 @@
 @model NLI_POS.Pages.Orders.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Order Details";
 }
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
+    <h3>Order Details</h3>
 
-<h1>Details</h1>
-
-<div>
-    <h4>Order</h4>
-    <hr />
-    <div class="row">
-        <div class="col-sm-6 form-group">
-            <span class="form-label">@Html.DisplayNameFor(model => model.Order.OrderNo)</span>
-            <span class="form-control">@Html.DisplayFor(model => model.Order.OrderNo)</span>
+    <div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-6 form-group">
+                <span class="form-label">@Html.DisplayNameFor(model => model.Order.OrderNo)</span>
+                <span class="form-control">@Html.DisplayFor(model => model.Order.OrderNo)</span>
+            </div>
+            <div class="col-sm-3 form-group">
+                @Html.DisplayNameFor(model => model.Order.OrderDate)
+                <span class="form-control">@Html.DisplayFor(model => model.Order.OrderDate)</span>
+            </div>
+            <div class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Order.Office)
+                <span class="form-control">@Html.DisplayFor(model => model.Order.Office.Name)</span>
+            </div>
         </div>
-        <div class="col-sm-3 form-group">
-            @Html.DisplayNameFor(model => model.Order.OrderDate)
-            <span class="form-control">@Html.DisplayFor(model => model.Order.OrderDate)</span>
-        </div>
-        <div class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Order.Office)
-            <span class="form-control">@Html.DisplayFor(model => model.Order.Office.Name)</span>
+        <div class="row">
+            <div class="col-sm-9">
+                Customer
+                <span class="form-control">@Html.DisplayFor(model => model.Order.Customers.CustCode) | @Html.DisplayFor(model => model.Order.Customers.FirstName) @Html.DisplayFor(model => model.Order.Customers.LastName)</span>
+            </div>
+            <div class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Order.Customers.CustClass)
+                <span class="form-control">@Html.DisplayFor(model => model.Order.Customers.CustClasses.Name) </span>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-9">
-            Customer
-            <span class="form-control">@Html.DisplayFor(model => model.Order.Customers.CustCode) | @Html.DisplayFor(model => model.Order.Customers.FirstName) @Html.DisplayFor(model => model.Order.Customers.LastName)</span>
-        </div>
-        <div class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Order.Customers.CustClass)
-            <span class="form-control">@Html.DisplayFor(model => model.Order.Customers.CustClasses.Name) </span>
-        </div>
+    <div>
+        <br />
+        <partial name="_OrderDetailsPartial" model="Model.OrderList"></partial>
     </div>
-    
-</div>
-<div>
-    <br/>
-    <partial name="_OrderDetailsPartial" model="Model.OrderList"></partial>
-</div>
 
-<div class="row">
-    @Html.DisplayNameFor(model => model.Order.Notes)
-    <span class="form-control">@Html.TextAreaFor(model => model.Order.Notes, new { @class = "form-control", @readonly = "readonly", rows = 3 })</span>
-</div>
-<div>
-    @* <a asp-page="./Edit" asp-route-id="@Model.Order.Id">Edit</a> | *@
-    <a asp-page="./Index">Back to List</a>
+    <div class="row p-3">
+        @Html.DisplayNameFor(model => model.Order.Notes)
+        <textarea class="form-control" asp-for="Order.Notes" rows="3" readonly></textarea>
+    </div>
+    <div>
+        @* <a asp-page="./Edit" asp-route-id="@Model.Order.Id">Edit</a> | *@
+        <a asp-page="./Index">Back to List</a>
+    </div>
 </div>

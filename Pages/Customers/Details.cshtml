@@ -5,139 +5,141 @@
     ViewData["Title"] = "Details";
 }
 
-<div>
+<div class="container bg-light p-3 rounded border shadow">
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl" onclick="window.location = './Index';"></i> </span>
     <h4>Customer Details</h4>
     <hr />
-    <div class="container bg-light p-3 rounded border">
-        <div class="row">
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                <label class="control-label">Customer Code</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.CustCode)</label>
-            </div>
 
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                <label class="control-label">Office</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.OfficeCountry.Name)</label>
-            </div>
-
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                <label class="control-label">Customer Class</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.CustClasses.Name)</label>
-            </div>
-
-
+    <div class="row">
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            <label class="control-label">Customer Code</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.CustCode)</label>
         </div>
-        <div class="row">
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                <label class="control-label">First Name</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.FirstName)</label>
-            </div>
 
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                <label class="control-label">Middle Name</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.MiddleName)</label>
-            </div>
-
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                <label class="control-label">Last Name</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.LastName)</label>
-            </div>
-
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            <label class="control-label">Office</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.OfficeCountry.Name)</label>
         </div>
-        <div class="row">
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                @Html.DisplayNameFor(model => model.Customer.Email)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.Email)</label>
-            </div>
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                <label class="control-label">Mobile Number</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.MobileNo)</label>
-            </div>
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                <label class="control-label">Landline Number</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.LandlineNo)</label>
-            </div>
+
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            <label class="control-label">Customer Class</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.CustClasses.Name)</label>
         </div>
-        <div class="row">
-            <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                @Html.DisplayNameFor(model => model.Customer.Gender)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.Gender)</label>
-            </div>
 
-            <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                @Html.DisplayNameFor(model => model.Customer.Birthday)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.Birthday)</label>
-            </div>
 
-            <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                <label class="control-label">Civil Status</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.CivilStat)</label>
-            </div>
-
-            <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                @Html.DisplayNameFor(model => model.Customer.Nationality)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.Nationality)</label>
-            </div>
-
+    </div>
+    <div class="row">
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            <label class="control-label">First Name</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.FirstName)</label>
         </div>
-        <div class="row">
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                @Html.DisplayNameFor(model => model.Customer.Country)
-                <label class="form-control">@ViewData["Country"]</label>
-            </div>
 
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                @Html.DisplayNameFor(model => model.Customer.Province)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.Province)</label>
-            </div>
-
-            <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                @Html.DisplayNameFor(model => model.Customer.City)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.City)</label>
-            </div>
-
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            <label class="control-label">Middle Name</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.MiddleName)</label>
         </div>
-        <div class="row">
-            <div class="pt-2 col-12 col-sm-5 col-md-5 col-lg-5 col-xl-5">
-                @Html.DisplayNameFor(model => model.Customer.Address1)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.Address1)</label>
-            </div>
 
-            <div class="pt-2 col-12 col-sm-5 col-md-5 col-lg-5 col-xl-5">
-                @Html.DisplayNameFor(model => model.Customer.Address2)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.Address2)</label>
-            </div>
-
-
-            <div class="pt-2 col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2">
-                <label class="control-label">Postal Code</label>
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.PostalCode)</label>
-            </div>
-
-
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            <label class="control-label">Last Name</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.LastName)</label>
         </div>
-        <div class="row">
-            <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
-                @Html.DisplayNameFor(model => model.Customer.EncodeDate)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.EncodeDate)</label>
-            </div>
-            <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
-                @Html.DisplayNameFor(model => model.Customer.EncodedBy)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.EncodedBy)</label>
-            </div>
-            <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
-                @Html.DisplayNameFor(model => model.Customer.UpdateDate)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.UpdateDate)</label>
-            </div>
-            <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
-                @Html.DisplayNameFor(model => model.Customer.UpdateddBy)
-                <label class="form-control">@Html.DisplayFor(model => model.Customer.UpdateddBy)</label>
-            </div>
 
+    </div>
+    <div class="row">
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            @Html.DisplayNameFor(model => model.Customer.Email)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.Email)</label>
+        </div>
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            <label class="control-label">Mobile Number</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.MobileNo)</label>
+        </div>
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            <label class="control-label">Landline Number</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.LandlineNo)</label>
         </div>
     </div>
-</div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Customer.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+    <div class="row">
+        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+            @Html.DisplayNameFor(model => model.Customer.Gender)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.Gender)</label>
+        </div>
+
+        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+            @Html.DisplayNameFor(model => model.Customer.Birthday)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.Birthday)</label>
+        </div>
+
+        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+            <label class="control-label">Civil Status</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.CivilStat)</label>
+        </div>
+
+        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+            @Html.DisplayNameFor(model => model.Customer.Nationality)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.Nationality)</label>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            @Html.DisplayNameFor(model => model.Customer.Country)
+            <label class="form-control">@ViewData["Country"]</label>
+        </div>
+
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            @Html.DisplayNameFor(model => model.Customer.Province)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.Province)</label>
+        </div>
+
+        <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+            @Html.DisplayNameFor(model => model.Customer.City)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.City)</label>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="pt-2 col-12 col-sm-5 col-md-5 col-lg-5 col-xl-5">
+            @Html.DisplayNameFor(model => model.Customer.Address1)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.Address1)</label>
+        </div>
+
+        <div class="pt-2 col-12 col-sm-5 col-md-5 col-lg-5 col-xl-5">
+            @Html.DisplayNameFor(model => model.Customer.Address2)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.Address2)</label>
+        </div>
+
+
+        <div class="pt-2 col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+            <label class="control-label">Postal Code</label>
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.PostalCode)</label>
+        </div>
+
+
+    </div>
+    <div class="row">
+        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+            @Html.DisplayNameFor(model => model.Customer.EncodeDate)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.EncodeDate)</label>
+        </div>
+        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+            @Html.DisplayNameFor(model => model.Customer.EncodedBy)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.EncodedBy)</label>
+        </div>
+        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+            @Html.DisplayNameFor(model => model.Customer.UpdateDate)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.UpdateDate)</label>
+        </div>
+        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+            @Html.DisplayNameFor(model => model.Customer.UpdateddBy)
+            <label class="form-control">@Html.DisplayFor(model => model.Customer.UpdateddBy)</label>
+        </div>
+
+    </div>
+
+
+    <div class="p-2">
+        <a class="btn btn-primary" asp-page="./Edit" asp-route-id="@Model.Customer.Id"><i class="fas fa-pen-square"></i> Edit</a> 
+        @* <a asp-page="./Index">Back to List</a> *@
+    </div>
 </div>

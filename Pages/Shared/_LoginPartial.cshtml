@@ -1,24 +1,27 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@using NLI_POS.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-        <ul class="navbar-nav flex-grow-1">
-            <li class="nav-item dropdown ">
-                <a class="nav-link  dropdown-toggle" role="button" data-bs-toggle="dropdown" id="navbarSettMenu" aria-expanded="false" >
+<ul class="navbar-nav ms-auto text-light">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a class="nav-link " asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.FindFirst("FullName")?.Value!</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
+                <button type="submit" class="nav-link btn btn-link "><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item dropdown ">
+                <a class="nav-link  dropdown-toggle" role="button" data-bs-toggle="dropdown" id="navbarSettMenu" aria-expanded="false">
                     <i class="fas fa-cogs fa-xl" title="Settings"></i> <span class="d-sm-none d-lg-inline-block"> Settings </span>
 
                 </a>
@@ -29,12 +32,13 @@ else
                     <li><a class="dropdown-item" asp-area="" asp-page="/Products/Index" onclick="ShowProgress();"><i class="fas fa-grip-horizontal"></i> Products</a></li>
                 </ul>
             </li>
-            </ul>
-    <li class="nav-item">
+        </ul>
+        }
+        <li class="nav-item">
             <a class="nav-link " asp-area="Identity" asp-page="/Account/Register" title="Register"><i class="fas fa-user-plus"></i> Register </a>
-    </li>
-    <li class="nav-item">
+        </li>
+        <li class="nav-item">
             <a class="nav-link " asp-area="Identity" asp-page="/Account/Login" title="Login"><i class="fas fa-sign-in-alt"></i> Login</a>
-    </li>
-}
+        </li>
+    }
 </ul>

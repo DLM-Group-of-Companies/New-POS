@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Build.Evaluation;
 using Microsoft.EntityFrameworkCore;
-using NLI_POS.Data;
 using NLI_POS.Models;
-using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 
 namespace NLI_POS.Pages.Orders
 {
@@ -39,9 +31,28 @@ namespace NLI_POS.Pages.Orders
 
             ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
-            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
+
+            var products = _context.Products
+            .Select(p => new { p.Id, p.ProductName })
+            .ToList();
+
+            // Insert default item at the top
+            products.Insert(0, new { Id = 0, ProductName = "-- Select --" });
+
+            ViewData["ProductId"] = new SelectList(products, "Id", "ProductName");
+
             //ViewData["ProductCombos"] = new SelectList(_context.ProductCombos, "Id", "ProductsDesc");
             return Page();
+        }
+
+        public JsonResult OnGetProductsByCategory(string categoryId)
+        {
+            var products = _context.Products
+                .Where(p => p.ProductCategory == categoryId)
+                .Select(p => new { id = p.Id, name = p.ProductName })
+                .ToList();
+
+            return new JsonResult(products);
         }
 
         public IActionResult OnGetCustomers()
@@ -69,7 +80,14 @@ namespace NLI_POS.Pages.Orders
                                                 }).ToList();
 
             //SectionList.Insert(0, new SelectListItem { Text = "--Select Product--", Value = "" });
-
+            if (SectionList.Count == 0)
+            {
+                SectionList.Insert(0, new SelectListItem { Text = "No Product Available", Value = "" });
+            }
+            else
+            {
+                SectionList.Insert(0, new SelectListItem { Text = "--Select--", Value = "" });
+            }
             return new JsonResult(SectionList);
         }
 
@@ -85,6 +103,10 @@ namespace NLI_POS.Pages.Orders
             if (SectionList.Count == 0)
             {
                 SectionList.Insert(0, new SelectListItem { Text = "No Combination Available", Value = "" });
+            }
+            else
+            {
+                SectionList.Insert(0, new SelectListItem { Text = "--Select--", Value = "" });
             }
 
 
@@ -113,12 +135,12 @@ namespace NLI_POS.Pages.Orders
             {
                 ModelState.AddModelError("", "Cart is empty. Please add products.");
                 var customer = _context.Customer
-    .Select(p => new
-    {
-        Id = p.Id,
-        FullName = p.CustCode + " | " + p.FirstName + " " + p.LastName
-    })
-    .ToList();
+                .Select(p => new
+                {
+                    Id = p.Id,
+                    FullName = p.CustCode + " | " + p.FirstName + " " + p.LastName
+                })
+                .ToList();
 
                 ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
                 ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
@@ -152,6 +174,7 @@ namespace NLI_POS.Pages.Orders
             for (int j = 0; j < i; j++)
             {
                 Order.ProductId = cart[j].ProductId;
+                Order.ComboId = cart[j].ProductCombo;
                 Order.Qty = cart[j].Quantity;
                 Order.Price = cart[j].Price;
                 Order.Amount = Order.Price * Order.Qty;
@@ -162,6 +185,17 @@ namespace NLI_POS.Pages.Orders
             }
             //_context.Orders.Add(Order);
             //await _context.SaveChangesAsync();
+
+            //// ✅ Deduct stock here
+            //var product = await _context.Products.FindAsync(cart[j].ProductId);
+            //if (product != null)
+            //{
+            //    product.StockQuantity -= cart[j].Quantity;
+            //    if (product.StockQuantity < 0) product.StockQuantity = 0; // optional safeguard
+            //    _context.Products.Update(product);
+            //    await _context.SaveChangesAsync();
+            //}
+
             HttpContext.Session.Remove("Cart");
             return RedirectToPage("./Index");
         }
@@ -169,7 +203,9 @@ namespace NLI_POS.Pages.Orders
         public class ProductInput
         {
             public int ProductId { get; set; }
-            public string Name { get; set; }
+            public string ProductName { get; set; }
+            public int? ProductCombo { get; set; }
+            public string ComboName { get; set; }
             public decimal Price { get; set; }
             public int Quantity { get; set; }
         }
@@ -177,7 +213,9 @@ namespace NLI_POS.Pages.Orders
         public class ProductItem
         {
             public int ProductId { get; set; }
-            public string Name { get; set; } = "";
+            public string ProductName { get; set; }
+            public int? ProductCombo { get; set; }
+            public string ComboName { get; set; }
             public decimal Price { get; set; }
             public int Quantity { get; set; }
         }
@@ -210,7 +248,8 @@ namespace NLI_POS.Pages.Orders
                 sessionCart.Add(new ProductItem
                 {
                     ProductId = input.ProductId,
-                    Name = input.Name,
+                    ProductName = input.ProductName,
+                    ProductCombo = input.ProductCombo,
                     Price = input.Price,
                     Quantity = input.Quantity
                 });

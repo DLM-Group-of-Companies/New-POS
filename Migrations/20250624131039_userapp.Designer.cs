@@ -11,8 +11,8 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250520081221_update8")]
-    partial class update8
+    [Migration("20250624131039_userapp")]
+    partial class userapp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,6 +83,11 @@ namespace NLI_POS.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("varchar(21)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -133,6 +138,10 @@ namespace NLI_POS.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator().HasValue("IdentityUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -335,7 +344,6 @@ namespace NLI_POS.Migrations
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("MiddleName")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
@@ -497,8 +505,11 @@ namespace NLI_POS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Amount")
+                    b.Property<decimal?>("Amount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("ComboId")
+                        .HasColumnType("int");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
@@ -510,8 +521,12 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("ItemNo")
+                    b.Property<int?>("ItemNo")
                         .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<int>("OfficeId")
                         .HasColumnType("int");
@@ -527,10 +542,17 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("ProductId")
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ProductCategory")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Qty")
+                    b.Property<int?>("Qty")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateDate")
@@ -540,6 +562,8 @@ namespace NLI_POS.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ComboId");
 
                     b.HasIndex("CustomerId");
 
@@ -683,6 +707,28 @@ namespace NLI_POS.Migrations
                     b.ToTable("ProductTypes");
                 });
 
+            modelBuilder.Entity("NLI_POS.Models.ApplicationUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("Designation")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("OfficeId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("OfficeId");
+
+                    b.HasDiscriminator().HasValue("ApplicationUser");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -804,6 +850,10 @@ namespace NLI_POS.Migrations
 
             modelBuilder.Entity("NLI_POS.Models.Order", b =>
                 {
+                    b.HasOne("NLI_POS.Models.ProductCombo", "ProductCombos")
+                        .WithMany()
+                        .HasForeignKey("ComboId");
+
                     b.HasOne("NLI_POS.Models.Customer", "Customers")
                         .WithMany()
                         .HasForeignKey("CustomerId")
@@ -818,13 +868,13 @@ namespace NLI_POS.Migrations
 
                     b.HasOne("NLI_POS.Models.Product", "Products")
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.Navigation("Customers");
 
                     b.Navigation("Office");
+
+                    b.Navigation("ProductCombos");
 
                     b.Navigation("Products");
                 });
@@ -849,6 +899,17 @@ namespace NLI_POS.Migrations
                         .IsRequired();
 
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("NLI_POS.Models.OfficeCountry", "OfficeCountry")
+                        .WithMany()
+                        .HasForeignKey("OfficeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OfficeCountry");
                 });
 #pragma warning restore 612, 618
         }

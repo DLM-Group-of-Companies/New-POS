@@ -5,9 +5,10 @@
     ViewData["Title"] = "Edit";
 }
 
+<div class="container bg-light p-3 rounded border shadow">
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl" onclick="window.location = './Index';"></i> </span>
 <h4>Customer Edit</h4>
 <hr />
-<div class="container bg-light p-3 rounded border">
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="Customer.Id" />
@@ -152,14 +153,15 @@
 
         <div class="form-group">
             <input type="submit" value="Save" class="btn btn-primary" />
+            <a class="btn btn-dark text-light" asp-page="./Index">Cancel</a>
         </div>
 
     </form>
-</div>
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
 
+<div>
+    
+</div>
+</div>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

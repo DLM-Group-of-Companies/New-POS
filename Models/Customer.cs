@@ -20,9 +20,10 @@ namespace NLI_POS.Models
         [Required]
         [StringLength(200)]
         public string FirstName { get; set; }
-        [Required]
+ 
         [StringLength(200)]
         public string? MiddleName { get; set; }
+
         [Required]
         [StringLength(200)]
         public string LastName { get; set; }
@@ -59,8 +60,8 @@ namespace NLI_POS.Models
         public string? Country { get; set; }
         public string? PostalCode { get; set; }
 
-        [ForeignKey("OfficeCountry")]
         [Display(Name = "Office")]
+        [ForeignKey("OfficeCountry")]        
         public int OfficeId { get; set; }
 
         public string? Nationality { get; set; }

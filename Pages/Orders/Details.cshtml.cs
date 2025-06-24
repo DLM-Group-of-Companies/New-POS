@@ -30,7 +30,7 @@ namespace NLI_POS.Pages.Orders
                 return NotFound();
             }
 
-            var order = await _context.Orders.Include(o => o.Office).Include(o=>o.Customers).ThenInclude(c => c.CustClasses).FirstOrDefaultAsync(m => m.Id == id);
+            var order = await _context.Orders.Include(o => o.Office).Include(o=>o.Customers).ThenInclude(c => c.CustClasses).Include(p=>p.ProductCombos).FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
                 return NotFound();

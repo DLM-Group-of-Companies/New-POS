@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using NLI_POS.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -28,8 +33,10 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between"> 
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
                             <a class="nav-link " asp-area="" asp-page="/Index"><i class="fas fa-home"></i> Home</a>
                         </li>
                         <li class="nav-item">
@@ -41,7 +48,7 @@
                         <li class="nav-item">
                             <a class="nav-link " asp-area="" asp-page="/Customers/Index"><i class="fas fa-file-alt"></i> Reports</a>
                         </li>
-                    </ul>
+                    </ul>}
                     <partial name="_LoginPartial" />
                  </div>
             </div>
@@ -79,8 +86,8 @@
     </div>
 
     <footer class="border-top footer text-muted fixed-bottom">
-        <div class="container">
-            &copy; 2025 - NLI_POS - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        <div class="container-fluid bg-dark bg-gradient">
+            &copy; 2025 Noble Life International
         </div>
     </footer>
 
