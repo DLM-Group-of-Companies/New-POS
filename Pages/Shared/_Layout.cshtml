@@ -16,10 +16,33 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://kit.fontawesome.com/cc42349d53.js" crossorigin="anonymous"></script>
 
+    <!-- ✅ jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- ✅ DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- ✅ DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
+
+    <!-- Buttons extension CSS -->
+    @*    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+
+     <!-- Buttons and export dependencies -->
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js">    </script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script> *@
+
+
     <!-- Toastr -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-
 </head>
 <body>
     <header>
@@ -37,17 +60,40 @@
                     {
                         <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
-                            <a class="nav-link " asp-area="" asp-page="/Index"><i class="fas fa-home"></i> Home</a>
+                                <a class="nav-link " asp-area="" asp-page="/Index">
+                                    <i class="fas fa-home fa-xl" title="Home"></i> <span class="d-sm-none d-lg-inline-block">  Home</span>
+
+                        </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link " asp-area="" asp-page="/Orders/Index"><i class="fas fa-cash-register"></i> Order</a>
+                                <a class="nav-link " asp-area="" asp-page="/Orders/Index">
+                                    <i class="fas fa-cash-register fa-xl" title="Order"></i> <span class="d-sm-none d-lg-inline-block">  Order</span>
+
+                        </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link " asp-area="" asp-page="/Customers/Index"><i class="fas fa-users"></i> Customer</a>
+                                <a class="nav-link " asp-area="" asp-page="/Customers/Index"><i class="fas fa-users fa-xl" title="Customer"></i> <span class="d-sm-none d-lg-inline-block"> Customer</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link " asp-area="" asp-page="/Customers/Index"><i class="fas fa-file-alt"></i> Reports</a>
+                                <a class="nav-link " asp-area="" asp-page="/Orders/Index"><i class="fas fa-file-alt fa-xl" title="Reports"></i> <span class="d-sm-none d-lg-inline-block"> Reports</span></a>
                         </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <ul class="navbar-nav flex-grow-1">
+                                    <li class="nav-item dropdown ">
+                                        <a class="nav-link  dropdown-toggle" role="button" data-bs-toggle="dropdown" id="navbarSettMenu" aria-expanded="false">
+                                            <i class="fas fa-cogs fa-xl" title="Settings"></i> <span class="d-sm-none d-lg-inline-block"> Settings </span>
+
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarSettMenu">
+                                            <li><a class="dropdown-item" asp-area="" asp-page="/Users/Index" onclick="ShowProgress();"><i class="fas fa-users-cog"></i> Users</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-page="/Offices/Index" onclick="ShowProgress();"><i class="fas fa-laptop-house"></i> Branches</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-page="/Countries/Index" onclick="ShowProgress();"><i class="fas fa-globe-asia"></i> Countries</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-page="/Products/Index" onclick="ShowProgress();"><i class="fas fa-grip-horizontal"></i> Products</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            }
                     </ul>}
                     <partial name="_LoginPartial" />
                  </div>
@@ -91,7 +137,7 @@
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @* <script src="~/lib/jquery/dist/jquery.min.js"></script> *@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 

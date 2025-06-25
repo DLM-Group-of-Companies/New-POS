@@ -28,6 +28,10 @@ namespace NLI_POS.Models
         [StringLength(20)]
         public string ProductCategory { get; set; }
 
+        [Display(Name = "Class")]
+        [StringLength(20)]
+        public string? ProductClass { get; set; } //Main or Collateral
+
         public string SKU { get; set; }
 
         [Display(Name = "Unit Cost")]

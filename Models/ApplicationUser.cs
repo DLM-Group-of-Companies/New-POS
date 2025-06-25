@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,6 +20,7 @@ namespace NLI_POS.Models
         [ForeignKey("OfficeCountry")]
         public int OfficeId { get; set; }
 
+        [ValidateNever]
         public virtual OfficeCountry OfficeCountry { get; set; }
     }
 }

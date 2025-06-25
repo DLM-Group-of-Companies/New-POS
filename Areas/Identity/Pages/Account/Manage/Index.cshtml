@@ -15,11 +15,37 @@
                 <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
                 <label asp-for="Username" class="form-label"></label>
             </div>
+                <div class="form-group">
+                    <label asp-for="Fullname"></label>
+                    <input asp-for="Fullname" class="form-control text-capitalize" />
+                </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
                 <label asp-for="Input.PhoneNumber" class="form-label"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    @{
+                        if (User.IsInRole("ADMIN"))
+                        {
+                            <select asp-for="@Model.role" name="ddlRole" class="form-control text-black-50">
+                                <option value="USER">Staff</option>
+                                <option value="RO">Branch Officer</option>
+                                <option value="ADMIN">Administrator</option>
+                            </select>
+                        }
+                        else
+                        {
+                            <select asp-for="@Model.role" name="ddlRole" class="form-control text-black-50" >
+                                <option value="USER">Staff</option>
+                                <option value="RO">Branch Officer</option>
+                                <option value="ADMIN">Administrator</option>
+                            </select>
+                        }
+                    }
+
+                </div>
             <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
         </form>
     </div>

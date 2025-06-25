@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NLI_POS.Models
@@ -19,7 +20,9 @@ namespace NLI_POS.Models
         [Display(Name = "Office")]
         public int OfficeId { get; set; }
 
+        [ValidateNever]
         public virtual Product Products { get; set; }
+        [ValidateNever]
         public virtual OfficeCountry Office { get; set; }
 
     }

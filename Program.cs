@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using NLI_POS.Data;
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
+using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,8 @@ builder.Services.AddNotyf(config =>
     config.IsDismissable = true;
     config.Position = NotyfPosition.BottomRight;
 });
+
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
 var app = builder.Build();
 

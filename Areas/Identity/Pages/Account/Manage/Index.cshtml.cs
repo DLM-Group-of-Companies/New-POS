@@ -2,14 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using NLI_POS.Data;
 using NLI_POS.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace NLI_POS.Areas.Identity.Pages.Account.Manage
 {
@@ -18,44 +17,33 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
+        private ApplicationDbContext _context;
+        [BindProperty]
+        public IList<string> role { get; set; }
+
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        [BindProperty]
+        [Display(Name = "Full Name")]
+        public string Fullname { get; set; }
+
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -74,30 +62,51 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
             };
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string? pEmail)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (pEmail == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
+
+                Fullname = user.FullName;
+                role = await _userManager.GetRolesAsync(user);
+                await LoadAsync(user);
+            }
+            else
+            {
+                var sUser = await _userManager.FindByEmailAsync(pEmail);
+                if (sUser != null)
+                {
+                    Fullname = sUser.FullName;
+                    role = await _userManager.GetRolesAsync(sUser);
+                    await LoadAsync(sUser);
+                }
             }
 
-            await LoadAsync(user);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+         public async Task<IActionResult> OnPostAsync(string? pEmail)
         {
-            var user = await _userManager.GetUserAsync(User);
+            ApplicationUser user;
+            if (pEmail == null)
+            {
+                user = await _userManager.GetUserAsync(User);
+            }
+            else
+            {
+                user = await _userManager.FindByEmailAsync(pEmail);
+            }
+            //var user = await _userManager.GetUserAsync(User);
+            //var user = await _userManager.FindByEmailAsync(pEmail);
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                await LoadAsync(user);
-                return Page();
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
@@ -109,11 +118,29 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+
             }
 
-            await _signInManager.RefreshSignInAsync(user);
+            var oldRole = await _userManager.GetRolesAsync(user);
+            if (oldRole.Count > 0)
+            {
+                await _userManager.RemoveFromRoleAsync(user, oldRole[0]);
+            }
+
+            string strDDLRole = Request.Form["ddlRole"].ToString();
+            if (strDDLRole != null && strDDLRole != "")
+            {
+                await _userManager.AddToRoleAsync(user, strDDLRole);
+            }
+            user.FullName = Fullname;
+            await _userManager.UpdateAsync(user);
+            //await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
-            return RedirectToPage();
+
+            if (pEmail == null)
+                return RedirectToPage();
+            else
+                return RedirectToPage("Index", new { pemail = pEmail });
         }
     }
 }

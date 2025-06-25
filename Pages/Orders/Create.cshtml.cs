@@ -149,7 +149,7 @@ namespace NLI_POS.Pages.Orders
                 return Page();
             }
             long ticks = DateTime.Now.Ticks;
-            Order.OrderNo = $"MLAHQ-{ticks}";
+            Order.OrderNo = $"MLAHQ-{ticks.ToString().Substring(0, 10)}";
             Order.EncodeDate = DateTime.UtcNow.AddHours(8);
 
             var oType = await _context.Customer.Include(c => c.CustClasses).FirstOrDefaultAsync(c => c.Id == Order.CustomerId);

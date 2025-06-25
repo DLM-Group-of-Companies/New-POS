@@ -54,8 +54,16 @@ namespace NLI_POS.Areas.Identity.Pages.Account
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
+        [BindProperty]
+        public string Role { get; set; }
+
         public class InputModel
         {
+            [Required]
+            [StringLength(20, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+            [Display(Name = "Username")]
+            public string Username { get; set; }
+            
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -65,6 +73,9 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
             [Display(Name = "Full Name")]
             public string FullName { get; set; }
+
+            [Display(Name = "Contat Number")]
+            public string PhoneNumber { get; set; }
 
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
@@ -78,6 +89,7 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
 
             [Required]
+            [Display(Name = "Office Branch")]
             public int OfficeId { get; set; }
         }
 
@@ -95,27 +107,53 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                var user = new ApplicationUser { UserName = Input.Username.Trim().ToUpper(), Email = Input.Email.Trim(), FullName = Input.FullName.Trim(), OfficeId = Input.OfficeId };
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                var isUserNameAlreadyExists = _userManager.Users.Any(x => x.UserName == user.UserName);
+                if (isUserNameAlreadyExists)
+                {
+                    ModelState.AddModelError("UserName", "This username already exists.");
+                    return Page();
+                }
+
+                var isEmailAlreadyExists = _userManager.Users.Any(x => x.Email == user.Email);
+                if (isEmailAlreadyExists)
+                {
+                    ModelState.AddModelError("Email", "This email already exists.");
+                    return Page();
+                }
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    if (!await _roleManager.RoleExistsAsync("ADMIN"))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole("ADMIN"));
+                    }
 
-                    var userId = await _userManager.GetUserIdAsync(user);
+                    if (!await _roleManager.RoleExistsAsync("USER"))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole("USER"));
+                    }
+
+                    //await _userManager.AddToRoleAsync(user, Role);
+                    await _userManager.AddToRoleAsync(user, "USER");
+
+                    _logger.LogInformation("User created a new account with password.");
+                    //var result = await _userManager.CreateAsync(user, Input.Password);
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                        values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "NobleLife POS - Confirm your email",
+                        $"<img src='sms.ournoblelife.com/Images/noblelifelogo.png' width ='300'><br/><br/>Hi, <br/><br/>Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>." +
+                        $"<br/><br/>Your username is {Input.Username.ToUpper()} <br/> Password is {Input.ConfirmPassword}  <br/><br/><br/><br/> This is a system generated email. Please do not reply.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -131,9 +169,11 @@ namespace NLI_POS.Areas.Identity.Pages.Account
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+
             }
 
             // If we got this far, something failed, redisplay form
+            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry.Where(b => b.isActive == true).OrderBy(b => b.Name), "Id", "Name");
             return Page();
         }
 

@@ -11,77 +11,91 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Order[0].OrderNo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Order[0].OrderDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Order[0].ItemNo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Order[0].Customers)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Order[0].Office)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Order[0].Qty)
-            </th>
-
-            <th>
-                @Html.DisplayNameFor(model => model.Order[0].Products)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Order[0].Amount)
-            </th>
-
-
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Order)
-        {
+ @*    <table id="ordersTable" class="table table-striped">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.OrderNo)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.OrderDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ItemNo)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Customers.FirstName) @Html.DisplayFor(modelItem => item.Customers.LastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Office.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Qty)
-                </td>
-
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.Products.ProductName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Amount)
-                </td>
-
-                <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                <th>@Html.DisplayNameFor(model => model.Order[0].OrderNo)</th>
+                <th>@Html.DisplayNameFor(model => model.Order[0].OrderDate)</th>
+                <th>@Html.DisplayNameFor(model => model.Order[0].ItemNo)</th>
+                <th>@Html.DisplayNameFor(model => model.Order[0].Customers)</th>
+                <th>@Html.DisplayNameFor(model => model.Order[0].Office)</th>
+                <th>@Html.DisplayNameFor(model => model.Order[0].Qty)</th>
+                <th>@Html.DisplayNameFor(model => model.Order[0].Products)</th>
+                <th>@Html.DisplayNameFor(model => model.Order[0].Amount)</th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Order)
+            {
+                <tr>
+                    <td>@item.OrderNo</td>
+                    <td>@item.OrderDate.ToShortDateString()</td>
+                    <td>@item.ItemNo</td>
+                    <td>@item.Customers.FirstName @item.Customers.LastName</td>
+                    <td>@item.Office.Name</td>
+                    <td>@item.Qty</td>
+                    <td>@item.Products.ProductName</td>
+                    <td>@item.Amount?.ToString("N2")</td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table> *@
+
+    <table id="ordersTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Order No</th>
+                <th>Order Date</th>
+                <th>Item No</th>
+                <th>Customer</th>
+                <th>Office</th>
+                <th>Qty</th>
+                <th>Product</th>
+                <th>Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+    </table>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#ordersTable').DataTable({
+                ajax: {
+                    url: '@Url.Page("Index", "Orders")', // Points to OnGetOrders
+                    dataSrc: 'data'
+                },
+                columns: [
+                    { data: 'orderNo' },
+                    { data: 'orderDate' },
+                    { data: 'itemNo' },
+                    { data: 'customerName' },
+                    { data: 'office' },
+                    { data: 'qty' },
+                    { data: 'productName' },
+                    { data: 'amount' },
+                    {
+                        data: 'Id',
+                        render: function (data) {
+                            return `
+                                        <a href="/Orders/Edit?id=${data}">Edit</a> |
+                                        <a href="/Orders/Details?id=${data}">Details</a> |
+                                        <a href="/Orders/Delete?id=${data}">Delete</a>
+                                    `;
+                        }
+                    }
+                ],
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            });
+        });
+    </script>
+}
