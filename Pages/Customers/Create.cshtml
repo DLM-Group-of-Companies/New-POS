@@ -30,7 +30,6 @@
                     <select asp-for="Customer.OfficeId" class="form-control" asp-items="ViewBag.OfficeId">
                         <option value="">Select</option>
                     </select>
-                    @* </ *@select>
                 </div>
             </div>
 
@@ -143,7 +142,10 @@
                     <span asp-validation-for="Customer.PostalCode" class="text-danger small"></span>
                 </div>
             </div>
-
+            <div class="form-group row p-2">
+                <label asp-for="Customer.Notes" class="control-label"></label>
+                <textarea asp-for="Customer.Notes" class="form-control" rows="2"></textarea>
+            </div>
             <input asp-for="Customer.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
             <input asp-for="Customer.EncodedBy" type="hidden" value="ARMAN" />
 

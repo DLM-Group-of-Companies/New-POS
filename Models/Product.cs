@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NLI_POS.Models
@@ -50,6 +51,8 @@ namespace NLI_POS.Models
         public DateTime? UpdateDate { get; set; }
         public string? UpdateddBy { get; set; }
 
+        [Display(Name = "Type")]
+        [ValidateNever]
         public virtual ProductType ProductTypes { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using NLI_POS.Models;
 
 namespace NLI_POS.Pages.Orders
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly NLI_POS.Data.ApplicationDbContext _context;
@@ -17,31 +18,32 @@ namespace NLI_POS.Pages.Orders
 
         public IList<Order> Order { get;set; } = default!;
 
-        //public async Task OnGetAsync()
-        //{
-        //    Order = await _context.Orders
-        //        .Include(o => o.Customers)
-        //        .Include(o => o.Office)
-        //        .Include(o => o.Products).ToListAsync();
-        //}
-
-        public JsonResult OnGetOrders()
+        public async Task<JsonResult> OnGetOrdersAsync()
         {
             var orders = _context.Orders
                 .Include(o => o.Customers)
                 .Include(o => o.Office)
                 .Include(o => o.Products)
-                .Select(o => new {
+                .GroupBy(o => new
+                {
                     o.OrderNo,
-                    OrderDate = o.OrderDate.ToString("yyyy-MM-dd"),
-                    o.ItemNo,
+                    OrderDate = o.OrderDate.Date,
+                    o.CustomerId,
+                    o.OfficeId,
+                    o.OrderType,
                     CustomerName = o.Customers.FirstName + " " + o.Customers.LastName,
-                    Office = o.Office.Name,
-                    o.Qty,
-                    ProductName = o.Products.ProductName,
-                    Amount = o.Amount,
-                    o.Id
-                }).ToList();
+                    OfficeName = o.Office.Name
+                })
+                .Select(g => new
+                {
+                    g.Key.OrderNo,
+                    OrderDate = g.Key.OrderDate,
+                    CustomerName = g.Key.CustomerName,
+                    Office = g.Key.OfficeName,
+                    TotAmount = g.Sum(x => x.Amount)
+                })
+                .ToList();
+
 
             return new JsonResult(new { data = orders });
         }

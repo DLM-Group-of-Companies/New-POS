@@ -10,7 +10,7 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
-<table class="table">
+<table id="customerTable" class="table">
     <thead>
         <tr>
             <th>
@@ -90,3 +90,44 @@
     </tbody>
 </table>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('#customerTable').DataTable({
+            dom: 'Bfrtip',
+            responsive: true,
+            buttons: [
+                {
+                    extend: 'copy',
+                    className: 'btn btn-sm btn-outline-secondary',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn btn-sm btn-outline-success',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-sm btn-outline-success',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    orientation: 'landscape',
+                    className: 'btn btn-sm btn-outline-danger',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-sm btn-outline-dark',
+                    exportOptions: { columns: ':not(:last-child)' }
+                }
+            ],
+            columnDefs: [
+                { targets: [0], visible: false }, // Hide ID column
+                { targets: -1, orderable: false } // Disable sort on last column (Actions)
+            ]
+        });
+    });
+</script>

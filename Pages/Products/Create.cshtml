@@ -6,7 +6,7 @@
     ViewData["Title"] = "Create Product";
     var jsonData = JsonSerializer.Serialize(Model.ProductCombos);
 }
-
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
 <h4>Create Product</h4>
 <hr />
 
@@ -126,7 +126,7 @@
 <div>
     <a asp-page="Index">Back to List</a>
 </div>
-
+</div>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

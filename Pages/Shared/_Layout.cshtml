@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - NLI_POS</title>
+    <title>@ViewData["Title"] - NobleLife POS</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @* <link rel="stylesheet" href="~/NLI_POS.styles.css" asp-append-version="true" /> *@
@@ -25,19 +25,17 @@
     <!-- ✅ DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-
-
     <!-- Buttons extension CSS -->
-    @*    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
 
-     <!-- Buttons and export dependencies -->
+    <!-- Buttons and export dependencies -->
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js">    </script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js">    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script> *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 
     <!-- Toastr -->
@@ -49,13 +47,13 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm  navbar-dark bg-dark bg-gradient">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">
-                    <img src="~/images/noblelife-white.png" alt="" width="150"  class="d-inline-block align-text-top" />
-                    </a>
+                    <img src="~/images/noblelife-white.png" alt="" width="150" class="d-inline-block align-text-top" />
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between"> 
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     @if (SignInManager.IsSignedIn(User))
                     {
                         <ul class="navbar-nav flex-grow-1">
@@ -63,20 +61,20 @@
                                 <a class="nav-link " asp-area="" asp-page="/Index">
                                     <i class="fas fa-home fa-xl" title="Home"></i> <span class="d-sm-none d-lg-inline-block">  Home</span>
 
-                        </a>
-                        </li>
-                        <li class="nav-item">
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link " asp-area="" asp-page="/Orders/Index">
                                     <i class="fas fa-cash-register fa-xl" title="Order"></i> <span class="d-sm-none d-lg-inline-block">  Order</span>
 
-                        </a>
-                        </li>
-                        <li class="nav-item">
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link " asp-area="" asp-page="/Customers/Index"><i class="fas fa-users fa-xl" title="Customer"></i> <span class="d-sm-none d-lg-inline-block"> Customer</span></a>
-                        </li>
-                        <li class="nav-item">
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link " asp-area="" asp-page="/Orders/Index"><i class="fas fa-file-alt fa-xl" title="Reports"></i> <span class="d-sm-none d-lg-inline-block"> Reports</span></a>
-                        </li>
+                            </li>
                             @if (User.IsInRole("Admin"))
                             {
                                 <ul class="navbar-nav flex-grow-1">
@@ -87,16 +85,18 @@
                                         </a>
                                         <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarSettMenu">
                                             <li><a class="dropdown-item" asp-area="" asp-page="/Users/Index" onclick="ShowProgress();"><i class="fas fa-users-cog"></i> Users</a></li>
-                                            <li><a class="dropdown-item" asp-area="" asp-page="/Offices/Index" onclick="ShowProgress();"><i class="fas fa-laptop-house"></i> Branches</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-page="/Offices/Index" onclick="ShowProgress();"><i class="fas fa-laptop-house"></i> Offices</a></li>
                                             <li><a class="dropdown-item" asp-area="" asp-page="/Countries/Index" onclick="ShowProgress();"><i class="fas fa-globe-asia"></i> Countries</a></li>
                                             <li><a class="dropdown-item" asp-area="" asp-page="/Products/Index" onclick="ShowProgress();"><i class="fas fa-grip-horizontal"></i> Products</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-page="/Inventory/Index" onclick="ShowProgress();"><i class="fas fa-boxes"></i> Inventory</a></li>
                                         </ul>
                                     </li>
                                 </ul>
                             }
-                    </ul>}
+                        </ul>
+                    }
                     <partial name="_LoginPartial" />
-                 </div>
+                </div>
             </div>
         </nav>
     </header>

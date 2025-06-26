@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using NLI_POS.Data;
 using NLI_POS.Models;
 
 namespace NLI_POS.Pages.Orders
@@ -23,14 +18,14 @@ namespace NLI_POS.Pages.Orders
         public IList<Order> OrderList { get; set; } = default!;
 
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(string? orderNo)
         {
-            if (id == null)
+            if (orderNo == null)
             {
                 return NotFound();
             }
 
-            var order = await _context.Orders.Include(o => o.Office).Include(o=>o.Customers).ThenInclude(c => c.CustClasses).Include(p=>p.ProductCombos).FirstOrDefaultAsync(m => m.Id == id);
+            var order = await _context.Orders.Include(o => o.Office).Include(o=>o.Customers).ThenInclude(c => c.CustClasses).Include(p=>p.ProductCombos).FirstOrDefaultAsync(m => m.OrderNo == orderNo);
             if (order == null)
             {
                 return NotFound();

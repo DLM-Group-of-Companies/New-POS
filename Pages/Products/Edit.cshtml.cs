@@ -139,6 +139,7 @@ namespace NLI_POS.Pages.Products
         {
             if (!ModelState.IsValid)
             {
+                GetProductList();
                 return Page();
             }
 

@@ -126,6 +126,21 @@ namespace NLI_POS.Pages.Orders
         [BindProperty]
         public Order Order { get; set; } = default!;
 
+        private async Task LoadDropdownsAsync()
+        {
+            var customer = await _context.Customer
+                .Select(p => new
+                {
+                    Id = p.Id,
+                    FullName = p.CustCode + " | " + p.FirstName + " " + p.LastName
+                })
+                .ToListAsync();
+
+            ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
+            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
+        }
+
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
@@ -134,67 +149,188 @@ namespace NLI_POS.Pages.Orders
             if (cart == null || !cart.Any())
             {
                 ModelState.AddModelError("", "Cart is empty. Please add products.");
-                var customer = _context.Customer
-                .Select(p => new
-                {
-                    Id = p.Id,
-                    FullName = p.CustCode + " | " + p.FirstName + " " + p.LastName
-                })
-                .ToList();
-
-                ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
-                ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
-                ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
+                await LoadDropdownsAsync(); // Reload select lists
 
                 return Page();
             }
-            long ticks = DateTime.Now.Ticks;
-            Order.OrderNo = $"MLAHQ-{ticks.ToString().Substring(0, 10)}";
-            Order.EncodeDate = DateTime.UtcNow.AddHours(8);
 
-            var oType = await _context.Customer.Include(c => c.CustClasses).FirstOrDefaultAsync(c => c.Id == Order.CustomerId);
-            Order.OrderType = oType.CustClasses.Name;
-
-            ModelState.Remove("Order.OrderNo");
-            ModelState.Remove("Order.EncodeDate");
-            ModelState.Remove("Order.Office");
-            ModelState.Remove("Order.CustClasses");
-            ModelState.Remove("Order.Products");
-            ModelState.Remove("Order.ProductCombos");
-            ModelState.Remove("Order.Office");
-            ModelState.Remove("Order.CustClasses");
-            ModelState.Remove("Order.Customers");
-            ModelState.Remove("Order.OrderType");
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            int i = cart.Count();
-            for (int j = 0; j < i; j++)
-            {
-                Order.ProductId = cart[j].ProductId;
-                Order.ComboId = cart[j].ProductCombo;
-                Order.Qty = cart[j].Quantity;
-                Order.Price = cart[j].Price;
-                Order.Amount = Order.Price * Order.Qty;
-                Order.ItemNo = j + 1;
-                _context.Orders.Add(Order);
-                await _context.SaveChangesAsync();
-                Order.Id = Order.Id + 1;
-            }
-            //_context.Orders.Add(Order);
-            //await _context.SaveChangesAsync();
-
-            //// ✅ Deduct stock here
-            //var product = await _context.Products.FindAsync(cart[j].ProductId);
-            //if (product != null)
+            // Check inventory before proceeding
+            //foreach (var item in cart)
             //{
-            //    product.StockQuantity -= cart[j].Quantity;
-            //    if (product.StockQuantity < 0) product.StockQuantity = 0; // optional safeguard
-            //    _context.Products.Update(product);
-            //    await _context.SaveChangesAsync();
+            //    var inventory = await _context.InventoryStocks
+            //        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId);
+
+            //    if (inventory == null || inventory.StockQty < item.Quantity)
+            //    {
+            //        var product = await _context.Products.FindAsync(item.ProductId);
+            //        string productName = product?.ProductName ?? $"Product ID {item.ProductId}";
+
+            //        ModelState.AddModelError("", $"Not enough stock for {productName}. Available: {inventory?.StockQty ?? 0}, Requested: {item.Quantity}");
+            //        await LoadDropdownsAsync(); // Reload select lists
+            //        return Page();
+            //    }
             //}
+
+            foreach (var item in cart)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+
+                // Check if product is a promo bundle
+                if (product != null && product.ProductCategory == "Promo")
+                {
+                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == item.ProductId);
+
+                    if (combo != null)
+                    {
+                        var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
+                        var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
+
+                        for (int i = 0; i < productIds.Count; i++)
+                        {
+                            int componentProductId = productIds[i];
+                            int requiredQty = qtyList[i] * item.Quantity; // Multiply by how many promos were ordered
+
+                            var inventory = await _context.InventoryStocks
+                                .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == Order.OfficeId);
+
+                            if (inventory == null || inventory.StockQty < requiredQty)
+                            {
+                                var componentProduct = await _context.Products.FindAsync(componentProductId);
+                                string componentName = componentProduct?.ProductName ?? $"Product ID {componentProductId}";
+
+                                ModelState.AddModelError("", $"Not enough stock for promo component: {componentName}. Available: {inventory?.StockQty ?? 0}, Required: {requiredQty}");
+                                await LoadDropdownsAsync();
+                                return Page();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Regular product stock check
+                    var inventory = await _context.InventoryStocks
+                        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId);
+
+                    if (inventory == null || inventory.StockQty < item.Quantity)
+                    {
+                        string productName = product?.ProductName ?? $"Product ID {item.ProductId}";
+
+                        ModelState.AddModelError("", $"Not enough stock for {productName}. Available: {inventory?.StockQty ?? 0}, Requested: {item.Quantity}");
+                        await LoadDropdownsAsync();
+                        return Page();
+                    }
+                }
+            }
+
+
+            // Setup base order data
+            string orderNo = "";
+            bool isUnique = false;
+
+            do //Generate Order Number and make sure it will not have duplicates incase multiple users saved record at same time
+            {
+                long ticks = DateTime.UtcNow.Ticks;
+                orderNo = $"MLAHQ-{ticks.ToString().Substring(0, 10)}";
+
+                isUnique = !_context.Orders.Any(o => o.OrderNo == orderNo);
+            } while (!isUnique);
+
+
+            DateTime encodeDate = DateTime.UtcNow.AddHours(8);
+
+            var oType = await _context.Customer
+                .Include(c => c.CustClasses)
+                .FirstOrDefaultAsync(c => c.Id == Order.CustomerId);
+
+            string orderType = oType?.CustClasses?.Name ?? "Others";
+
+            int itemNo = 1;
+
+            foreach (var item in cart)
+            {
+                var order = new Order
+                {
+                    OrderNo = orderNo,
+                    OrderDate=encodeDate.Date,
+                    EncodeDate = encodeDate,
+                    CustomerId = Order.CustomerId,
+                    OfficeId = Order.OfficeId,
+                    OrderType = orderType,
+                    ProductId = item.ProductId,
+                    ComboId = item.ProductCombo,
+                    Qty = item.Quantity,
+                    Price = item.Price,
+                    Amount = item.Price * item.Quantity,
+                    EncodedBy = User.Identity.Name,                    
+                    ItemNo = itemNo++
+                };
+
+
+                _context.Orders.Add(order);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // ✅ Now update inventory
+            //foreach (var item in cart)
+            //{
+            //    var inventory = await _context.InventoryStocks
+            //        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId); // assuming stock is per-office
+
+            //    if (inventory != null)
+            //    {
+            //        inventory.StockQty -= item.Quantity;
+            //        if (inventory.StockQty < 0) inventory.StockQty = 0;
+            //        _context.InventoryStocks.Update(inventory);
+            //    }
+            //}
+
+            foreach (var item in cart)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+
+                if (product != null && product.ProductCategory == "Promo")
+                {
+                    // Promo logic
+                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == item.ProductId);
+                    if (combo != null)
+                    {
+                        var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
+                        var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
+
+                        for (int i = 0; i < productIds.Count; i++)
+                        {
+                            int componentProductId = productIds[i];
+                            int requiredQty = qtyList[i] * item.Quantity;
+
+                            var inventory = await _context.InventoryStocks
+                                .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == Order.OfficeId);
+
+                            if (inventory != null)
+                            {
+                                inventory.StockQty -= requiredQty;
+                                if (inventory.StockQty < 0) inventory.StockQty = 0;
+                                _context.InventoryStocks.Update(inventory);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Regular product logic
+                    var inventory = await _context.InventoryStocks
+                        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId);
+
+                    if (inventory != null)
+                    {
+                        inventory.StockQty -= item.Quantity;
+                        if (inventory.StockQty < 0) inventory.StockQty = 0;
+                        _context.InventoryStocks.Update(inventory);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
 
             HttpContext.Session.Remove("Cart");
             return RedirectToPage("./Index");

@@ -27,3 +27,14 @@ body {
     padding-bottom: 50px;
     /*padding-top: 65px;*/
 }
+
+/*data table search*/
+.dataTables_filter {
+    padding: 10px; /* top/bottom 10px, left/right 20px */
+}
+
+/*Validation Summary*/
+.validation-summary-errors ul {
+margin-bottom:2px;
+padding-left:20px;
+}

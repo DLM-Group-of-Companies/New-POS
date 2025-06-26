@@ -64,7 +64,11 @@ namespace NLI_POS.Models
         [ForeignKey("OfficeCountry")]        
         public int OfficeId { get; set; }
 
+        [StringLength(30)]
         public string? Nationality { get; set; }
+
+        [StringLength(500)]
+        public string? Notes { get; set; }
 
         public DateTime EncodeDate { get; set; }
         public string EncodedBy { get; set; }
