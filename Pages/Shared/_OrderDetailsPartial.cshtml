@@ -1,75 +1,72 @@
 ﻿@model IList<NLI_POS.Models.Order>
 
-<table class="table table-success table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model[0].ItemNo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model[0].ProductCategory)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model[0].Products)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model[0].ProductCombos)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model[0].Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model[0].Qty)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model[0].Amount)
-            </th>
+@* <table class="table table-success table-striped">*@
+@* <thead class="table-secondary">  *@
+<tr>
+    <th>
+        Item#
+    </th>
+    <th>
+        Category
+    </th>
+    <th>
+        Item(s)
+    </th>
+    <th>
+        Sub-Item(s)
+    </th>
+    <th class="text-end">
+        @Html.DisplayNameFor(model => model[0].Price)
+    </th>
+    <th class="text-end">
+        @Html.DisplayNameFor(model => model[0].Qty)
+    </th>
+    <th class="text-end">
+        @Html.DisplayNameFor(model => model[0].Amount)
+    </th>
 
 
-            <th></th>
-        </tr>
+    <th></th>
+</tr>
     </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ItemNo)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Products.ProductCategory)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Products.ProductName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ProductCombos.ProductsDesc)
-                </td>
-                <td class="text-end">
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td class="text-end">
-                    @Html.DisplayFor(modelItem => item.Qty)
-                </td>
-                <td class="text-end">
-                    @Html.DisplayFor(modelItem => item.Amount)
-                </td>
+<tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Products.ProductCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Products.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductCombos.ProductsDesc)
+            </td>
+            <td class="text-end">
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td class="text-end">
+                @Html.DisplayFor(modelItem => item.Qty)
+            </td>
+            <td class="text-end">
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
 
-                <td>
-                    @* <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> | *@
-                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> 
-                    @* <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a> *@
-                </td>
-            </tr>
-        }
-    </tbody>
-    <tfoot class="table-info">
-        <tr class="fw-bold">
-            <td colspan="4">Total</td>
-            <td class="text-end">@Model.Sum(i => i.Price ?? 0).ToString("N2")</td>
-            <td class="text-end">@Model.Sum(i => i.Qty ?? 0).ToString("0")</td>
-            <td class="text-end">@Model.Sum(i => i.Amount ?? 0).ToString("N2")</td>
-            <td ></td>
+            <td>
+            </td>
         </tr>
-    </tfoot>
-</table>
+    }
+</tbody>
+<tfoot class="table-secondary">
+    <tr class="fw-bold">
+        <td colspan="4">Total</td>
+        <td class="text-end">@Model.Sum(i => i.Price ?? 0).ToString("N2")</td>
+        <td class="text-end">@Model.Sum(i => i.Qty ?? 0).ToString("0")</td>
+        <td class="text-end">@Model.Sum(i => i.Amount ?? 0).ToString("N2")</td>
+        <td></td>
+    </tr>
+</tfoot>
+@* </table> *@

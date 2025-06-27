@@ -1,0 +1,10 @@
+﻿@media print {
+    @page {
+        size: landscape;
+    }
+
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

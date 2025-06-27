@@ -233,8 +233,7 @@
         $(document).ready(function () {
             $('#ProductId').change(function () {
                 var selectedProductId = $(this).val();
-                var custclasstxt = $('#CustClassDisplay').text();
-                alert(custclasstxt);
+                var custclasstxt = $('#CustClassDisplay').text();                
                 $("#ComboId").empty();
                 //$("#ComboId").append("<option value=''>--Select--</option>");
                 $.getJSON(`?handler=ProductComboList&ProdId=${selectedProductId}`, (data) => {

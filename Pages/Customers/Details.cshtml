@@ -9,14 +9,14 @@
     <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl" onclick="window.location = './Index';"></i> </span>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="customerTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
-                Customer Details
+        <li class="nav-item border" role="presentation">
+            <button class="nav-link active fw-bold" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
+                <i class="fas fa-user-cog fa-xl"></i> CUSTOMER DETAILS
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
-                Order History
+        <li class="nav-item border" role="presentation">
+            <button class="nav-link fw-bold" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                <i class="fas fa-list fa-xl"></i> ORDER HISTORY
             </button>
         </li>
     </ul>
@@ -116,6 +116,7 @@
                     </div>
 
                 </div>
+
                 <div class="row">
                     <div class="pt-2 col-12 col-sm-5 col-md-5 col-lg-5 col-xl-5">
                         @Html.DisplayNameFor(model => model.Customer.Address1)
@@ -132,9 +133,8 @@
                         <label class="control-label">Postal Code</label>
                         <label class="form-control">@Html.DisplayFor(model => model.Customer.PostalCode)</label>
                     </div>
-
-
                 </div>
+
                 <div class="row">
                     <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
                         @Html.DisplayNameFor(model => model.Customer.EncodeDate)
@@ -152,9 +152,7 @@
                         @Html.DisplayNameFor(model => model.Customer.UpdateddBy)
                         <label class="form-control">@Html.DisplayFor(model => model.Customer.UpdateddBy)</label>
                     </div>
-
                 </div>
-
 
                 <div class="p-2">
                     <a class="btn btn-primary" asp-page="./Edit" asp-route-id="@Model.Customer.Id"><i class="fas fa-pen-square"></i> Edit</a>
@@ -175,6 +173,7 @@
                             <th>Order No</th>
                             <th>Date</th>
                             <th>Amount</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -184,6 +183,9 @@
                                 <td>@order.OrderNo</td>
                                 <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
                                 <td>@order.TotAmount.ToString("N2")</td>
+                                <td>
+                                    <a asp-page="/Orders/Details" asp-route-orderNo="@order.OrderNo">Details</a>
+                                </td>
                             </tr>
                         }
                     </tbody>
