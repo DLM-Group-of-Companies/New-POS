@@ -11,13 +11,13 @@
 
     <form method="post" id="form">
 
-        <div class="row">
+        <div class="row p-2">
             <div class="col-md-12 p-2">
                 @* First Column - New Product *@
 
 
                 <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
-                <div class="row">
+                <div class="row pt-2">
                     <input asp-for="Products.Id" id="ProdMainID" type="hidden" />
                     <div class="col-md-4">
                         <div class="form-group">
@@ -35,7 +35,18 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="Products.ProductClass" class="control-label"></label>
+                            <select asp-for="Products.ProductClass" class="form-control" >
+                                <option value="">Select</option>
+                                <option value="Main">Main</option>
+                                <option value="Collateral">Collateral</option>
+                            </select>
+                            <span asp-validation-for="Products.ProductClass" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
                         <div class="form-group">
                             <label asp-for="Products.ProductDescription" class="control-label"></label>
                             <input asp-for="Products.ProductDescription" class="form-control" />
@@ -43,7 +54,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row pt-2">
                     <div class="col-md-3">
                         <div class="form-group">
                             <label asp-for="Products.ProducTypeId" class="control-label"></label>
@@ -75,7 +86,7 @@
                     </div>
 
                 </div>
-                <div class="row">
+                <div class="row pt-2">
                     <div class="col-md-3">
                         <div class="form-group">
                             <label asp-for="Products.UnitCost" class="control-label"></label>
@@ -105,12 +116,27 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="form-group form-check form-switch">
-                        <label class="form-check-label">
-                            <input class="form-check-input" asp-for="Products.IsActive" /> Active
-                        </label>
-
+                <div class="row pt-2">
+                    <div class="col-md-2">
+                        <div class="form-group form-check form-switch">
+                            <label class="form-check-label">
+                                <input class="form-check-input" asp-for="Products.IsActive" /> Active
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group form-check form-switch">
+                            <label class="form-check-label">
+                                <input class="form-check-input" asp-for="Products.isFreebieAvailable" style="accent-color: green;" /> Freebie Available
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group form-check form-switch">
+                            <label class="form-check-label">
+                                <input class="form-check-input" asp-for="Products.isStaffAvailable" /> Staff Available
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -256,9 +282,9 @@
                 url: "?handler=ProductList",
                 success: function (data) {
                     let newselect = `<select id='ProductComboList[${rowCount}][1]'
-                                                     asp-for='ProductComboList[${rowCount}][1]'
-                                                     name='ProductComboList[${rowCount}][1]'
-                                                     class='form-control'>`;
+                                                                     asp-for='ProductComboList[${rowCount}][1]'
+                                                                     name='ProductComboList[${rowCount}][1]'
+                                                                     class='form-control'>`;
 
                     $.each(data, function (i, item) {
                         newselect += `<option value="${item.value}">${item.text}</option>`;
@@ -267,35 +293,35 @@
                     newselect += "</select>";
 
                     let newitem = `
-                                <div class="row p-1 inputRow">
-                                    <div class="col-8">
-                                        <div class="form-group">${newselect}</div>
-                                    </div>
-                                    <div class="col-2">
-                                        <input type="hidden" id="ProductComboList[${rowCount}][0]"
-                                               asp-for="ProductComboList[${rowCount}][0]"
-                                               name="ProductComboList[${rowCount}][0]"
-                                               value="${mainID}">
-                                        <input type="number" id="ProductComboList[${rowCount}][2]"
-                                               asp-for="ProductComboList[${rowCount}][2]"
-                                               name="ProductComboList[${rowCount}][2]"
-                                               class="form-control">
-                                    </div>
-                                    <div class="col-1 text-center">
-                                        <button type="button" class="removeRow btn btn-danger btn-sm">
-                                            <i class="fas fa-minus-circle"></i>
-                                        </button>
-                                    </div>
-                                    <div class="col-1 text-center">
-                                                <button id="addRow" type="button" onclick="getSelText(${rowCount});addProductComboRow()"
-                                                class="btn btn-success btn-sm">
-                                            <i class="fas fa-plus-circle"></i>
-                                        </button>
-                                        <input type="hidden" id="ProductComboList[${rowCount}][3]"
-                                               asp-for="ProductComboList[${rowCount}][3]"
-                                               name="ProductComboList[${rowCount}][3]">
-                                    </div>
-                                </div>`;
+                                                <div class="row p-1 inputRow">
+                                                    <div class="col-8">
+                                                        <div class="form-group">${newselect}</div>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <input type="hidden" id="ProductComboList[${rowCount}][0]"
+                                                               asp-for="ProductComboList[${rowCount}][0]"
+                                                               name="ProductComboList[${rowCount}][0]"
+                                                               value="${mainID}">
+                                                        <input type="number" id="ProductComboList[${rowCount}][2]"
+                                                               asp-for="ProductComboList[${rowCount}][2]"
+                                                               name="ProductComboList[${rowCount}][2]"
+                                                               class="form-control">
+                                                    </div>
+                                                    <div class="col-1 text-center">
+                                                        <button type="button" class="removeRow btn btn-danger btn-sm">
+                                                            <i class="fas fa-minus-circle"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-1 text-center">
+                                                                <button id="addRow" type="button" onclick="getSelText(${rowCount});addProductComboRow()"
+                                                                class="btn btn-success btn-sm">
+                                                            <i class="fas fa-plus-circle"></i>
+                                                        </button>
+                                                        <input type="hidden" id="ProductComboList[${rowCount}][3]"
+                                                               asp-for="ProductComboList[${rowCount}][3]"
+                                                               name="ProductComboList[${rowCount}][3]">
+                                                    </div>
+                                                </div>`;
 
                     $("#newRow").append(newitem);
                 },

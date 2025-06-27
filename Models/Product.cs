@@ -44,6 +44,8 @@ namespace NLI_POS.Models
         [Display(Name = "Staff Price")]
         public decimal StaffPrice { get; set; }
 
+        public bool isStaffAvailable { get; set; }
+        public bool isFreebieAvailable { get; set; }
         public bool IsActive { get; set; }
 
         public DateTime EncodeDate { get; set; }

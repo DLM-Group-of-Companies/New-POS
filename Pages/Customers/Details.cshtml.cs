@@ -21,6 +21,17 @@ namespace NLI_POS.Pages.Customers
         }
 
         public Customer Customer { get; set; } = default!;
+        public IList<OrderSummary> Order { get; set; } = new List<OrderSummary>();
+
+        public class OrderSummary
+        {
+            public string OrderNo { get; set; } = string.Empty;
+            public DateTime OrderDate { get; set; }
+            public string CustomerName { get; set; } = string.Empty;
+            public string Office { get; set; } = string.Empty;
+            public decimal TotAmount { get; set; }
+        }
+
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -38,6 +49,31 @@ namespace NLI_POS.Pages.Customers
             else
             {
                 Customer = customer;
+                Order = _context.Orders
+                    .Where(o=>o.CustomerId== id)
+                          .Include(o => o.Customers)
+                          .Include(o => o.Office)
+                          .Include(o => o.Products)
+                          .AsEnumerable()
+                          .GroupBy(o => new
+                          {
+                              o.OrderNo,
+                              OrderDate = o.OrderDate.Date,
+                              o.CustomerId,
+                              o.OfficeId,
+                              o.OrderType,
+                              CustomerName = o.Customers.FirstName + " " + o.Customers.LastName,
+                              OfficeName = o.Office.Name
+                          })
+                          .Select(g => new OrderSummary
+                          {
+                              OrderNo = g.Key.OrderNo,
+                              OrderDate = g.Key.OrderDate,
+                              CustomerName = g.Key.CustomerName,
+                              Office = g.Key.OfficeName,
+                              TotAmount = (decimal)g.Sum(x => x.Amount)
+                          })
+                          .ToList();
             }
             return Page();
         }

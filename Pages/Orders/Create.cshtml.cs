@@ -113,13 +113,43 @@ namespace NLI_POS.Pages.Orders
             return new JsonResult(SectionList);
         }
 
-        public JsonResult OnGetGetProducAmount(int id)
+        public JsonResult OnGetCustomerClass(int id)
+        {
+            var customer = _context.Customer
+                .Include(c => c.CustClasses)
+                .FirstOrDefault(c => c.Id == id);
+
+            if (customer == null)
+                return new JsonResult(new { success = false });
+
+            return new JsonResult(new
+            {
+                success = true,
+                custClassId = customer.CustClass,
+                custClassName = customer.CustClasses.Name
+            });
+        }
+
+
+        public JsonResult OnGetGetProducAmount(int id, string? custclass)
         {
             //ViewData["ProductCombos"] = new SelectList(_context.ProductCombos.Where(c=>c.ProductId==id), "Id", "ProductsDesc");
 
             var ProdAmount = _context.Products.FirstOrDefault(p => p.Id == id);
 
-            return new JsonResult(ProdAmount.RegPrice);
+            if (custclass == "Staff")
+            {
+                return new JsonResult(ProdAmount.StaffPrice);
+            }
+            else if (custclass == "Over the Counter")
+            {
+                return new JsonResult(ProdAmount.RegPrice);
+            }
+            else
+            {
+                return new JsonResult(ProdAmount.RegPrice);
+            }
+            
 
         }
 
@@ -155,22 +185,6 @@ namespace NLI_POS.Pages.Orders
             }
 
             // Check inventory before proceeding
-            //foreach (var item in cart)
-            //{
-            //    var inventory = await _context.InventoryStocks
-            //        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId);
-
-            //    if (inventory == null || inventory.StockQty < item.Quantity)
-            //    {
-            //        var product = await _context.Products.FindAsync(item.ProductId);
-            //        string productName = product?.ProductName ?? $"Product ID {item.ProductId}";
-
-            //        ModelState.AddModelError("", $"Not enough stock for {productName}. Available: {inventory?.StockQty ?? 0}, Requested: {item.Quantity}");
-            //        await LoadDropdownsAsync(); // Reload select lists
-            //        return Page();
-            //    }
-            //}
-
             foreach (var item in cart)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);

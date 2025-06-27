@@ -29,11 +29,10 @@
                                 <span asp-validation-for="Order.OrderDate" class="text-danger small"></span>
                             </div>
                         </div>
-                        <div class="row pb-4">
-                            @* <span class="text-danger small">*</span> *@
+                        <div class="row pb-4">  
+                            <div class="col-lg-12 ">
                             <label asp-for="Order.CustomerId" class="control-label"></label>
-                            <div class="col-lg-12 input-group">
-
+                            <div class="input-group">
                                 <select asp-for="Order.CustomerId" id="CustomerId" class="form-control" asp-items="ViewBag.CustomerId">
                                     <option value="">-- Select Customer--</option>
                                 </select>
@@ -42,11 +41,15 @@
                                 </div>
 
                             </div>
+                            <div class="col-lg-12 p-2">
+                                <span id="CustClassDisplay" class="badge bg-success"></span>
+                                <input id="Order_CustClass" name="Order.CustClass" type="hidden" />
+                                </div>
                             <span asp-validation-for="Order.CustomerId" class="text-danger small"></span>
+                            </div>
+
                         </div>
-                        @*                     <div class="row pb-4">
-                        <button class="btn btn-success" onclick="openCustomerSearchModal()"><i class="fas fa-user-plus"></i> New Customer</button>
-                        </div> *@
+    
                     </div>
                     <input asp-for="Order.ItemNo" type="hidden" />
                     <br />
@@ -54,7 +57,6 @@
                         <div class="row pb-4">
                             <div class="col-lg-4 col-md-4 col-sm-12 col-12 form-group">
                                 <label asp-for="Order.ProductCategory" class="control-label"></label>
-                                @* <input asp-for="Products.ProductCategory" class="form-control" /> *@
                                 <select id="ProductCategory" asp-for="Order.ProductCategory" id="ProductCategory" data-name="ProductCategory" class="form-control">
                                     <option value="Regular">Regular</option>
                                     <option value="Promo">Promo</option>
@@ -65,7 +67,6 @@
                             <div class="col-lg-8 col-md-8 col-sm-12 col-12 form-group">
                                 <label asp-for="Order.ProductId" class="control-label"></label>
                                 <select id="ProductId" asp-for="Order.ProductId" data-name="ProductId" class="form-control" asp-items="ViewBag.ProductId">
-                                    @* <option value="">-- Select --</option> *@
                                 </select>
                             </div>
                         </div>
@@ -201,12 +202,39 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
+    <script> //Get Customer Class to determine if Staff. Staff has different price
+    $('#CustomerId').on('change', function () {
+        var customerId = $(this).val();
+
+        if (customerId) {
+            $.ajax({
+                url: '@Url.Page("Create", "CustomerClass")',
+                type: 'GET',
+                data: { id: customerId },
+                success: function (res) {
+                    if (res.success) {
+                        $('#CustClassDisplay').text(res.custClassName); 
+                        $('#Order_CustClass').val(res.custClassId); 
+                    } else {
+                        $('#CustClassDisplay').text("Not found");
+                    }
+                },
+                error: function () {
+                    alert('Error retrieving customer class');
+                }
+            });
+        }
+    });
+</script>
+
+
     <script>
         var amount = 0;
         $(document).ready(function () {
             $('#ProductId').change(function () {
                 var selectedProductId = $(this).val();
-                //alert(selectedProductId);
+                var custclasstxt = $('#CustClassDisplay').text();
+                alert(custclasstxt);
                 $("#ComboId").empty();
                 //$("#ComboId").append("<option value=''>--Select--</option>");
                 $.getJSON(`?handler=ProductComboList&ProdId=${selectedProductId}`, (data) => {
@@ -218,7 +246,7 @@
                     cache: false,
                     type: "GET",
                     url: "?handler=GetProducAmount",
-                    data: { __RequestVerificationToken: gettoken(), id: selectedProductId },
+                    data: { __RequestVerificationToken: gettoken(), id: selectedProductId, custclass: custclasstxt },
                     dataType: 'json',
                     // contentType: "application/json; charset=utf-8",
                     // dataType: "html",

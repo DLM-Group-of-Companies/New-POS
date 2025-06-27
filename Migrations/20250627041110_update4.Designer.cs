@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NLI_POS.Data;
 
@@ -10,9 +11,11 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250627041110_update4")]
+    partial class update4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -636,9 +639,6 @@ namespace NLI_POS.Migrations
 
                     b.Property<string>("UpdateddBy")
                         .HasColumnType("longtext");
-
-                    b.Property<bool>("isFreebieAvailable")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("isStaffAvailable")
                         .HasColumnType("tinyint(1)");
