@@ -4,7 +4,7 @@ using NLI_POS.Models;
 
 namespace NLI_POS.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -21,5 +21,6 @@ namespace NLI_POS.Data
         public DbSet<ProductCombo> ProductCombos { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<ApplicationUser> AppUsers { get; set; }
+        public DbSet<UserOfficeAccess> UserOfficesAccess { get; set; }
     }
 }

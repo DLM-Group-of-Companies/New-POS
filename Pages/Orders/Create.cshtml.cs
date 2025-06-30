@@ -32,7 +32,7 @@ namespace NLI_POS.Pages.Orders
             ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
 
-            var products = _context.Products
+            var products = _context.Products.Where(p=>p.IsActive)
             .Select(p => new { p.Id, p.ProductName })
             .ToList();
 
@@ -48,7 +48,7 @@ namespace NLI_POS.Pages.Orders
         public JsonResult OnGetProductsByCategory(string categoryId)
         {
             var products = _context.Products
-                .Where(p => p.ProductCategory == categoryId)
+                .Where(p => p.IsActive && p.ProductCategory == categoryId)
                 .Select(p => new { id = p.Id, name = p.ProductName })
                 .ToList();
 
@@ -72,7 +72,7 @@ namespace NLI_POS.Pages.Orders
         {
             ModelState.Clear();
 
-            List<SelectListItem> SectionList = (from d in _context.Products.Where(p => p.ProductCategory == ProdCat)
+            List<SelectListItem> SectionList = (from d in _context.Products.Where(p => p.IsActive && p.ProductCategory == ProdCat)
                                                 select new SelectListItem
                                                 {
                                                     Text = d.ProductName,

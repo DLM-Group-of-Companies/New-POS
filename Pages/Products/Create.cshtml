@@ -6,12 +6,12 @@
     ViewData["Title"] = "Create Product";
     var jsonData = JsonSerializer.Serialize(Model.ProductCombos);
 }
-<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
+<div class="container bg-white bg-gradient rounded-3 shadow p-2" style="width: 60%;">
 <h4>Create Product</h4>
 <hr />
 
 <form method="post">
-    <div class="row">
+    <div class="row p-2">
         <div class="col-md-12 p-2">
             <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
             <div class="row">

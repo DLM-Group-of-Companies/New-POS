@@ -1,0 +1,50 @@
+﻿@page
+@model NLI_POS.Pages.UsersOfficeAccess.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
+    <h1>User Office Access</h1>
+
+    <p>
+        <a asp-page="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserOfficeAccess[0].User.UserName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserOfficeAccess[0].User.FullName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserOfficeAccess[0].OfficeCountry)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.UserOfficeAccess)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OfficeCountry.Name)
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

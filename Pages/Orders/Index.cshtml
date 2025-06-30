@@ -6,46 +6,12 @@
 }
 
 <div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl" onclick="window.location = './Index';"></i> </span>
     <h3>Order</h3>
 
     <p>
         <a class="btn btn-primary btn-gradient" asp-page="Create"><i class="fas fa-cart-plus"></i> New Order</a>
     </p>
-    @*    <table id="ordersTable" class="table table-striped">
-    <thead>
-    <tr>
-    <th>@Html.DisplayNameFor(model => model.Order[0].OrderNo)</th>
-    <th>@Html.DisplayNameFor(model => model.Order[0].OrderDate)</th>
-    <th>@Html.DisplayNameFor(model => model.Order[0].ItemNo)</th>
-    <th>@Html.DisplayNameFor(model => model.Order[0].Customers)</th>
-    <th>@Html.DisplayNameFor(model => model.Order[0].Office)</th>
-    <th>@Html.DisplayNameFor(model => model.Order[0].Qty)</th>
-    <th>@Html.DisplayNameFor(model => model.Order[0].Products)</th>
-    <th>@Html.DisplayNameFor(model => model.Order[0].Amount)</th>
-    <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model.Order)
-    {
-    <tr>
-    <td>@item.OrderNo</td>
-    <td>@item.OrderDate.ToShortDateString()</td>
-    <td>@item.ItemNo</td>
-    <td>@item.Customers.FirstName @item.Customers.LastName</td>
-    <td>@item.Office.Name</td>
-    <td>@item.Qty</td>
-    <td>@item.Products.ProductName</td>
-    <td>@item.Amount?.ToString("N2")</td>
-    <td>
-    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-    </td>
-    </tr>
-    }
-    </tbody>
-    </table> *@
 
     <table id="ordersTable" class="table table-striped">
         <thead class="table-primary">
@@ -66,22 +32,21 @@
         $(document).ready(function () {
 
             // Globally override default DataTables button classes
-$.extend(true, $.fn.dataTable.Buttons.defaults, {
-    dom: {
-        button: {
-            className: 'btn btn-sm btn-outline-primary' // or any Bootstrap class
-        }
-    }
-});
-
+            $.extend(true, $.fn.dataTable.Buttons.defaults, {
+                dom: {
+                    button: {
+                        className: 'btn btn-sm btn-outline-primary' // or any Bootstrap class
+                    }
+                }
+            });
 
             const exportCommon = {
-    exportOptions: {
-        columns: ':not(.no-export)' // Exclude Actions column
-    },
-    title: 'Orders Report',
-    pageSize: 'A4'
-};
+                exportOptions: {
+                    columns: ':not(.no-export)' // Exclude Actions column
+                },
+                title: 'Orders Report',
+                pageSize: 'A4'
+            };
 
             $('#ordersTable').DataTable({
                 ajax: {
@@ -90,10 +55,12 @@ $.extend(true, $.fn.dataTable.Buttons.defaults, {
                 },
                 columns: [
                     { data: 'orderNo' },
-                    { data: 'orderDate' ,
+                    {
+                        data: 'orderDate',
                         render: function (data, type, row) {
-        return new Date(data).toLocaleDateString('en-CA'); // outputs YYYY-MM-DD
-    }},
+                            return new Date(data).toLocaleDateString('en-CA'); // outputs YYYY-MM-DD
+                        }
+                    },
                     { data: 'customerName' },
                     { data: 'office' },
                     {
@@ -102,31 +69,41 @@ $.extend(true, $.fn.dataTable.Buttons.defaults, {
                         render: function (data, type, row) {
                             return parseFloat(data).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         }
-                            },
-                            {
-                                data: 'orderNo',
-                                render: function (data) {
-                                    return `
-                                                        <a href="/Orders/Edit?orderNo=${data}">Edit</a> |
-                                                <a href="/Orders/Details?orderNo=${data}">Details</a> |
-                                                <a href="/Orders/Delete?orderNo=${data}">Delete</a>
-                                    `;
+                    },
+                    {
+                        data: 'orderNo',
+                        render: function (data) {
+                            return `
+                                <a href="/Orders/Edit?orderNo=${data}">Edit</a> |
+                                <a href="/Orders/Details?orderNo=${data}">Details</a> |
+                                <a href="/Orders/Delete?orderNo=${data}">Delete</a>
+                    `;
                         }
                     }
                 ],
                 columnDefs: [
-    { targets: 5, orderable: false } // Disable sorting Actions column
-],
+                    { targets: 5, orderable: false } // Disable sorting Actions column
+                ],
                 responsive: true,
-    dom: 'Bfrtip',
-    buttons: [
-        $.extend(true, {}, exportCommon, { extend: 'copy',className: 'btn  btn-outline-primary' }),
-        $.extend(true, {}, exportCommon, { extend: 'csv',className: 'btn  btn-outline-success' }),
-        $.extend(true, {}, exportCommon, { extend: 'excel',className: 'btn  btn-outline-success' }),
-        $.extend(true, {}, exportCommon, { extend: 'pdfHtml5', orientation: 'portrait',className: 'btn  btn-outline-danger' }),
-        $.extend(true, {}, exportCommon, { extend: 'print',className: 'btn  btn-outline-secondary' })
-    ],
-                    });
-                });
+                dom: 'Bfrtip',
+                buttons: [
+                    $.extend(true, {}, exportCommon, { extend: 'copy', className: 'btn  btn-outline-primary' }),
+                    $.extend(true, {}, exportCommon, { extend: 'csv', className: 'btn  btn-outline-success' }),
+                    $.extend(true, {}, exportCommon, { extend: 'excel', className: 'btn  btn-outline-success' }),
+                    $.extend(true, {}, exportCommon, { extend: 'pdfHtml5', orientation: 'portrait', className: 'btn  btn-outline-danger' }),
+                    $.extend(true, {}, exportCommon, { extend: 'print', className: 'btn  btn-outline-secondary' })
+                ],
+            });
+        });
+
+        // Show loader on AJAX request
+        $('#ordersTable').on('preXhr.dt', function () {
+            $('#preloader').show();
+        });
+
+        // Hide loader when data is loaded
+        $('#ordersTable').on('xhr.dt', function () {
+            $('#preloader').hide();
+        });
     </script>
 }

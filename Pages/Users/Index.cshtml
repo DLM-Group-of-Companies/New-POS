@@ -1,0 +1,247 @@
+﻿@page
+@model NLI_POS.Pages.Users.IndexModel
+@{
+    ViewData["Title"] = "Users";
+}
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl" onclick="window.location = './Index';"></i> </span>
+    <h3><i class="fas fa-users"></i> Users</h3>
+    <hr/>
+    <p>
+        <a href="../Identity/Account/Register" class=" btn btn-primary"><i class="fas fa-user-plus"></i>  Register</a>
+    </p>
+    <table id="usersTable" class="table table-striped table-info">
+        <thead class="table-secondary">
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Designation</th>
+                <th>Default Office</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>@user.FullName</td>
+                    <td>@user.Designation</td>
+                    <td>@user.OfficeCountry?.Name</td>
+                    <td>
+                        <div class="d-flex">
+                            <button class="btn btn-info btn-sm m-1 text-white " title="Manage Office Access" data-user-id="@user.Id" data-bs-toggle="modal" data-bs-target="#officeAccessModal" onclick="loadUserAccess(this)" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
+                                <i class="fas fa-grip-horizontal"></i>
+                            </button>
+                            <a href="../Identity/Account/Manage?pEmail=@user.Email" class="btn btn-success btn-sm m-1" title="Edit" aria-disabled='@( (user.UserName?.ToUpper() == "ADMIN").ToString().ToLower() ) ' style="@(user.UserName?.ToUpper() == "ADMIN" ? "pointer-events: none; opacity: 0.6;" : "")" )><i class="fas fa-edit"></i> </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Office Access Modal -->
+<div class="modal fade" id="officeAccessModal" tabindex="-1">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Office Access</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userAccessModalBody">
+                <!-- dynamic content will go here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <script>
+        $('#officeAccessModal').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').draggable({
+                handle: ".modal-header"
+            });
+        });
+    </script>
+
+
+    <script>
+        let currentUserId = null;
+
+        $(document).ready(function () {
+            $('#usersTable').DataTable({
+                responsive: true
+            });
+        });
+
+        function openOfficeAccessModal() {
+            $('#officeAccessModal').modal('show');
+        }
+
+        function loadUserAccess(button) {
+            const userId = button.getAttribute('data-user-id');
+            currentUserId = userId;
+            //alert(userId);
+            const modalBody = document.getElementById('userAccessModalBody');
+
+            // Show loading
+            modalBody.innerHTML = `
+                            <div class="text-center p-3">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p>Loading...</p>
+                            </div>`;
+
+            // Fetch partial view
+            fetch(`/UsersOfficeAccess/AccessModal?userId=${encodeURIComponent(userId)}`)
+                .then(response => response.text())
+                .then(html => {
+                    //alert(html);
+                    modalBody.innerHTML = html;
+                })
+                .catch(err => {
+                    alert(err);
+                    modalBody.innerHTML = `<div class="alert alert-danger">Failed to load data.</div>`;
+                    console.error(err);
+                });
+        }
+
+        function reloadUserAccess(userId) {
+            const container = document.getElementById('userAccessModalBody');
+            container.innerHTML = `
+                        <div class="text-center p-3">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p>Loading...</p>
+                        </div>`;
+
+            fetch(`/UsersOfficeAccess/AccessModal?userId=${encodeURIComponent(userId)}`)
+                .then(res => res.text())
+                .then(html => {
+                    container.innerHTML = html;
+                    // Show modal after loading content
+                    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('officeAccessModal'));
+                    modal.show();
+                })
+                .catch(err => {
+                    container.innerHTML = `<div class="alert alert-danger">Failed to load.</div>`;
+                    console.error(err);
+                });
+        }
+    </script>
+
+
+    <script>
+        function openAddAccessModal(userId) {
+            //alert(userId);
+            const modal = new bootstrap.Modal(document.getElementById('addAccessModal'));
+            const contentDiv = document.getElementById('addAccessModalBody');
+
+            contentDiv.innerHTML = `
+                            <div class="text-center p-4">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p>Loading form...</p>
+                            </div>`;
+
+            fetch(`/UsersOfficeAccess/Create?userId=${encodeURIComponent(userId)}`)
+                .then(res => res.text())
+                .then(html => {
+                    contentDiv.innerHTML = html;
+                    modal.show();
+                })
+                .catch(err => {
+                    contentDiv.innerHTML = `<div class="alert alert-danger">Failed to load form.</div>`;
+                    console.error(err);
+                });
+        }
+    </script>
+
+    <script>        
+
+        document.addEventListener('submit', function (e) {
+            if (e.target && e.target.id === 'addAccessForm') {
+                e.preventDefault();
+
+                const form = e.target;
+                const formData = new FormData(form);
+
+                fetch('/UsersOfficeAccess/Create', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Save failed');
+                        return res.text();
+                    })
+                    .then(html => {
+                        // Replace modal with updated content or close it
+                        document.getElementById('addAccessModalBody').innerHTML = html;
+
+                        // Optionally close the modal if save succeeded (you can check via status marker in html)
+                        if (!html.includes('validation-summary-errors')) {
+                            bootstrap.Modal.getInstance(document.getElementById('addAccessModal')).hide();
+                            // Optionally: reload table or show success alert
+                            // ✅ Reload the table
+                            //$('#accessTable').DataTable().ajax.reload();
+                            //alert(currentUserId);
+                            reloadUserAccess(currentUserId);
+
+                            // ✅ Optionally show alert
+                            toastr.options.closeButton = false;
+                            toastr.options.timeOut = 1800;
+                            toastr.options.fadeOut = 1000;
+                            toastr.success('Office access added successfully!');
+                        }
+                    })
+                    .catch(err => {
+                        alert('Error saving data.');
+                        console.error(err);
+                    });
+            }
+        });
+
+        function deleteRecord(button) {
+            const accId = button.dataset.accessId;
+            //alert(accId);
+
+            // Send AJAX request to check if the record exists
+            $.ajax({
+                url: '/UsersOfficeAccess/Delete/', // Adjust the URL to match your route
+                //url: '@Url.Page("DeleteConfirmed")',
+                type: 'POST',
+                cache: false,
+                data: { __RequestVerificationToken: gettoken(), id: accId },
+                success: function (successDelete) {
+                    if (successDelete) {
+                        toastr.options.closeButton = false;
+                        toastr.options.timeOut = 1800;
+                        toastr.options.fadeOut = 1000;
+                        toastr.options.onHidden = function () { selRow.remove(); }
+                        toastr.success('Successfully deleted!');
+                        //const userId = document.querySelector('#addAccessForm [name="UserOfficeAccess.UserId"]').value;
+                        reloadUserAccess(currentUserId);
+                        $("#partialModal").modal('hide');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    //toastr.waring('@TempData["Message"]');
+                    alert('An error occurred while deleting the record.');
+                    alert('err:' + xhr.responseText);
+                }
+            });
+        }
+
+        function gettoken() {
+            var token = '@Html.AntiForgeryToken()';
+            token = $(token).val();
+            return token;
+        }
+
+    </script>
+
+
+}

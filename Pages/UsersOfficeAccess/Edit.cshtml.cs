@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 
-namespace NLI_POS.Pages.Customers
+namespace NLI_POS.Pages.UsersOfficeAccess
 {
     public class EditModel : PageModel
     {
@@ -21,7 +21,7 @@ namespace NLI_POS.Pages.Customers
         }
 
         [BindProperty]
-        public Customer Customer { get; set; } = default!;
+        public UserOfficeAccess UserOfficeAccess { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,15 +30,14 @@ namespace NLI_POS.Pages.Customers
                 return NotFound();
             }
 
-            var customer = await _context.Customer.FirstOrDefaultAsync(m => m.Id == id);
-            if (customer == null)
+            var userofficeaccess =  await _context.UserOfficesAccess.FirstOrDefaultAsync(m => m.Id == id);
+            if (userofficeaccess == null)
             {
                 return NotFound();
             }
-            Customer = customer;
-            ViewData["CustClass"] = new SelectList(_context.CustClass, "Id", "Name");
-            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
-            ViewData["Country"] = new SelectList(_context.Country, "Code", "Name");
+            UserOfficeAccess = userofficeaccess;
+           ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+           ViewData["UserId"] = new SelectList(_context.AppUsers, "Id", "Id");
             return Page();
         }
 
@@ -46,15 +45,12 @@ namespace NLI_POS.Pages.Customers
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
-            ModelState.Remove("Customer.OfficeCountries");
-            ModelState.Remove("Customer.CustClasses");
-
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            _context.Attach(Customer).State = EntityState.Modified;
+            _context.Attach(UserOfficeAccess).State = EntityState.Modified;
 
             try
             {
@@ -62,7 +58,7 @@ namespace NLI_POS.Pages.Customers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CustomerExists(Customer.Id))
+                if (!UserOfficeAccessExists(UserOfficeAccess.Id))
                 {
                     return NotFound();
                 }
@@ -75,9 +71,9 @@ namespace NLI_POS.Pages.Customers
             return RedirectToPage("./Index");
         }
 
-        private bool CustomerExists(int id)
+        private bool UserOfficeAccessExists(int id)
         {
-            return _context.Customer.Any(e => e.Id == id);
+            return _context.UserOfficesAccess.Any(e => e.Id == id);
         }
     }
 }

@@ -20,7 +20,7 @@
                                 </div>
 
  
-                                <form id="account" method="post">
+                                <form id="account" method="post" onsubmit="showLoader()">
                                     <p>Please login to your account</p>
                                     <hr />
                                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
@@ -43,16 +43,16 @@
                                     <div>
                                         <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
                                     </div>
-                                    <div>
+                                    <div class="pt-2">
                                         <p>
-                                            <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+                                            <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none">Forgot your password?</a>
                                         </p>
-                                        <p>
+                                        @* <p>
                                             <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
                                         </p>
                                         <p>
                                             <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                                        </p>
+                                        </p> *@
                                     </div>
                                 </form>
 

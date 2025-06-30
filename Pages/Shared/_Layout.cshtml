@@ -25,6 +25,10 @@
     <!-- ✅ DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
+    <!-- ✅ Responsive DataTables JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+
     <!-- Buttons extension CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
 
@@ -37,6 +41,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
+
+    <!-- Include jQuery UI for .draggable() -->
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css" />
 
     <!-- Toastr -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
@@ -102,6 +110,10 @@
         </nav>
     </header>
     <div class="container pt-5">
+        <div id="preloader" style="display:none;">
+            <div class="loader"></div>
+        </div>
+
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -141,6 +153,13 @@
     @* <script src="~/lib/jquery/dist/jquery.min.js"></script> *@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        function showLoader() {
+            document.getElementById("preloader").style.display = "flex";
+        }
+    </script>
+
 
     @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("Notyf")

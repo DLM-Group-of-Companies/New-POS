@@ -37,7 +37,7 @@ namespace NLI_POS.Pages.Customers
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
             ViewData["Country"] = new SelectList(_context.Country, "Code", "Name");
 
-            ModelState.Remove("Customer.OfficeCountry");
+            ModelState.Remove("Customer.OfficeCountries");
             ModelState.Remove("Customer.CustClasses");
 
             //-- Generate Customer ID

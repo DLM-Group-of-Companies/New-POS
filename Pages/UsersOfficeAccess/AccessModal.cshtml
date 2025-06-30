@@ -1,0 +1,51 @@
+﻿@page
+@model NLI_POS.Pages.UsersOfficeAccess.AccessModalModel
+@{
+    Layout = null; // It's a partial
+}
+<h6 class="mb-3 fw-bold">Access for: @Model.User.FullName (@Model.User.UserName)</h6>
+<table id="accessTable" class="table table-sm table-bordered">
+    <thead>
+        <tr class="table-dark table-bordered">
+            <th>Office</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var access in Model.AccessList)
+        {
+            <tr>
+                <td>                    
+                    @access.OfficeCountry.Name
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <btn class="details btn btn-danger btn-sm  m-1" title="Delete" data-access-Id="@access.Id" onclick="deleteRecord(this)"><i class="fas fa-trash-alt"></i> </btn>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <button class="btn btn-primary"  data-bs-toggle="modal" data-bs-target="#addAccessModal" onclick="openAddAccessModal('@Model.User.Id')"><i class="fas fa-plus-circle"></i> Add Office Access</button>
+</div>
+
+<!-- Office Access Modal -->
+<div class="modal fade" id="addAccessModal" tabindex="-1">
+    <div class="modal-dialog modal-lg" style="position: absolute; top: 5%; left: 48%; transform: none;">
+        <div class="modal-content" id="addAccessModalContent">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Office Access</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="addAccessModalBody">
+                <!-- dynamic content will go here -->
+
+            </div>
+        </div>
+    </div>
+</div>
+

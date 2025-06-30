@@ -39,13 +39,16 @@ namespace NLI_POS.Models
         public decimal UnitCost { get; set; }
         [Display(Name = "Regular Price")]
         public decimal RegPrice { get; set; }
-        [Display(Name = "Member Price")]
+        [Display(Name = "Standard Dist Price")]
         public decimal MemPrice { get; set; }
         [Display(Name = "Staff Price")]
         public decimal StaffPrice { get; set; }
 
+        [Display(Name = "Freebie Available")]
         public bool isStaffAvailable { get; set; }
+        [Display(Name = "Staff Available")]
         public bool isFreebieAvailable { get; set; }
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
         public DateTime EncodeDate { get; set; }

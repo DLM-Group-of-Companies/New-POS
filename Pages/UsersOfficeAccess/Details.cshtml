@@ -1,0 +1,55 @@
+﻿@page
+@model NLI_POS.Pages.UsersOfficeAccess.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>UserOfficeAccess</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserOfficeAccess.EncodeDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserOfficeAccess.EncodeDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserOfficeAccess.EncodedBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserOfficeAccess.EncodedBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserOfficeAccess.UpdateDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserOfficeAccess.UpdateDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserOfficeAccess.UpdateddBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserOfficeAccess.UpdateddBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserOfficeAccess.User)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserOfficeAccess.User.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserOfficeAccess.OfficeCountry)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserOfficeAccess.OfficeCountry.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.UserOfficeAccess.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

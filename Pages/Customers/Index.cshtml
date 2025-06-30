@@ -5,95 +5,101 @@
     ViewData["Title"] = "Customers";
 }
 <div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
-<h3>Customer</h3>
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl" onclick="window.location = './Index';"></i> </span>
+    <h3>Customers</h3>
+    <p>
+        <a class="btn btn-primary btn-gradient" asp-page="Create"><i class="fas fa-user-plus"></i> Add Customer</a>
+    </p>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table id="customerTable" class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].CustCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].FirstName)
-            </th>
+    <table id="customerTable" class="table table-striped small">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Customer[0].CustCode)
+                </th>
 
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].LastName)
-            </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Customer[0].FirstName)
+                </th>
 
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].MobileNo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].LandlineNo)
-            </th>   
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].Province)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].City)
-            </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Customer[0].LastName)
+                </th>
+
+                <th>
+                    Contact Number(s)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Customer[0].Email)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Customer[0].City)
+                </th>
 
 
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].OfficeCountry)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer[0].CustClasses)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Customer) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Customer[0].OfficeCountry)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Customer[0].CustClasses)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Customer)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CustCode)
+                    </td>
 
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
 
-            <td>
-                @Html.DisplayFor(modelItem => item.MobileNo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LandlineNo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Province)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.City)
-            </td>
-   
-            <td>
-                @Html.DisplayFor(modelItem => item.OfficeCountry.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustClasses.Name)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MobileNo)
+                        @if (!string.IsNullOrWhiteSpace(item.LandlineNo))
+                        {
+                            <span> | @Html.DisplayFor(modelItem => item.LandlineNo)</span>
+                        }
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.City)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OfficeCountry.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CustClasses.Name)
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 <script>
+    document.getElementById("preloader").style.display = "flex";
+
     $(document).ready(function () {
         $('#customerTable').DataTable({
+            responsive: true,
             dom: 'Bfrtip',
             responsive: true,
             buttons: [
@@ -123,11 +129,33 @@
                     className: 'btn btn-sm btn-outline-dark',
                     exportOptions: { columns: ':not(:last-child)' }
                 }
+
             ],
             columnDefs: [
-                { targets: [0], visible: false }, // Hide ID column
-                { targets: -1, orderable: false } // Disable sort on last column (Actions)
-            ]
+                { responsivePriority: 1, targets: 0 },  // CustCode (important)
+                { responsivePriority: 2, targets: 1 },  // FirstName
+                { responsivePriority: 3, targets: 2 },  // LastName
+                { responsivePriority: 4, targets: 3 },  // Contact Numbers
+                { responsivePriority: 5, targets: 4 },  // Province
+                { responsivePriority: 6, targets: 5 },  // City
+                { responsivePriority: 7, targets: 6 },  // OfficeCountry
+                { responsivePriority: 8, targets: 7 },  // CustClasses
+                { responsivePriority: 10001, targets: 8 } // Edit/Delete links - lowest priority
+            ],
+            initComplete: function () {
+                // Hide the loader when DataTable finishes initializing
+                document.getElementById("preloader").style.display = "none";
+            }
         });
+    });
+
+    // Show loader on AJAX request
+    $('#customerTable').on('preXhr.dt', function () {
+        $('#preloader').show();
+    });
+
+    // Hide loader when data is loaded
+    $('#customerTable').on('xhr.dt', function () {
+        $('#preloader').hide();
     });
 </script>

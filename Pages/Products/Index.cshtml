@@ -5,6 +5,7 @@
     ViewData["Title"] = "Index";
 }
 <div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl" onclick="window.location = './Index';"></i> </span>
     <h3>Products</h3>
 
     <p>
@@ -75,10 +76,10 @@
 
                     <td>
                         <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> 
                         @if (User.IsInRole("ADMIN"))
                         {
-                            <a class="details btn btn-outline-danger btn-sm rounded-circle m-1" title="Delete" href="javascript:;"><i class="fas fa-trash-alt"></i> </a>
+                            <span> | </span> <a class="details btn btn-outline-danger btn-sm rounded-circle m-1" title="Delete" href="javascript:;"><i class="fas fa-trash-alt"></i> </a>
                         }
                     </td>
                 </tr>
@@ -125,6 +126,16 @@
                 { targets: -1, orderable: false } // Disable sort on last column (Actions)
             ]
         });
+    });
+
+    // Show loader on AJAX request
+    $('#ProductTable').on('preXhr.dt', function () {
+        $('#preloader').show();
+    });
+
+    // Hide loader when data is loaded
+    $('#ProductTable').on('xhr.dt', function () {
+        $('#preloader').hide();
     });
 </script>
 
