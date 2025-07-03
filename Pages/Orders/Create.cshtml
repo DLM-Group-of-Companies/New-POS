@@ -5,13 +5,14 @@
     ViewData["Title"] = "Create";
 }
 <div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
-    <h4>New Order</h4>
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl text-danger" onclick="window.location = './Index';"></i> </span>
+    <h4><i class="fas fa-cart-plus"></i> New Order</h4>
     <hr />
-    <form method="post" id="myForm">
-
+    <form method="post" onsubmit="return validateAndShowLoader(this)" id="myForm">
         <div class="row px-2">
             <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75"></div>
-            <div class="col-lg-6 pt-2">
+            <div class="col-lg-5 pt-2">
+                @* Main Column 1 *@
                 <div class="container ">
                     <div class="row p-3 border border-info rounded">
                         <div class="row pb-4">
@@ -19,45 +20,44 @@
 
                             <div class="col-lg-7 col-md-7 col-sm-7 col-7 form-group">
                                 <label asp-for="Order.OfficeId" class="control-label"></label>
-                                <select asp-for="Order.OfficeId" class="form-control" asp-items="ViewBag.OfficeId"></select>
+                                <select asp-for="Order.OfficeId" class="form-control form-select" asp-items="ViewBag.OfficeId"></select>
                             </div>
-                            <div class="col-lg-1 col-md-1 col-sm-1 col-1 form-group">
-                            </div>
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-4  form-group">
+
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-5  form-group">
                                 <label asp-for="Order.OrderDate" class="control-label"></label>
                                 <input asp-for="Order.OrderDate" class="form-control" value="@DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd")" />
                                 <span asp-validation-for="Order.OrderDate" class="text-danger small"></span>
                             </div>
                         </div>
-                        <div class="row pb-4">  
+                        <div class="row pb-4">
                             <div class="col-lg-12 ">
-                            <label asp-for="Order.CustomerId" class="control-label"></label>
-                            <div class="input-group">
-                                <select asp-for="Order.CustomerId" id="CustomerId" class="form-control" asp-items="ViewBag.CustomerId">
-                                    <option value="">-- Select Customer--</option>
-                                </select>
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
-                                </div>
+                                <label asp-for="Order.CustomerId" class="control-label"></label>
+                                <div class="input-group">
+                                    <select asp-for="Order.CustomerId" id="CustomerId" class="form-control form-select" asp-items="ViewBag.CustomerId">
+                                        <option value="">-- Select Customer--</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
+                                    </div>
 
-                            </div>
-                            <div class="col-lg-12 p-2">
-                                <span id="CustClassDisplay" class="badge bg-success"></span>
-                                <input id="Order_CustClass" name="Order.CustClass" type="hidden" />
                                 </div>
-                            <span asp-validation-for="Order.CustomerId" class="text-danger small"></span>
+                                <div class="col-lg-12 p-2">
+                                    <span id="CustClassDisplay" class="badge bg-success"></span>
+                                    <input id="Order_CustClass" name="Order.CustClass" type="hidden" />
+                                </div>
+                                <span asp-validation-for="Order.CustomerId" class="text-danger small"></span>
                             </div>
 
                         </div>
-    
+
                     </div>
                     <input asp-for="Order.ItemNo" type="hidden" />
                     <br />
                     <div class="row p-3 border border-warning rounded">
                         <div class="row pb-4">
                             <div class="col-lg-4 col-md-4 col-sm-12 col-12 form-group">
-                                <label asp-for="Order.ProductCategory" class="control-label"></label>
-                                <select id="ProductCategory" asp-for="Order.ProductCategory" id="ProductCategory" data-name="ProductCategory" class="form-control">
+                                Category
+                                <select id="ProductCategory" asp-for="Order.ProductCategory" data-name="ProductCategory" class="form-control form-select">
                                     <option value="Regular">Regular</option>
                                     <option value="Promo">Promo</option>
                                     <option value="Freebie">Freebie</option>
@@ -66,24 +66,26 @@
                             </div>
                             <div class="col-lg-8 col-md-8 col-sm-12 col-12 form-group">
                                 <label asp-for="Order.ProductId" class="control-label"></label>
-                                <select id="ProductId" asp-for="Order.ProductId" data-name="ProductId" class="form-control" asp-items="ViewBag.ProductId">
+                                <select id="ProductId" asp-for="Order.ProductId" data-name="ProductId" class="form-control form-select" asp-items="ViewBag.ProductId">
                                 </select>
                             </div>
                         </div>
 
                         <div class="row pb-4">
-                            <div class="col-lg-6 col-md-6 col-sm-12 col-12 form-group">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 form-group">
                                 <label asp-for="Order.ComboId" class="control-label"></label>
-                                <select id="ComboId" asp-for="Order.ComboId" data-name="ComboId" class="form-control" asp-items="ViewBag.ProductCombos">
+                                <select id="ComboId" asp-for="Order.ComboId" data-name="ComboId" class="form-control form-select" asp-items="ViewBag.ProductCombos">
                                     @* <option value="">-- Select --</option> *@
                                 </select>
                             </div>
-                            <div class="col-lg-3 col-md-3 col-sm-4 col-4 form-group">
+                        </div>
+                        <div class="row pb-4">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-4 form-group">
                                 <label asp-for="Order.Qty" class="control-label"></label>
                                 <input id="Qty" asp-for="Order.Qty" data-name="Qty" class="form-control" />
                                 <span asp-validation-for="Order.Qty" class="text-danger small"></span>
                             </div>
-                            <div class="col-lg-3 col-md-3 col-sm-8 col-8 form-group">
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-8 form-group">
                                 <input id="Price" asp-for="Order.Price" asp-format="{0:C2}" data-name="Price" type="hidden" />
                                 <label asp-for="Order.Amount" class="control-label"></label>
                                 <input id="Amount" asp-for="Order.Amount" asp-format="{0:C2}" data-name="Amount" class="form-control" />
@@ -99,7 +101,7 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="Order.EncodedBy" class="control-label"></label>
-                                <input asp-for="Order.EncodedBy" class="form-control" value="ARMAN" />
+                                <input asp-for="Order.EncodedBy" class="form-control" value="@User?.Identity.Name" />
                                 <span asp-validation-for="Order.EncodedBy" class="text-danger small"></span>
                             </div>
 
@@ -110,7 +112,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 pt-2">
+            <div class="col-lg-7 pt-2">
+                @* Main Column 2 *@
                 <!-- Area for Items selected -->
                 <div class="container">
                     <div class="row bg-dark ">
@@ -128,6 +131,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr>
+                                    <td colspan="6"> &nbsp;</td>
+                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -141,8 +147,18 @@
                         </table>
 
                     </div>
-                    <div class="row">
-                        <hr />
+                    <hr />
+                    <div class="row  pb-4">
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-12 form-group">
+                            <label asp-for="Order.PaymentMethod" class="control-label"></label>
+                            <select asp-for="Order.PaymentMethod" class="form-control" asp-items="ViewBag.PaymentMethod"></select>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-12 form-group">
+                            <label asp-for="Order.RefNo" class="control-label"></label>
+                            <input asp-for="Order.RefNo" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row pb-4">
                         <div class="form-group">
                             <label asp-for="Order.Notes" class="control-label"></label>
                             <textarea asp-for="Order.Notes" class="form-control" rows="3"></textarea>
@@ -202,30 +218,31 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script> //Get Customer Class to determine if Staff. Staff has different price
-    $('#CustomerId').on('change', function () {
-        var customerId = $(this).val();
+    <script>
+        //Get Customer Class to determine if Staff. Staff has different price
+        $('#CustomerId').on('change', function () {
+            var customerId = $(this).val();
 
-        if (customerId) {
-            $.ajax({
-                url: '@Url.Page("Create", "CustomerClass")',
-                type: 'GET',
-                data: { id: customerId },
-                success: function (res) {
-                    if (res.success) {
-                        $('#CustClassDisplay').text(res.custClassName); 
-                        $('#Order_CustClass').val(res.custClassId); 
-                    } else {
-                        $('#CustClassDisplay').text("Not found");
+            if (customerId) {
+                $.ajax({
+                    url: '@Url.Page("Create", "CustomerClass")',
+                    type: 'GET',
+                    data: { id: customerId },
+                    success: function (res) {
+                        if (res.success) {
+                            $('#CustClassDisplay').text(res.custClassName);
+                            $('#Order_CustClass').val(res.custClassId);
+                        } else {
+                            $('#CustClassDisplay').text("Not found");
+                        }
+                    },
+                    error: function () {
+                        alert('Error retrieving customer class');
                     }
-                },
-                error: function () {
-                    alert('Error retrieving customer class');
-                }
-            });
-        }
-    });
-</script>
+                });
+            }
+        });
+    </script>
 
 
     <script>
@@ -233,9 +250,8 @@
         $(document).ready(function () {
             $('#ProductId').change(function () {
                 var selectedProductId = $(this).val();
-                var custclasstxt = $('#CustClassDisplay').text();                
+                var custclasstxt = $('#CustClassDisplay').text();
                 $("#ComboId").empty();
-                //$("#ComboId").append("<option value=''>--Select--</option>");
                 $.getJSON(`?handler=ProductComboList&ProdId=${selectedProductId}`, (data) => {
                     $.each(data, function (i, item) {
                         $("#ComboId").append(`<option value="${data[i].value}">${data[i].text}</option>`);
@@ -247,8 +263,6 @@
                     url: "?handler=GetProducAmount",
                     data: { __RequestVerificationToken: gettoken(), id: selectedProductId, custclass: custclasstxt },
                     dataType: 'json',
-                    // contentType: "application/json; charset=utf-8",
-                    // dataType: "html",
                     success: function (response) {
                         amount = response;
                         $("#Price").val(amount);
@@ -260,7 +274,6 @@
                     },
                     error: function (response) {
                         $("#partialModal").find(".modal-body").html(response);
-                        // alert('error:' + response.responseText);
                         alert('Error encountered. This record may already have been deleted.');
                     }
                 });
@@ -285,7 +298,6 @@
             $("#ProductCategory").on("change", function () {
                 var category = $(this).val();
                 $("#ProductId").empty();
-                // $("#ProductId").append("<option value=''>Select</option>");
                 $.getJSON(`?handler=ProductList&ProdCat=${category}`, (data) => {
                     $.each(data, function (i, item) {
                         $("#ProductId").append(`<option value="${data[i].value}">${data[i].text}</option>`);
@@ -297,7 +309,6 @@
         $(function () {
             $("#OrderType").on("change", function () {
                 var type = $(this).val();
-                //alert(type);
                 $("#CustomerId").empty();
                 $("#CustomerId").append("<option value=''>Select</option>");
                 $.getJSON(`?handler=Customers`, (data) => {
@@ -309,7 +320,7 @@
         });
     </script>
 
-       <script>
+    <script>
         //For Cart Processes
         let cart = [];
 
@@ -381,21 +392,20 @@
             cart.forEach(item => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                                                                   <td class="col-4 align-middle">${item.productName}</td>
-                                                                   <td class="col-5 align-middle">${item.comboName}</td>
-                                                                   <td class="col-1 align-middle">₱${item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td >
-                                                                   <td class="col-1">
-                                                                      <input type="number" min="1" class="form-control input-sm align-middle" value="${item.quantity}" maxlength="5" onchange="editQuantity(${item.productId}, this.value)" />
-                                                                   </td>
-                                                                   <td class="col-1 align-middle">₱${(item.price * item.quantity).toFixed(2)}</td>
-                                                                   <td><button type="button" class="btn btn-danger btn-sm" title="Remove item" onclick="removeProduct(${item.productId})"><i class="fas fa-times"></i></button></td>
-                                                               `;
+                        <td class="col-4 align-middle">${item.productName}</td>
+                        <td class="col-5 align-middle">${item.comboName}</td>
+                        <td class="col-1 align-middle">₱${item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td >
+                        <td class="col-1">
+                            <input type="number" min="1" class="form-control input-sm align-middle" value="${item.quantity}" maxlength="5" onchange="editQuantity(${item.productId}, this.value)" />
+                        </td>
+                        <td class="col-1 align-middle">₱${(item.price * item.quantity).toFixed(2)}</td>
+                        <td><button type="button" class="btn btn-danger btn-sm" title="Remove item" onclick="removeProduct(${item.productId})"><i class="fas fa-times"></i></button></td>
+                                                                               `;
                 tbody.appendChild(row);
                 total += item.price * item.quantity;
             });
 
             document.getElementById('grandTotal').innerText = total.toFixed(2);
-
             document.getElementById("ProductCategory").value = "";
             document.getElementById("ProductId").value = "";
             document.getElementById("ComboId").value = "";
@@ -426,7 +436,6 @@
         }
 
         function syncCartWithServer() {
-            //alert(cart.combId);
             fetch('?handler=SyncCart', {
                 method: 'POST',
                 headers: {
@@ -439,7 +448,6 @@
 
         function saveOrder() {
             if (!cart || cart.length === 0) {
-                //alert("Your cart is empty. Please add at least one product.");
                 toastr.options.positionClass = "toast-bottom-right";
                 toastr.options.closeButton = false;
                 toastr.options.showDuration = 100;
@@ -448,8 +456,6 @@
                 toastr.warning('Your cart is empty. Please add at least one product.');
                 return;
             }
-
-            //alert(cart.combId);
             const form = document.querySelector('form');
             const formData = new FormData(form);
 
@@ -501,18 +507,18 @@
 
                     data.forEach(customer => {
                         tbody.append(`
-                                                                   <tr>
-                                                                   <td>${customer.custcode}</td>
-                                                                       <td>${customer.name}</td>
-                                                                       <td>${customer.email}</td>
-                                                                       <td>${customer.phone}</td>
-                                                                       <td>
-                                                                           <button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>
-                                                                               Select
-                                                                           </button>
-                                                                       </td>
-                                                                   </tr>
-                                                               `);
+                            <tr>
+                            <td>${customer.custcode}</td>
+                                <td>${customer.name}</td>
+                                <td>${customer.email}</td>
+                                <td>${customer.phone}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>
+                                        Select
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
                     });
                 }
             });
@@ -523,7 +529,7 @@
             $('#Order_CustomerId').val(customer.id); // Update the select input
             $('#customerSearchModal').modal('hide');
 
-            // Optionally populate other form fields if you have them:
+            // Populate other form fields:
             $('#CustomerId').val(customer.id).change();
             //$('#CustomerEmail').val(customer.email);
         }

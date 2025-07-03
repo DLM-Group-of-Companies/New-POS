@@ -1,0 +1,259 @@
+﻿@page
+@using System.Text.Json
+@model NLI_POS.Pages.Products.NewModel
+
+@{
+    ViewData["Title"] = "New Product";
+}
+
+<div class="container bg-white bg-gradient rounded-4 shadow p-4 ">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="text-primary"><i class="far fa-plus-square me-2"></i> New Product</h4>
+        <i class="fas fa-times fa-lg text-danger cursor-pointer" title="Close" onclick="window.location = './Index';"></i>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-lg-7">
+            @* column for product details and pricess *@
+            <form method="post" onsubmit="return validateAndShowLoader(this)">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <!-- PRODUCT DETAILS -->
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="Products.ProductCode" class="form-label"></label>
+                        <input asp-for="Products.ProductCode" class="form-control" />
+                        <span asp-validation-for="Products.ProductCode" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-8">
+                        <label asp-for="Products.ProductName" class="form-label"></label>
+                        <input asp-for="Products.ProductName" class="form-control" />
+                        <span asp-validation-for="Products.ProductName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label asp-for="Products.ProductDescription" class="form-label"></label>
+                        <input asp-for="Products.ProductDescription" class="form-control" />
+                        <span asp-validation-for="Products.ProductDescription" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Products.ProductType" class="form-label"></label>
+                        <select asp-for="Products.ProductType" class="form-select" asp-items="ViewBag.ProductType">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="Products.ProductType" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Products.ProductCategory" class="form-label"></label>
+                        <select asp-for="Products.ProductCategory" id="ProductCategory" class="form-select">
+                            <option value="">Select</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Promo">Promo</option>
+                            <option value="Freebie">Freebie</option>
+                        </select>
+                        <span asp-validation-for="Products.ProductCategory" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Products.SKU" class="form-label"></label>
+                        <input asp-for="Products.SKU" class="form-control" />
+                        <span asp-validation-for="Products.SKU" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- PRODUCT PRICING -->
+                <hr class="my-4" />
+                <h5 class="text-secondary"><i class="fas fa-tags me-2"></i>Product Price Details</h5>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="ProductPrice.CountryId" class="form-label"></label>
+                        <select asp-for="ProductPrice.CountryId" class="form-select"
+                                asp-items="@(new SelectList(Model.Countries, "Id", "Name"))">
+                            <option value="">Select Country</option>
+                        </select>
+                        <span asp-validation-for="ProductPrice.CountryId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-3">
+                        <label asp-for="ProductPrice.UnitCost" class="form-label"></label>
+                        <input asp-for="ProductPrice.UnitCost" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ProductPrice.RegPrice" class="form-label"></label>
+                        <input asp-for="ProductPrice.RegPrice" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ProductPrice.DistPrice" class="form-label"></label>
+                        <input asp-for="ProductPrice.DistPrice" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ProductPrice.StaffPrice" class="form-label"></label>
+                        <input asp-for="ProductPrice.StaffPrice" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-3">
+                        <label asp-for="ProductPrice.BPPPrice" class="form-label"></label>
+                        <input asp-for="ProductPrice.BPPPrice" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ProductPrice.MedPackPrice" class="form-label"></label>
+                        <input asp-for="ProductPrice.MedPackPrice" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ProductPrice.CorpAccPrice" class="form-label"></label>
+                        <input asp-for="ProductPrice.CorpAccPrice" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="ProductPrice.NaturoPrice" class="form-label"></label>
+                        <input asp-for="ProductPrice.NaturoPrice" class="form-control" />
+                    </div>
+                </div>
+
+                <!-- Active Switch & Hidden Fields -->
+                <div class="row g-3 mt-4 align-items-center">
+                    <div class="col-md-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" asp-for="Products.IsActive" />
+                            <label class="form-check-label" for="Products_IsActive">Active</label>
+                        </div>
+                    </div>
+                </div>
+
+                <input asp-for="Products.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
+                <input asp-for="Products.EncodedBy" type="hidden" value="@User.Identity?.Name" />
+
+                <div class="mt-4 text-end">
+                    <button type="submit" value="Save" class="btn btn-success px-4"><i class="far fa-save me-2"></i>Save</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-5">
+            @* column for product price table *@
+            @* <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].Country)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].Product)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].UnitCost)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].RegPrice)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].DistPrice)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].StaffPrice)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].BPPPrice)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].MedPackPrice)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].CorpAccPrice)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ProductPrices[0].NaturoPrice)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ProductPrices)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Country.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Product.ProductName)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UnitCost)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RegPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DistPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.StaffPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BPPPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.MedPackPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CorpAccPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NaturoPrice)
+                            </td>
+
+                            <td>
+                                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table> *@
+
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                @foreach (var item in Model.ProductPrices)
+                {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.Product.ProductName</h5>
+                                <p class="card-text">
+                                    <strong>Country:</strong> @item.Country.Name<br />
+                                    <strong>Unit Cost:</strong> @item.UnitCost<br />
+                                    <strong>Reg Price:</strong> @item.RegPrice<br />
+                                    <strong>Dist Price:</strong> @item.DistPrice<br />
+                                    <strong>Staff Price:</strong> @item.StaffPrice<br />
+                                    <strong>BPP Price:</strong> @item.BPPPrice<br />
+                                    <strong>Med Pack Price:</strong> @item.MedPackPrice<br />
+                                    <strong>Corp Acc Price:</strong> @item.CorpAccPrice<br />
+                                    <strong>Naturo Price:</strong> @item.NaturoPrice
+                                </p>
+                            </div>
+                            <div class="card-footer text-end">
+                                <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                                <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                                <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

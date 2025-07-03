@@ -41,7 +41,7 @@
         <dd class="col-sm-6">
             @Html.DisplayFor(model => model.Products.SKU)
         </dd>
-        <dt class="col-sm-4">
+       @*  <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Products.UnitCost)
         </dt>
         <dd class="col-sm-6">
@@ -64,7 +64,7 @@
         </dt>
         <dd class="col-sm-6">
             @Html.DisplayFor(model => model.Products.StaffPrice)
-        </dd>
+        </dd> *@
         <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Products.IsActive)
         </dt>
@@ -95,15 +95,15 @@
         <dd class="col-sm-6">
             @Html.DisplayFor(model => model.Products.UpdateddBy)
         </dd>
-        <dt class="col-sm-4">
+@*         <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Products.ProductTypes)
         </dt>
         <dd class="col-sm-6">
             @Html.DisplayFor(model => model.Products.ProductTypes.Name)
-        </dd>
+        </dd> *@
     </dl>
     
-    <form method="post">
+   <form method="post" onsubmit="return validateAndShowLoader(this)">
         <input type="hidden" asp-for="Products.Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-page="./Index">Back to List</a>

@@ -30,7 +30,7 @@ namespace NLI_POS.Pages.Products
 
         public IActionResult OnGet(int? Id)
         {
-            ViewData["ProducTypeId"] = new SelectList(_context.ProductTypes, "Id", "Name");
+            ViewData["ProductType"] = new SelectList(_context.ProductTypes, "Name", "Name");
             ViewData["Product"] = new SelectList(_context.Products.OrderBy(p=>p.ProductName), "Id", "ProductName");
             ProductCombos = _context.ProductCombos.Where(p => p.ProductId == Id).ToList();
             return Page();
@@ -77,7 +77,6 @@ namespace NLI_POS.Pages.Products
             {
                 return Page();
             }
-
             
             _context.Products.Add(Products);
             await _context.SaveChangesAsync();

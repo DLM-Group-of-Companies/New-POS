@@ -1,20 +1,20 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
@@ -35,8 +35,8 @@ body {
 
 /*Validation Summary*/
 .validation-summary-errors ul {
-margin-bottom:2px;
-padding-left:20px;
+    margin-bottom: 2px;
+    padding-left: 20px;
 }
 
 /*Preloader*/
@@ -77,3 +77,41 @@ padding-left:20px;
 .cursor-move {
     cursor: move;
 }
+
+#collTable.dataTable {
+    width: 100% !important;
+}
+
+/*Remove numeric input arrows*/
+/* Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/*Tab`s active text a bold*/
+.nav-tabs .nav-link.active {
+    font-weight: bold;
+}
+
+/*.nav-tabs {
+    border-bottom: 1px solid #343a40;*/ /* dark gray */
+/*}*/
+
+    /* Darker border for active tab */
+    .nav-tabs .nav-link.active {
+        border-color: #343a40 #343a40 #ffff; /* top, sides, bottom */
+        font-weight: bold;
+    }
+
+    /* Optional: Darker border for non-active tabs */
+    .nav-tabs .nav-link {
+        border: 1px solid #ccc;
+        border-bottom: none;
+    }

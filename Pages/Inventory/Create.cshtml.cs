@@ -19,10 +19,32 @@ namespace NLI_POS.Pages.Inventory
             _context = context;
         }
 
-        public IActionResult OnGet()
+        [BindProperty(SupportsGet = true)]
+        public int? OfficeId { get; set; }
+
+        public IActionResult OnGet(int officeId)
         {
-        ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
-        ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
+            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry.Where(o => o.Id == officeId), "Id", "Name");
+            //ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
+
+            var usedProductIds = _context.InventoryStocks.Where(i=>i.OfficeId == officeId)
+            .Select(s => s.ProductId)
+            .ToList();
+
+            ViewData["ProductId"] = new SelectList(
+                _context.Products
+                    .Where(p => !usedProductIds.Contains(p.Id))
+                    .Select(p => new
+                    {
+                        Id = p.Id,
+                        Name = p.ProductName + " - [" + p.ProductCode + "]"
+                    })
+                    .ToList(),
+                "Id",
+                "Name"
+            );
+
+
             return Page();
         }
 
@@ -30,7 +52,7 @@ namespace NLI_POS.Pages.Inventory
         public InventoryStock InventoryStock { get; set; } = default!;
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(int officeId)
         {
             if (!ModelState.IsValid)
             {
@@ -40,7 +62,7 @@ namespace NLI_POS.Pages.Inventory
             _context.InventoryStocks.Add(InventoryStock);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Index", new { officeId = officeId });
         }
     }
 }

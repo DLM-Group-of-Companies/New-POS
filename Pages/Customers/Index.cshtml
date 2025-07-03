@@ -5,14 +5,14 @@
     ViewData["Title"] = "Customers";
 }
 <div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
-    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl" onclick="window.location = './Index';"></i> </span>
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl text-danger" onclick="window.location = './Index';"></i> </span>
     <h3>Customers</h3>
     <p>
         <a class="btn btn-primary btn-gradient" asp-page="Create"><i class="fas fa-user-plus"></i> Add Customer</a>
     </p>
 
     <table id="customerTable" class="table table-striped small">
-        <thead>
+        <thead class="table-primary">
             <tr>
                 <th>
                     @Html.DisplayNameFor(model => model.Customer[0].CustCode)

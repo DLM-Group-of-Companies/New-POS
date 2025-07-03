@@ -77,8 +77,10 @@ namespace NLI_POS.Models
         public string? UpdateddBy { get; set; }
 
         [ValidateNever]
+        [Display(Name = "Office")]
         public virtual OfficeCountry OfficeCountry { get; set; }
         [ValidateNever]
+        [Display(Name = "Customer Class")]
         public virtual CustClass CustClasses { get; set; }
   
     }

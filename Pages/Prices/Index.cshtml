@@ -1,0 +1,95 @@
+﻿@page
+@model NLI_POS.Pages.Prices.IndexModel
+
+@{
+    ViewData["Title"] = "Prices";
+}
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl text-danger" onclick="window.location = './Index';"></i> </span>
+    <h3>Prices</h3>
+
+    <p>
+        <a asp-page="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].Country)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].Product)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].UnitCost)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].RegPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].DistPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].StaffPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].BPPPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].MedPackPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].CorpAccPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice[0].NaturoPrice)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ProductPrice)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Country.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Product.ProductName)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UnitCost)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RegPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DistPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StaffPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BPPPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MedPackPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CorpAccPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NaturoPrice)
+                    </td>
+
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

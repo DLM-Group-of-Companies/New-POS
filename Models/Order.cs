@@ -51,6 +51,13 @@ namespace NLI_POS.Models
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
         public decimal? Amount { get; set; }
 
+        [Display(Name = "Payment Method")]
+        public string PaymentMethod { get; set; }
+
+        [Display(Name = "Reference No.")]
+        [StringLength(40)]
+        public string? RefNo { get; set; }
+
         [StringLength(500)]
         public string? Notes { get; set; }
 
@@ -67,6 +74,5 @@ namespace NLI_POS.Models
         public virtual Customer Customers { get; set; }
         [ValidateNever]
         public virtual OfficeCountry Office { get; set; }
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,9 +24,14 @@ namespace NLI_POS.Pages.Inventory
             _context = context;
         }
 
-        public string Office { get; set; }
+        //[BindProperty]
+        //public string Office { get; set; }
 
-        public void OnGet()
+        [BindProperty(SupportsGet = true)]
+        [Display(Name ="Office")]
+        public int? officeId { get; set; }
+
+        public void OnGet(int? officeId)
         {
             //User.IsInRole("Admin");
 
@@ -34,17 +40,18 @@ namespace NLI_POS.Pages.Inventory
             .Select(o => new SelectListItem
             {
                 Value = o.Id.ToString(),
-                Text = o.Name
+                Text = o.Name,
+                Selected = (officeId != null && o.Id == officeId)
             })
             .ToList();
 
-            //// Insert the default "--Select--" item at the top
-            //if (offices.Count > 1)
+                //// Insert the default "--Select--" item at the top
+            //if (countries.Count > 1)
             //{
-            //    offices.Insert(0, new SelectListItem { Value = "", Text = "--Select--" });
+            //    countries.Insert(0, new SelectListItem { Value = "", Text = "--Select--" });
             //}
 
-            ViewData["Office"] = offices;
+            ViewData["OfficeId"] = offices;
         }
 
         public async Task<JsonResult> OnGetMain(int? officeId)

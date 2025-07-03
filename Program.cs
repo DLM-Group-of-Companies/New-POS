@@ -43,8 +43,26 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    //Seeding For User Roles
     var services = scope.ServiceProvider;
     await IdentitySeeder.SeedRolesAsync(services);
+
+    //Seeding For Payment Methods
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    if (!context.PaymentMethods.Any())
+    {
+        context.PaymentMethods.AddRange(
+            new PaymentMethods { Name = "Cash", Description = "Cash Payment" },
+            new PaymentMethods { Name = "Credit Card", Description = "Credit Card Payment" },
+            new PaymentMethods { Name = "GCash", Description = "GCash Mobile Payment" },
+            new PaymentMethods { Name = "Check", Description = "Check Payment" },
+            new PaymentMethods { Name = "Bank Transfer", Description = "Bank Transfer Payment" },
+            new PaymentMethods { Name = "Voucher", Description = "Voucher Payment" },
+            new PaymentMethods { Name = "Other", Description = "Payment not indicated on the list" }
+        );
+        context.SaveChanges();
+    }
 }
 
 

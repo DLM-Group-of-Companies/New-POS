@@ -4,79 +4,94 @@
 @{
     ViewData["Title"] = "Inventory";
 }
-<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
-    <h3>Inventory</h3>
-    <div class="row p-2">
-        <div class="form-group col-lg-8">            
-            <a class="btn btn-primary" asp-page="Create"><i class="far fa-plus-square"></i> Add New</a>
-        </div>
-        <div class="form-group col-lg-4">
-            <label asp-for="Office" class="control-label"></label>
-            <select id="Office" asp-for="Office" class="form-control form-select" asp-items="ViewBag.Office">
-                @* <option value="">--Select--</option> *@
-            </select>
-        </div>
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0 text-primary">
+            <i class="fas fa-boxes"></i> Inventory
+        </h4>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
     </div>
     <hr />
+    <div class="row mb-3">
+        <div class="col-lg-8">
+            <a id="addNewBtn" class="btn btn-primary"><i class="far fa-plus-square"></i> Add New</a>
+        </div>
+        <div class="col-lg-4">
+            <label asp-for="officeId" class="form-label fw-bold"></label>
+            <select id="officeId" asp-for="officeId" class="form-select" asp-items="ViewBag.OfficeId"></select>
+        </div>
+    </div>
 
-    <p class="fw-bold">Main Products</p>
+    <ul class="nav nav-tabs bg-light" id="inventoryTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active " id="main-tab" data-bs-toggle="tab" data-bs-target="#main" type="button" role="tab" aria-controls="main" aria-selected="true">Main Products</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link " id="coll-tab" data-bs-toggle="tab" data-bs-target="#coll" type="button" role="tab" aria-controls="coll" aria-selected="false">Marketing Collateral</button>
+        </li>
+    </ul>
 
-     <table id="mainTable" class="table table-success table-striped">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th class="text-end">Stock</th>
+    <div class="tab-content p-3 border border-1 border-secondary" id="inventoryTabsContent">
+        <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="main-tab">
+            <table id="mainTable" class="table table-success table-striped">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Description</th>
+                        <th class="text-end">Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
 
-                <th>Actions</th>
-            </tr>
-        </thead>
-    </table>
-
-    <hr/>
-    <p class="fw-bold">Marketing Collateral Products</p>
-
-
-    <table id="collTable" class="table table-info table-striped">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th class="text-end">Stock</th>
-
-                <th>Actions</th>
-            </tr>
-        </thead>
-    </table>
+        <div class="tab-pane fade" id="coll" role="tabpanel" aria-labelledby="coll-tab">
+            <table id="collTable" class="table table-info table-striped">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Description</th>
+                        <th class="text-end">Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Assign DataTables to variables
-            var mainTable = $('#mainTable').DataTable({
+
+            var mainTable = $('#mainTable').DataTable({ 
                 ajax: {
-                    url: '@Url.Page("Index", "Main")', // Points to OnGetMain
+                    url: '@Url.Page("Index", "Main")',
                     data: function (d) {
-                        d.officeId = $('#Office').val(); // Send officeId to server
+                        d.officeId = $('#officeId').val();
                     },
-                    dataSrc: 'data'
+                    dataSrc: 'data',
+                            error: function (xhr, error, thrown) {
+            console.warn('DataTable error:', error);
+            // Optionally handle gracefully
+        }
                 },
                 columns: [
                     { data: 'products.productName' },
+                    { data: 'products.productDescription' },
                     {
                         data: 'stockQty',
                         className: 'text-end',
-                        orderable: false, // <--- this disables sorting
+                        orderable: false,
                         render: function (data) {
                             return data != null ? data.toLocaleString() : '0';
                         }
                     },
                     {
                         data: 'id',
-                        orderable: false, // <--- this disables sorting
+                        orderable: false,
                         render: function (data) {
-                            return `
-                                    <a href="/Orders/Edit?id=${data}">Edit</a> 
-                                `;
+                            return `<a href="/Orders/Edit?id=${data}">Edit</a>`;
                         }
                     }
                 ],
@@ -89,27 +104,26 @@
                 ajax: {
                     url: '@Url.Page("Index", "Collateral")',
                     data: function (d) {
-                        d.officeId = $('#Office').val(); // Send officeId to server
+                        d.officeId = $('#officeId').val();
                     },
                     dataSrc: 'data'
                 },
                 columns: [
                     { data: 'products.productName' },
+                    { data: 'products.productDescription' },
                     {
                         data: 'stockQty',
                         className: 'text-end',
-                        orderable: false, // <--- this disables sorting
+                        orderable: false,
                         render: function (data) {
                             return data != null ? data.toLocaleString() : '0';
                         }
                     },
                     {
                         data: 'id',
-                        orderable: false, // <--- this disables sorting
+                        orderable: false,
                         render: function (data) {
-                            return `
-                                    <a href="/Orders/Edit?id=${data}">Edit</a> 
-                                `;
+                            return `<a href="/Orders/Edit?id=${data}">Edit</a>`;
                         }
                     }
                 ],
@@ -118,11 +132,26 @@
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
             });
 
-            // Reload both tables when office filter changes
-            $('#Office').on('change', function () {
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $.fn.dataTable
+                    .tables({ visible: true, api: true })
+                    .columns.adjust()
+                    .responsive.recalc();
+            });
+
+            $('#officeId').on('change', function () {
                 mainTable.ajax.reload();
                 collTable.ajax.reload();
             });
+        });
+
+        document.getElementById("addNewBtn").addEventListener("click", function () {
+            const officeId = document.getElementById("officeId").value;
+            if (officeId) {
+                window.location.href = `/Inventory/Create?officeId=${officeId}`;
+            } else {
+                alert("Please select an office.");
+            }
         });
     </script>
 }

@@ -3,14 +3,15 @@
 @model NLI_POS.Pages.Products.CreateModel
 
 @{
-    ViewData["Title"] = "Create Product";
-    var jsonData = JsonSerializer.Serialize(Model.ProductCombos);
+    ViewData["Title"] = "New Product";
+    //var jsonData = JsonSerializer.Serialize(Model.ProductCombos);
 }
 <div class="container bg-white bg-gradient rounded-3 shadow p-2" style="width: 60%;">
-<h4>Create Product</h4>
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl text-danger" onclick="window.location = './Index';"></i> </span>
+    <h4><i class="far fa-plus-square"></i> New Product</h4>
 <hr />
 
-<form method="post">
+<form method="post" onsubmit="return validateAndShowLoader(this)">
     <div class="row p-2">
         <div class="col-md-12 p-2">
             <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
@@ -42,11 +43,11 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label asp-for="Products.ProducTypeId" class="control-label"></label>
-                        <select asp-for="Products.ProducTypeId" class="form-control" asp-items="ViewBag.ProducTypeId">
+                        <label asp-for="Products.ProductType" class="control-label"></label>
+                        <select asp-for="Products.ProductType" class="form-control" asp-items="ViewBag.ProductType">
                             <option value="">Select</option>
                         </select>
-                        <span asp-validation-for="Products.ProducTypeId" class="text-danger small"></span>
+                        <span asp-validation-for="Products.ProductType" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -71,7 +72,7 @@
                 </div>
 
             </div>
-            <div class="row">
+           @*  <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
                         <label asp-for="Products.UnitCost" class="control-label"></label>
@@ -101,8 +102,38 @@
                     </div>
                 </div>
             </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Products.BPPPrice" class="control-label"></label>
+                            <input asp-for="Products.BPPPrice" class="form-control" />
+                            <span asp-validation-for="Products.BPPPrice" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Products.CorpAcctPrice" class="control-label"></label>
+                            <input asp-for="Products.CorpAcctPrice" class="form-control" />
+                            <span asp-validation-for="Products.CorpAcctPrice" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Products.MedPackPrice" class="control-label"></label>
+                            <input asp-for="Products.MedPackPrice" class="form-control" />
+                            <span asp-validation-for="Products.MedPackPrice" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Products.NaturoPrice" class="control-label"></label>
+                            <input asp-for="Products.NaturoPrice" class="form-control" />
+                            <span asp-validation-for="Products.NaturoPrice" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div> *@
             <div class="col-md-2">
-                <div class="form-group form-check form-switch">
+                    <div class="form-group form-check form-switch" >
                     <label class="form-check-label">
                         <input class="form-check-input" asp-for="Products.IsActive" /> Active
                     </label>
@@ -111,21 +142,18 @@
             </div>
 
             <input asp-for="Products.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
-            <input asp-for="Products.EncodedBy" type="hidden" value="ARMAN" />
+            <input asp-for="Products.EncodedBy" type="hidden" value="@User.Identity?.Name" />
 
         </div>
 
         <div class="form-group">
-            <input type="submit" value="Create" class="btn btn-primary" />
+                <button type="submit" value="Save" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
         </div>
     </div>
 
 </form>
 
 
-<div>
-    <a asp-page="Index">Back to List</a>
-</div>
 </div>
 @section Scripts {
     @{

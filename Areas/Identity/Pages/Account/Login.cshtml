@@ -20,7 +20,7 @@
                                 </div>
 
  
-                                <form id="account" method="post" onsubmit="showLoader()">
+                                <form id="account" method="post" onsubmit="return validateAndShowLoader(this)">
                                     <p>Please login to your account</p>
                                     <hr />
                                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>

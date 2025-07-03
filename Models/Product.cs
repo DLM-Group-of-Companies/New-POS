@@ -21,28 +21,18 @@ namespace NLI_POS.Models
         [StringLength(200)]
         public string ProductDescription { get; set; } = string.Empty;
 
-        [ForeignKey("ProductTypes")]
         [Display(Name = "Product Type")]
-        public int ProducTypeId { get; set; }
+        public string? ProductType { get; set; }
 
         [Display(Name = "Category")]
         [StringLength(20)]
         public string ProductCategory { get; set; }
 
         [Display(Name = "Class")]
-        [StringLength(20)]
+        [StringLength(10)]
         public string? ProductClass { get; set; } //Main or Collateral
 
         public string SKU { get; set; }
-
-        [Display(Name = "Unit Cost")]
-        public decimal UnitCost { get; set; }
-        [Display(Name = "Regular Price")]
-        public decimal RegPrice { get; set; }
-        [Display(Name = "Standard Dist Price")]
-        public decimal MemPrice { get; set; }
-        [Display(Name = "Staff Price")]
-        public decimal StaffPrice { get; set; }
 
         [Display(Name = "Freebie Available")]
         public bool isStaffAvailable { get; set; }
@@ -56,8 +46,5 @@ namespace NLI_POS.Models
         public DateTime? UpdateDate { get; set; }
         public string? UpdateddBy { get; set; }
 
-        [Display(Name = "Type")]
-        [ValidateNever]
-        public virtual ProductType ProductTypes { get; set; }
     }
 }

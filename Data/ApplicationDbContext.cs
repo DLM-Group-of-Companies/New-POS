@@ -22,5 +22,7 @@ namespace NLI_POS.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<ApplicationUser> AppUsers { get; set; }
         public DbSet<UserOfficeAccess> UserOfficesAccess { get; set; }
+        public DbSet<PaymentMethods> PaymentMethods { get; set; }
+        public DbSet<ProductPrice> ProductPrices { get; set; }
     }
 }

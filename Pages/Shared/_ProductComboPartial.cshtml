@@ -60,7 +60,7 @@
                 success: function (response) {
                     // alert('response:' + response);
                     $("#partialModal").find(".modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
-                    $("#partialModal").find(".modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-user-times"></i> Delete</button>');
+                    $("#partialModal").find(".modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-trash-alt"></i> Delete</button>');
 
                     $("#partialModal").find(".modal-body").html(response);
                     $("#partialModal").modal('show');
@@ -101,7 +101,7 @@
 
     function deleteRecord() {
         // var vPatID = $(this).closest("tr").find("td").eq(0).html();
-        alert(vID);
+        //alert(vID);
 
         // Send AJAX request to check if the record exists
         $.ajax({
@@ -109,6 +109,9 @@
             url: '@Url.Page("/ProductCombos/Delete")',
             type: 'POST',
             cache: false,
+            beforeSend: function () {
+                showLoader(); // ✅ Show preloader before sending request
+            },
             // data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
             data: { id: vID.trim() },
             headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() }, //add the verification token to the header.
@@ -126,6 +129,9 @@
                 //toastr.waring('@TempData["Message"]');
                 alert('An error occurred while deleting the record.');
                 alert('err:' + xhr.responseText);
+            },
+            complete: function () {
+                hideLoader(); // ✅ Always hide loader after request
             }
         });
     }

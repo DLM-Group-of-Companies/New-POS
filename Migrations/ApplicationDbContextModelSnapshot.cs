@@ -567,6 +567,10 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(65,30)");
 
@@ -579,6 +583,10 @@ namespace NLI_POS.Migrations
 
                     b.Property<int?>("Qty")
                         .HasColumnType("int");
+
+                    b.Property<string>("RefNo")
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
@@ -599,6 +607,27 @@ namespace NLI_POS.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("NLI_POS.Models.PaymentMethods", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentMethods");
+                });
+
             modelBuilder.Entity("NLI_POS.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -606,6 +635,12 @@ namespace NLI_POS.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BPPPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("CorpAcctPrice")
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime>("EncodeDate")
                         .HasColumnType("datetime(6)");
@@ -617,11 +652,14 @@ namespace NLI_POS.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<decimal>("MedPackPrice")
+                        .HasColumnType("decimal(65,30)");
+
                     b.Property<decimal>("MemPrice")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<int>("ProducTypeId")
-                        .HasColumnType("int");
+                    b.Property<decimal>("NaturoPrice")
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("ProductCategory")
                         .IsRequired()
@@ -629,8 +667,8 @@ namespace NLI_POS.Migrations
                         .HasColumnType("varchar(20)");
 
                     b.Property<string>("ProductClass")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
@@ -646,6 +684,9 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<string>("ProductType")
+                        .HasColumnType("longtext");
 
                     b.Property<decimal>("RegPrice")
                         .HasColumnType("decimal(65,30)");
@@ -673,8 +714,6 @@ namespace NLI_POS.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProducTypeId");
 
                     b.ToTable("Products");
                 });
@@ -707,6 +746,65 @@ namespace NLI_POS.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductCombos");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.ProductPrice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BPPPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("CorpAccPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DistPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime?>("EncodeDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EncodedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("MedPackPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("NaturoPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RegPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("StaffPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdateddBy")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductPrices");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.ProductType", b =>
@@ -946,17 +1044,6 @@ namespace NLI_POS.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("NLI_POS.Models.Product", b =>
-                {
-                    b.HasOne("NLI_POS.Models.ProductType", "ProductTypes")
-                        .WithMany()
-                        .HasForeignKey("ProducTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ProductTypes");
-                });
-
             modelBuilder.Entity("NLI_POS.Models.ProductCombo", b =>
                 {
                     b.HasOne("NLI_POS.Models.Product", "Products")
@@ -966,6 +1053,25 @@ namespace NLI_POS.Migrations
                         .IsRequired();
 
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.ProductPrice", b =>
+                {
+                    b.HasOne("NLI_POS.Models.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NLI_POS.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.UserOfficeAccess", b =>

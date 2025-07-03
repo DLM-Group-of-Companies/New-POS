@@ -623,7 +623,7 @@ namespace NLI_POS.Migrations
                     b.Property<decimal>("MemPrice")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<int>("ProducTypeId")
+                    b.Property<int>("ProductType")
                         .HasColumnType("int");
 
                     b.Property<string>("ProductCategory")
@@ -677,7 +677,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProducTypeId");
+                    b.HasIndex("ProductType");
 
                     b.ToTable("Products");
                 });
@@ -953,7 +953,7 @@ namespace NLI_POS.Migrations
                 {
                     b.HasOne("NLI_POS.Models.ProductType", "ProductTypes")
                         .WithMany()
-                        .HasForeignKey("ProducTypeId")
+                        .HasForeignKey("ProductType")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

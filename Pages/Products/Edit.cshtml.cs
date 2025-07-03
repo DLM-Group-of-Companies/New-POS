@@ -36,6 +36,11 @@ namespace NLI_POS.Pages.Products
         [BindProperty]
         public IList<string> CombDesc { get; set; }
 
+        public List<Country> Countries { get; set; } = new(); // For dropdown
+
+        [BindProperty]
+        public ProductPrice ProductPrice { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -52,7 +57,12 @@ namespace NLI_POS.Pages.Products
 
             ProductCombos = _context.ProductCombos.Where(p => p.ProductId == id).ToList();
 
-            ViewData["ProducTypeId"] = new SelectList(_context.ProductTypes, "Id", "Name");
+            ViewData["ProductType"] = new SelectList(_context.ProductTypes, "Name", "Name");
+
+            Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
+
+            ProductPrice = await _context.ProductPrices.FirstOrDefaultAsync(p => p.ProductId == id );
+
             return Page();
         }
 
@@ -96,7 +106,7 @@ namespace NLI_POS.Pages.Products
                 //prodIds = productComboList[i][1]; 
                 //qtyList = productComboList[i][2];
                 selectedText = productComboList[i][3];
-                if (combText == "")
+                if (combText.Trim() == "")
                 {
                     prodIds = productComboList[i][1];
                     combText += selectedText;
@@ -104,9 +114,12 @@ namespace NLI_POS.Pages.Products
                 }
                 else
                 {
-                    prodIds += ", " + productComboList[i][1];
-                    combText += ", " + selectedText;
-                    qtyList += ", " + productComboList[i][2];
+                    if (productComboList[i][3] != "")
+                    {
+                        prodIds += ", " + productComboList[i][1];
+                        combText += ", " + selectedText;
+                        qtyList += ", " + productComboList[i][2];
+                    }
                 }
             }
 
@@ -133,36 +146,141 @@ namespace NLI_POS.Pages.Products
             await _context.SaveChangesAsync();
             return Page();
         }
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
+
+        public async Task<IActionResult> OnGetPrices(int countryId, int? id)
+        {
+            var price = await _context.ProductPrices
+                .Where(p => p.CountryId == countryId && p.ProductId== id)
+                .OrderByDescending(p => p.EncodeDate)
+                .FirstOrDefaultAsync();
+
+            if (price == null)
+            {
+                return new JsonResult(new
+                {
+                    UnitCost = 0m,
+                    RegPrice = 0m,
+                    DistPrice = 0m,
+                    StaffPrice = 0m,
+                    BPPPrice = 0m,
+                    MedPackPrice = 0m,
+                    CorpAccPrice = 0m,
+                    NaturoPrice = 0m
+                });
+            }
+            else
+            {
+                return new JsonResult(new
+                {
+                    price.UnitCost,
+                    price.RegPrice,
+                    price.DistPrice,
+                    price.StaffPrice,
+                    price.BPPPrice,
+                    price.MedPackPrice,
+                    price.CorpAccPrice,
+                    price.NaturoPrice
+                });
+            }
+        }
+
+
+        //public async Task<IActionResult> OnPostAsync()
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        GetProductList();
+        //        return Page();
+        //    }
+
+        //    _context.Attach(Products).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!ProductExists(Products.Id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return RedirectToPage("./Index");
+        //}
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
-                GetProductList();
+                Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
                 return Page();
             }
 
-            _context.Attach(Products).State = EntityState.Modified;
+            // Load the current product from the database
+            var originalProduct = await _context.Products
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == Products.Id);
 
-            try
+            if (originalProduct == null)
             {
+                return NotFound();
+            }
+
+            // Track if the product entity was changed
+            bool isProductModified = !_context.Entry(Products).CurrentValues.Properties.All(prop =>
+            {
+                var originalValue = originalProduct.GetType().GetProperty(prop.Name)?.GetValue(originalProduct);
+                var postedValue = Products.GetType().GetProperty(prop.Name)?.GetValue(Products);
+                return Equals(originalValue, postedValue);
+            });
+
+            // Attach and mark the product as modified only if changed
+            if (isProductModified)
+            {
+                Products.UpdateDate = DateTime.UtcNow.AddHours(8);
+                Products.UpdateddBy = User.Identity?.Name;
+                _context.Attach(Products).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+
+            // Always save or update the ProductPrice (as requested)
+            ProductPrice.ProductId = Products.Id;
+            ProductPrice.EncodeDate = DateTime.UtcNow.AddHours(8);
+            ProductPrice.EncodedBy = User.Identity?.Name ?? "System";
+
+            // Check if price exists
+            var existingPrice = await _context.ProductPrices
+                .FirstOrDefaultAsync(p => p.ProductId == Products.Id && p.CountryId == ProductPrice.CountryId);
+
+            if (existingPrice == null)
             {
-                if (!ProductExists(Products.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                _context.ProductPrices.Add(ProductPrice);
             }
+            else
+            {
+                existingPrice.UnitCost = ProductPrice.UnitCost;
+                existingPrice.RegPrice = ProductPrice.RegPrice;
+                existingPrice.DistPrice = ProductPrice.DistPrice;
+                existingPrice.StaffPrice = ProductPrice.StaffPrice;
+                existingPrice.BPPPrice = ProductPrice.BPPPrice;
+                existingPrice.MedPackPrice = ProductPrice.MedPackPrice;
+                existingPrice.CorpAccPrice = ProductPrice.CorpAccPrice;
+                existingPrice.NaturoPrice = ProductPrice.NaturoPrice;
+                existingPrice.EncodedBy = ProductPrice.EncodedBy;
+                existingPrice.EncodeDate = ProductPrice.EncodeDate;
+            }
+
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
         }
+
 
         private bool ProductExists(int id)
         {

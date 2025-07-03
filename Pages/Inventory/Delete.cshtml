@@ -25,14 +25,14 @@
             @Html.DisplayFor(model => model.InventoryStock.Products.Id)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.InventoryStock.Office)
+            @Html.DisplayNameFor(model => model.InventoryStock.OfficeId)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.InventoryStock.Office.Name)
         </dd>
     </dl>
     
-    <form method="post">
+   <form method="post" onsubmit="return validateAndShowLoader(this)">
         <input type="hidden" asp-for="InventoryStock.Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-page="./Index">Back to List</a>

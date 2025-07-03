@@ -1,0 +1,96 @@
+﻿@page
+@model NLI_POS.Pages.Prices.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2 w-75">
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl text-danger" onclick="window.location = './Index';"></i> </span>
+    <h3>New</h3>
+
+    <h4>Product Prices</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+           <form method="post" onsubmit="return validateAndShowLoader(this)">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="container p-4 border">
+                    <div class="row">
+                        <div class="col-lg-6 form-group">
+                            <label asp-for="ProductPrice.CountryId" class="control-label"></label>
+                            <select asp-for="ProductPrice.CountryId" class="form-control" asp-items="ViewBag.CountryId"></select>
+                        </div>
+                        <div class="col-lg-6 form-group">
+                            <span class="text-danger">*</span>
+                            <label asp-for="ProductPrice.ProductId" class="control-label"></label>
+                            <select asp-for="ProductPrice.ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="container p-4 border">
+                    <div class="row">
+                        <div class="col-lg-3 form-group">
+                            <label asp-for="ProductPrice.UnitCost" class="control-label"></label>
+                            <input asp-for="ProductPrice.UnitCost" class="form-control" />
+                            <span asp-validation-for="ProductPrice.UnitCost" class="text-danger"></span>
+                        </div>
+                        <div class="col-lg-3 form-group">
+                            <label asp-for="ProductPrice.RegPrice" class="control-label"></label>
+                            <input asp-for="ProductPrice.RegPrice" class="form-control" />
+                            <span asp-validation-for="ProductPrice.RegPrice" class="text-danger"></span>
+                        </div>
+                        <div class="col-lg-3 form-group">
+                            <label asp-for="ProductPrice.DistPrice" class="control-label"></label>
+                            <input asp-for="ProductPrice.DistPrice" class="form-control" />
+                            <span asp-validation-for="ProductPrice.DistPrice" class="text-danger"></span>
+                        </div>
+                        <div class="col-lg-3 form-group">
+                            <label asp-for="ProductPrice.StaffPrice" class="control-label"></label>
+                            <input asp-for="ProductPrice.StaffPrice" class="form-control" />
+                            <span asp-validation-for="ProductPrice.StaffPrice" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 form-group">
+                            <label asp-for="ProductPrice.BPPPrice" class="control-label"></label>
+                            <input asp-for="ProductPrice.BPPPrice" class="form-control" />
+                            <span asp-validation-for="ProductPrice.BPPPrice" class="text-danger"></span>
+                        </div>
+                        <div class="col-lg-3 form-group">
+                            <label asp-for="ProductPrice.MedPackPrice" class="control-label"></label>
+                            <input asp-for="ProductPrice.MedPackPrice" class="form-control" />
+                            <span asp-validation-for="ProductPrice.MedPackPrice" class="text-danger"></span>
+                        </div>
+                        <div class="col-lg-3 form-group">
+                            <label asp-for="ProductPrice.CorpAccPrice" class="control-label"></label>
+                            <input asp-for="ProductPrice.CorpAccPrice" class="form-control" />
+                            <span asp-validation-for="ProductPrice.CorpAccPrice" class="text-danger"></span>
+                        </div>
+                        <div class="col-lg-3 form-group">
+                            <label asp-for="ProductPrice.NaturoPrice" class="control-label"></label>
+                            <input asp-for="ProductPrice.NaturoPrice" class="form-control" />
+                            <span asp-validation-for="ProductPrice.NaturoPrice" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" asp-for="ProductPrice.EncodeDate" value="@DateTime.UtcNow.AddHours(8)" />
+                <input type="hidden" asp-for="ProductPrice.EncodedBy" value="@User.Identity?.Name" />
+
+
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-page="Index">Back to List</a>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -8,7 +8,7 @@
     <h4>Customer Registration</h4>
     <hr />
     <div class="container bg-light p-3 rounded border">
-        <form method="post">
+       <form method="post" onsubmit="return validateAndShowLoader(this)">
             <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
 
             <div class="form-group row p-2 ">

@@ -31,8 +31,9 @@ namespace NLI_POS.Pages.Orders
 
             ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
 
-            var products = _context.Products.Where(p=>p.IsActive)
+            var products = _context.Products.Where(p => p.IsActive)
             .Select(p => new { p.Id, p.ProductName })
             .ToList();
 
@@ -137,20 +138,20 @@ namespace NLI_POS.Pages.Orders
 
             var ProdAmount = _context.Products.FirstOrDefault(p => p.Id == id);
 
-            if (custclass == "Staff")
-            {
-                return new JsonResult(ProdAmount.StaffPrice);
-            }
-            else if (custclass == "Over the Counter")
-            {
-                return new JsonResult(ProdAmount.RegPrice);
-            }
-            else
-            {
-                return new JsonResult(ProdAmount.RegPrice);
-            }
-            
+            //if (custclass == "Staff")
+            //{
+            //    return new JsonResult(ProdAmount.StaffPrice);
+            //}
+            //else if (custclass == "Over the Counter")
+            //{
+            //    return new JsonResult(ProdAmount.RegPrice);
+            //}
+            //else
+            //{
+            //    return new JsonResult(ProdAmount.RegPrice);
+            //}
 
+            return new JsonResult(0);
         }
 
         [BindProperty]
@@ -180,7 +181,7 @@ namespace NLI_POS.Pages.Orders
             {
                 ModelState.AddModelError("", "Cart is empty. Please add products.");
                 await LoadDropdownsAsync(); // Reload select lists
-
+                ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
                 return Page();
             }
 
@@ -265,7 +266,7 @@ namespace NLI_POS.Pages.Orders
                 var order = new Order
                 {
                     OrderNo = orderNo,
-                    OrderDate=encodeDate.Date,
+                    OrderDate = encodeDate.Date,
                     EncodeDate = encodeDate,
                     CustomerId = Order.CustomerId,
                     OfficeId = Order.OfficeId,
@@ -275,7 +276,9 @@ namespace NLI_POS.Pages.Orders
                     Qty = item.Quantity,
                     Price = item.Price,
                     Amount = item.Price * item.Quantity,
-                    EncodedBy = User.Identity.Name,                    
+                    PaymentMethod = Order.PaymentMethod,
+                    RefNo = Order.RefNo,
+                    EncodedBy = User.Identity.Name,
                     ItemNo = itemNo++
                 };
 
@@ -285,27 +288,14 @@ namespace NLI_POS.Pages.Orders
 
             await _context.SaveChangesAsync();
 
-            // ✅ Now update inventory
-            //foreach (var item in cart)
-            //{
-            //    var inventory = await _context.InventoryStocks
-            //        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId); // assuming stock is per-office
-
-            //    if (inventory != null)
-            //    {
-            //        inventory.StockQty -= item.Quantity;
-            //        if (inventory.StockQty < 0) inventory.StockQty = 0;
-            //        _context.InventoryStocks.Update(inventory);
-            //    }
-            //}
-
+            // ✅ Update the inventory
             foreach (var item in cart)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
 
                 if (product != null && product.ProductCategory == "Promo")
                 {
-                    // Promo logic
+                    // Promo 
                     var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == item.ProductId);
                     if (combo != null)
                     {
@@ -331,7 +321,7 @@ namespace NLI_POS.Pages.Orders
                 }
                 else
                 {
-                    // Regular product logic
+                    // Regular product
                     var inventory = await _context.InventoryStocks
                         .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId);
 
