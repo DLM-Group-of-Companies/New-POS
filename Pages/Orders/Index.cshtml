@@ -5,10 +5,14 @@
     ViewData["Title"] = "Order";
 }
 
-<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-2">
-    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl text-danger" onclick="window.location = './Index';"></i> </span>
-    <h3>Order</h3>
-
+<div class="container-fluid bg-white bg-gradient shadow p-2"> 
+     <div class="d-flex justify-content-between align-items-center mb-3"> 
+        <h4 class="mb-0 text-primary">
+            <i class="fas fa-th-list"></i> Orders
+        </h4>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
+    </div>
+    <hr />
     <p>
         <a class="btn btn-primary btn-gradient" asp-page="New"><i class="fas fa-cart-plus"></i> New Order</a>
     </p>
@@ -22,7 +26,7 @@
                 <th>Office</th>
                 <th>Total Amount</th>
                 <th class="no-export">Actions</th>
-            </tr>
+            </tr>   
         </thead>
     </table>
 </div>

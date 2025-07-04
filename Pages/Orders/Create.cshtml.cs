@@ -172,7 +172,7 @@ namespace NLI_POS.Pages.Orders
             ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
         }
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
+        // SAVE
         public async Task<IActionResult> OnPostAsync()
         {
 
@@ -270,6 +270,7 @@ namespace NLI_POS.Pages.Orders
                     EncodeDate = encodeDate,
                     CustomerId = Order.CustomerId,
                     OfficeId = Order.OfficeId,
+                    ProductCategory = Order.ProductCategory,
                     OrderType = orderType,
                     ProductId = item.ProductId,
                     ComboId = item.ProductCombo,
@@ -278,7 +279,7 @@ namespace NLI_POS.Pages.Orders
                     Amount = item.Price * item.Quantity,
                     PaymentMethod = Order.PaymentMethod,
                     RefNo = Order.RefNo,
-                    EncodedBy = User.Identity.Name,
+                    EncodedBy = User?.Identity.Name,
                     ItemNo = itemNo++
                 };
 

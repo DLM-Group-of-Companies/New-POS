@@ -8,6 +8,13 @@ html {
     }
 }
 
+@media screen and (max-width: 1366px) {
+    html {
+        font-size: 12px;
+    }
+}
+
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -26,6 +33,8 @@ body {
     background-attachment: fixed;
     padding-bottom: 50px;
     /*padding-top: 65px;*/
+    width: 100vw;
+    overflow-x: hidden;
 }
 
 /*data table search*/
@@ -78,7 +87,7 @@ body {
     cursor: move;
 }
 
-#collTable.dataTable {
+.dataTable {
     width: 100% !important;
 }
 
@@ -104,14 +113,63 @@ input[type="number"] {
     border-bottom: 1px solid #343a40;*/ /* dark gray */
 /*}*/
 
-    /* Darker border for active tab */
-    .nav-tabs .nav-link.active {
-        border-color: #343a40 #343a40 #ffff; /* top, sides, bottom */
-        font-weight: bold;
+/* Darker border for active tab */
+.nav-tabs .nav-link.active {
+    border-color: #343a40 #343a40 #ffff; /* top, sides, bottom */
+    font-weight: bold;
+}
+
+/* Optional: Darker border for non-active tabs */
+.nav-tabs .nav-link {
+    border: 1px solid #ccc;
+    border-bottom: none;
+}
+
+/*menu icons*/
+.icon-container {
+    width: 24px; /* or 28px depending on your needs */
+    display: inline-block;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Hide sidebar and reset margin on small screens */
+/*@media (max-width: 767.98px) {
+    .sidebar-desktop {
+        background-color: red !important;
+        display: none !important;
     }
 
-    /* Optional: Darker border for non-active tabs */
-    .nav-tabs .nav-link {
-        border: 1px solid #ccc;
-        border-bottom: none;
+    #page-content {
+        margin-left: 0 !important;
     }
+}*/
+
+/* Desktop: show the sidebar */
+@media (min-width: 768px) {
+    .sidebar-desktop {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100vh;
+        z-index: 1030;
+    }
+
+    .with-sidebar #page-content {
+        margin-left: 250px;
+    }
+}
+
+/* Mobile: hide the sidebar */
+@media (max-width: 767.98px) {
+   .sidebar-desktop {
+        display: none !important;
+        z-index: -1 !important;
+    }
+
+    #page-content {
+        margin-left: 0 !important;
+    }
+}

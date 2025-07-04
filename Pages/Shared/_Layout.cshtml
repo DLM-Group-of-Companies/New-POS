@@ -3,6 +3,11 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+@{
+    var path = Context.Request.Path.ToString().ToLower();
+    var isLoginPage = path.Contains("/identity/account/login");
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,9 +15,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - NobleLife POS</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @*     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
+
+    @* <script src="~/lib/jquery/dist/jquery.min.js"></script> *@
     <script src="https://kit.fontawesome.com/cc42349d53.js" crossorigin="anonymous"></script>
 
     <!-- ✅ jQuery -->
@@ -49,115 +55,72 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
+    @*     <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm  navbar-dark bg-dark bg-gradient">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">
-                    <img src="~/images/noblelife-white.png" alt="" width="150" class="d-inline-block align-text-top" />
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
-                                <a class="nav-link " asp-area="" asp-page="/Index">
-                                    <i class="fas fa-home fa-xl" title="Home"></i> <span class="d-sm-none d-lg-inline-block">  Home</span>
+<body class="@((User.Identity?.IsAuthenticated ?? false) ? "with-sidebar" : "no-sidebar")">
 
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link " asp-area="" asp-page="/Orders/Index">
-                                    <i class="fas fa-cash-register fa-xl" title="Order"></i> <span class="d-sm-none d-lg-inline-block">  Order</span>
+    @* <div class="d-flex"> *@
+        <div>
+        @if (!isLoginPage)
+        {
+            
+            <!-- ✅ Sidebar for desktop (md+) only -->
+            <div class="sidebar-desktop d-none d-md-block bg-dark text-white">
+                @await Html.PartialAsync("_SidebarPartial")
+            </div>
 
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link " asp-area="" asp-page="/Customers/Index"><i class="fas fa-users fa-xl" title="Customer"></i> <span class="d-sm-none d-lg-inline-block"> Customer</span></a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link " asp-area="" asp-page="/Orders/Index"><i class="fas fa-file-alt fa-xl" title="Reports"></i> <span class="d-sm-none d-lg-inline-block"> Reports</span></a>
-                            </li>
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <ul class="navbar-nav flex-grow-1">
-                                    <li class="nav-item dropdown ">
-                                        <a class="nav-link  dropdown-toggle" role="button" data-bs-toggle="dropdown" id="navbarSettMenu" aria-expanded="false">
-                                            <i class="fas fa-cogs fa-xl" title="Settings"></i> <span class="d-sm-none d-lg-inline-block"> Settings </span>
+            <!-- ✅ Mobile top navbar with logo and menu toggle -->
+            <nav class="navbar navbar-dark bg-dark d-md-none w-100">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="/">
+                        <img src="~/images/noblelife-white.png" alt="Logo" height="30" />
+                        POS
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+            </nav>
 
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarSettMenu">
-                                            <li><a class="dropdown-item p-2" asp-area="" asp-page="/Users/Index" onclick="showLoader();"><i class="fas fa-users-cog"></i> Users</a></li>
-                                            <li><a class="dropdown-item p-2" asp-area="" asp-page="/Offices/Index" onclick="showLoader();"><i class="fas fa-laptop-house"></i> Offices</a></li>
-                                            <li><a class="dropdown-item p-2" asp-area="" asp-page="/Countries/Index" onclick="showLoader();"><i class="fas fa-globe-asia"></i> Countries</a></li>
-                                            <li><a class="dropdown-item p-2" asp-area="" asp-page="/Products/Index" onclick="showLoader();"><i class="fas fa-grip-horizontal"></i> Products</a></li>
-                                            <li><a class="dropdown-item p-2" asp-area="" asp-page="/Inventory/Index" onclick="showLoader();"><i class="fas fa-boxes"></i> Inventory</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            }
-                        </ul>
-                    }
-                    <partial name="_LoginPartial" />
+            <!-- ✅ Offcanvas for mobile only -->
+            <div class="offcanvas offcanvas-start bg-dark text-white d-md-none" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    @await Html.PartialAsync("_SidebarPartial")
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container pt-5">
-        <div id="preloader" style="display:none;">
-            <div class="loader"></div>
-        </div>
 
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        }
 
-        @* Modal start *@
-        <div id="partialModal" class="modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header bg-gradient bg-warning">
-                        <h5 class="modal-title"></h5>
-                        <button type="button" class="close border-0" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true" style="color:gray"><i class="fas fa-times"></i></span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                    </div>
-                    <div class="modal-footer">
-                        <div>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-chevron-left"></i> Cancel</button>
-                        </div>
-                        <div class="modal-footer-button">
-                            @* Will add button here programmatically *@
-                        </div>
-                    </div>
-                </div>
+        <!-- Main Content -->
+        <div class="flex-grow-1 " id="page-content" >
+            <div id="preloader" style="display:none;">
+                <div class="loader"></div>
             </div>
+
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
         </div>
-        @* Modal end *@
+
     </div>
 
-    <footer class="border-top footer text-muted fixed-bottom">
-        <div class="container-fluid bg-dark bg-gradient">
-            &copy; 2025 Noble Life International
-        </div>
+    <footer class="footer bg-black bg-gradient text-white text-center py-2 fixed-bottom">
+        &copy; 2025 Noble Life International
     </footer>
 
-    @* <script src="~/lib/jquery/dist/jquery.min.js"></script> *@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-     <script>
+    <script>
         function validateAndShowLoader(form) {
             if (!form) return false;
 
-            // jQuery Unobtrusive Validation
             if (typeof $ !== "undefined" && typeof $.validator !== "undefined") {
                 if (!$(form).valid()) return false;
             } else {
@@ -173,8 +136,8 @@
         }
     </script>
 
-
     @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("Notyf")
 </body>
+
 </html>

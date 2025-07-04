@@ -2,95 +2,81 @@
 @model NLI_POS.Pages.Customers.CreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Customer";
 }
-<div class="container-fluid p-2 rounded bg-light shadow">
-    <h4>Customer Registration</h4>
-    <hr />
-    <div class="container bg-light p-3 rounded border">
-       <form method="post" onsubmit="return validateAndShowLoader(this)">
-            <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
 
-            <div class="form-group row p-2 ">
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <span class="text-danger small">*</span>
-                    <label asp-for="Customer.CustCode" class="control-label"></label>
+
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0 text-primary"><i class="fas fa-user-plus me-2"></i>Customer Registration</h4>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
+    </div>
+    <hr />
+    <div class="card-body bg-light bg-gradient">
+        <form method="post" onsubmit="return validateAndShowLoader(this)">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label asp-for="Customer.CustCode" class="form-label">Customer Code <span class="text-danger">*</span></label>
                     <input asp-for="Customer.CustCode" class="form-control" value="NEW" readonly />
                     <span asp-validation-for="Customer.CustCode" class="text-danger small"></span>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <span class="text-danger small">*</span>
-                    <label asp-for="Customer.CustClass" class="control-label"></label>
-                    <select asp-for="Customer.CustClass" class="form-control" asp-items="ViewBag.CustClass">
+                <div class="col-md-4">
+                    <label asp-for="Customer.CustClass" class="form-label">Customer Class <span class="text-danger">*</span></label>
+                    <select asp-for="Customer.CustClass" class="form-select" asp-items="ViewBag.CustClass">
                         <option value="">Select</option>
                     </select>
+                    <span asp-validation-for="Customer.CustClass" class="text-danger small"></span>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <label asp-for="Customer.OfficeId" class="control-label"></label>
-                    <select asp-for="Customer.OfficeId" class="form-control" asp-items="ViewBag.OfficeId">
+                <div class="col-md-4">
+                    <label asp-for="Customer.OfficeId" class="form-label">Office <span class="text-danger">*</span></label>
+                    <select asp-for="Customer.OfficeId" class="form-select" asp-items="ViewBag.OfficeId">
                         <option value="">Select</option>
                     </select>
+                    <span asp-validation-for="Customer.OfficeId" class="text-danger small"></span>
                 </div>
             </div>
 
-            <div class="form-group row p-2">
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12 ">
-                    <span class="text-danger small">*</span>
-                    <label asp-for="Customer.FirstName" class="control-label"></label>
+            <hr class="my-4" />
+            <h5 class="text-primary mb-3"><i class="fas fa-id-card me-2"></i>Personal Information</h5>
+
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label asp-for="Customer.FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
                     <input asp-for="Customer.FirstName" class="form-control" />
                     <span asp-validation-for="Customer.FirstName" class="text-danger small"></span>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <span class="text-danger small">*</span>
-                    <label asp-for="Customer.MiddleName" class="control-label"></label>
+                <div class="col-md-4">
+                    <label asp-for="Customer.MiddleName" class="form-label">Middle Name </label>
                     <input asp-for="Customer.MiddleName" class="form-control" />
                     <span asp-validation-for="Customer.MiddleName" class="text-danger small"></span>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <span class="text-danger small">*</span>
-                    <label asp-for="Customer.LastName" class="control-label"></label>
+                <div class="col-md-4">
+                    <label asp-for="Customer.LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
                     <input asp-for="Customer.LastName" class="form-control" />
                     <span asp-validation-for="Customer.LastName" class="text-danger small"></span>
                 </div>
             </div>
-            <div class="form-group row p-2">
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <label asp-for="Customer.Email" class="control-label"></label>
-                    <input asp-for="Customer.Email" class="form-control" />
-                    <span asp-validation-for="Customer.Email" class="text-danger small"></span>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <label asp-for="Customer.MobileNo" class="control-label"></label>
-                    <input asp-for="Customer.MobileNo" class="form-control" />
-                    <span asp-validation-for="Customer.MobileNo" class="text-danger small"></span>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <label asp-for="Customer.LandlineNo" class="control-label"></label>
-                    <input asp-for="Customer.LandlineNo" class="form-control" />
-                    <span asp-validation-for="Customer.LandlineNo" class="text-danger small"></span>
-                </div>
-            </div>
-            <div class="form-group row p-2">
-                <div class="form-group col-lg-3 col-md-3 col-sm-12 col-12">
-                    <span class="text-danger small">*</span>
-                    <label asp-for="Customer.Gender" class="control-label"></label>
-                    <select asp-for="Customer.Gender" class="form-control">
+
+            <div class="row g-2 mt-1">
+                <div class="col-md-3">
+                    <label asp-for="Customer.Gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                    <select asp-for="Customer.Gender" class="form-select">
                         <option value="">Select</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                     </select>
                     <span asp-validation-for="Customer.Gender" class="text-danger small"></span>
                 </div>
-
-                <div class="form-group col-lg-3 col-md-3 col-sm-12 col-12">
-                    <span class="text-danger small">*</span>
-                    <label asp-for="Customer.Birthday" class="control-label"></label>
+                <div class="col-md-3">
+                    <label asp-for="Customer.Birthday" class="form-label">Birthday <span class="text-danger">*</span></label>
                     <input asp-for="Customer.Birthday" class="form-control" />
                     <span asp-validation-for="Customer.Birthday" class="text-danger small"></span>
                 </div>
-                <div class="form-group col-lg-3 col-md-3 col-sm-12 col-12">
-                    <label asp-for="Customer.CivilStat" class="control-label"></label>
-                    <select asp-for="Customer.CivilStat" class="form-control">
+                <div class="col-md-3">
+                    <label asp-for="Customer.CivilStat" class="form-label">Civil Status <span class="text-danger">*</span></label>
+                    <select asp-for="Customer.CivilStat" class="form-select">
                         <option value="">Select</option>
                         <option value="Single">Single</option>
                         <option value="Married">Married</option>
@@ -99,68 +85,93 @@
                     </select>
                     <span asp-validation-for="Customer.CivilStat" class="text-danger small"></span>
                 </div>
-                <div class="form-group col-lg-3 col-md-3 col-sm-12 col-12">
-                    <label asp-for="Customer.Nationality" class="control-label"></label>
+
+                <div class="col-md-3">
+                    <label asp-for="Customer.Nationality" class="form-label">Nationality</label>
                     <input asp-for="Customer.Nationality" class="form-control" />
                     <span asp-validation-for="Customer.Nationality" class="text-danger small"></span>
                 </div>
             </div>
 
-            <div class="form-group row p-2">
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <label asp-for="Customer.Country" class="control-label"></label>
-                    <select asp-for="Customer.Country" class="form-control" asp-items="ViewBag.Country">
+            <div class="row g-2 mt-1">
+                <div class="col-md-4">
+                    <label asp-for="Customer.Email" class="form-label">Email</label>
+                    <input asp-for="Customer.Email" class="form-control" />
+                    <span asp-validation-for="Customer.Email" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Customer.MobileNo" class="form-label">Mobile No.</label>
+                    <input asp-for="Customer.MobileNo" class="form-control" />
+                    <span asp-validation-for="Customer.MobileNo" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Customer.LandlineNo" class="form-label">Landline</label>
+                    <input asp-for="Customer.LandlineNo" class="form-control" />
+                    <span asp-validation-for="Customer.LandlineNo" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row g-2 mt-1">
+                <div class="col-md-4">
+                    <label asp-for="Customer.Country" class="form-label">Country</label>
+                    <select asp-for="Customer.Country" class="form-select" asp-items="ViewBag.Country">
                         <option value="">Select</option>
                     </select>
                     <span asp-validation-for="Customer.Country" class="text-danger small"></span>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <label asp-for="Customer.Province" class="control-label"></label>
+                <div class="col-md-4">
+                    <label asp-for="Customer.Province" class="form-label">Province</label>
                     <input asp-for="Customer.Province" class="form-control" />
                     <span asp-validation-for="Customer.Province" class="text-danger small"></span>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-12">
-                    <label asp-for="Customer.City" class="control-label"></label>
+
+                <div class="col-md-4">
+                    <label asp-for="Customer.City" class="form-label">City</label>
                     <input asp-for="Customer.City" class="form-control" />
                     <span asp-validation-for="Customer.City" class="text-danger small"></span>
                 </div>
             </div>
-            <div class="form-group row p-2">
-                <div class="col-lg-5 col-md-5 col-sm-12 col-12">
-                    <label asp-for="Customer.Address1" class="control-label"></label>
+
+            <div class="row g-2 mt-1">
+                <div class="col-md-5">
+                    <label asp-for="Customer.Address1" class="form-label">Address 1</label>
                     <input asp-for="Customer.Address1" class="form-control" />
                     <span asp-validation-for="Customer.Address1" class="text-danger small"></span>
                 </div>
-                <div class="col-lg-5 col-md-5 col-sm-12 col-12">
-                    <label asp-for="Customer.Address2" class="control-label"></label>
+                <div class="col-md-5">
+                    <label asp-for="Customer.Address2" class="form-label">Address 1</label>
                     <input asp-for="Customer.Address2" class="form-control" />
-                    <span asp-validation-for="Customer.Address2" class="text-danger small"></span>
+                    <span asp-validation-for="Customer.Address1" class="text-danger small"></span>
                 </div>
-                <div class="col-lg-2 col-md-2 col-sm-12 col-12">
-                    <label asp-for="Customer.PostalCode" class="control-label"></label>
+                <div class="col-md-2">
+                    <label asp-for="Customer.PostalCode" class="form-label">Postal Code</label>
                     <input asp-for="Customer.PostalCode" class="form-control" />
                     <span asp-validation-for="Customer.PostalCode" class="text-danger small"></span>
                 </div>
             </div>
-            <div class="form-group row p-2">
-                <label asp-for="Customer.Notes" class="control-label"></label>
-                <textarea asp-for="Customer.Notes" class="form-control" rows="2"></textarea>
+
+            <div class="row mt-3">
+                <div class="col">
+                    <label asp-for="Customer.Notes" class="form-label">Notes</label>
+                    <textarea asp-for="Customer.Notes" class="form-control" rows="1"></textarea>
+                </div>
             </div>
+
             <input asp-for="Customer.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
-            <input asp-for="Customer.EncodedBy" type="hidden" value="ARMAN" />
+            <input asp-for="Customer.EncodedBy" type="hidden" value="@User?.Identity.Name" />
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <a asp-page="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to List
+                </a>
+                @* <input type="submit" value="Save" class="btn btn-success px-4" /> *@
+                <button type="submit" class="btn btn-success px-4"><i class="far fa-save"></i> Save</button>
             </div>
-
         </form>
-
-    </div>
-
-    <div>
-        <a asp-page="Index">Back to List</a>
     </div>
 </div>
+
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

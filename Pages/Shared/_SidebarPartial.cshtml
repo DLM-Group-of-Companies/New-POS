@@ -1,0 +1,66 @@
+﻿@using NLI_POS.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<a class="navbar-brand mb-4 d-block text-center pt-4" asp-page="/Index">
+    <img src="~/images/noblelife-white.png" alt="Logo" width="150" />
+</a>
+<hr />
+<h4 class="text-center fw-bold">POINT OF SALE</h4>
+<hr />
+
+@if (SignInManager.IsSignedIn(User))
+{
+
+    <ul class="nav flex-column mb-auto">
+        <li class="nav-item">
+            <a class="nav-link text-white" asp-page="/Index">
+                <span class="icon-container"><i class="fas fa-home me-2"></i></span> Home
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" asp-page="/Orders/Index">
+                <span class="icon-container"><i class="fas fa-cash-register me-2"></i></span> Order
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" asp-page="/Customers/Index">
+                <span class="icon-container"><i class="fas fa-users me-2"></i></span> Customer
+            </a>
+        </li>
+
+        <!-- Reports Menu -->
+        <li class="nav-item">
+            <a class="nav-link text-white d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#reportsMenu" role="button" aria-expanded="false">
+                <span><span class="icon-container"><i class="fas fa-file-alt me-2"></i></span> Reports</span>
+                <i class="fas fa-chevron-down small"></i>
+            </a>
+            <div class="collapse ps-4" id="reportsMenu">
+                <a class="nav-link text-white" asp-page="/Report/DailySales">Daily Sales</a>
+                <a class="nav-link text-white" asp-page="/Report/SalesByDateRange">Sales by Date Range</a>
+            </div>
+        </li>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <!-- Settings Menu -->
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#settingsMenu" role="button" aria-expanded="false">
+                    <span>
+                        <span class="icon-container"><i class="fas fa-cogs me-2"></i></span> Settings</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+                <div class="collapse ps-4" id="settingsMenu">
+                    <a class="nav-link text-white" asp-page="/Users/Index"><i class="fas fa-users-cog me-2"></i> Users</a>
+                    <a class="nav-link text-white" asp-page="/Offices/Index"><i class="fas fa-laptop-house me-2"></i> Offices</a>
+                    <a class="nav-link text-white" asp-page="/Countries/Index"><i class="fas fa-globe-asia me-2"></i> Countries</a>
+                    <a class="nav-link text-white" asp-page="/Products/Index"><i class="fas fa-grip-horizontal me-2"></i> Products</a>
+                    <a class="nav-link text-white" asp-page="/Inventory/Index"><i class="fas fa-boxes me-2"></i> Inventory</a>
+                </div>
+            </li>
+        }
+    </ul>
+
+}
+<hr />
+<partial name="_LoginPartial" />

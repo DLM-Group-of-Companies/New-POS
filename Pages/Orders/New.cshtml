@@ -2,31 +2,32 @@
 @model NLI_POS.Pages.Orders.NewModel
 
 @{
-    ViewData["Title"] = "Customers";
+    ViewData["Title"] = "New Order";
 }
 <div class="container-fluid bg-white bg-gradient rounded-3 shadow p-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
         <h4 class="mb-0 text-primary">
             <i class="fas fa-cart-plus me-2"></i> New Order
         </h4>
         <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
     </div>
     <hr />
+
     <form method="post" onsubmit="return validateAndShowLoader(this)" id="myForm">
-        <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75 mb-3"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75 mb-2"></div>
 
         <div class="row">
             <div class="col-lg-4">
                 <!-- Office and Date Section -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-3">
-                    <h5 class="text-secondary border-bottom pb-1 mb-3"><i class="fas fa-building"></i> Office Info</h5>
+                <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-building"></i> Office Info</h5>
                     <input type="hidden" asp-for="Order.OrderNo" />
                     <div class="row">
-                        <div class="col-6 mb-3">
+                        <div class="col-6 mb-2">
                             <label asp-for="Order.OfficeId" class="form-label"></label>
                             <select id="OfficeId" asp-for="Order.OfficeId" class="form-select" asp-items="ViewBag.OfficeId"></select>
                         </div>
-                        <div class="col-6 mb-3">
+                        <div class="col-6 mb-2">
                             <label asp-for="Order.OrderDate" class="form-label"></label>
                             <input asp-for="Order.OrderDate" class="form-control" value="@DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd")" />
                             <span asp-validation-for="Order.OrderDate" class="text-danger small"></span>
@@ -35,8 +36,8 @@
                 </div>
 
                 <!-- Customer Section -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-3">
-                    <h5 class="text-secondary border-bottom pb-1 mb-3"><i class="fas fa-user"></i> Customer Info</h5>
+                <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-user"></i> Customer Info</h5>
                     <label asp-for="Order.CustomerId" class="form-label"></label>
                     <div class="input-group mb-2">
                         <select asp-for="Order.CustomerId" id="CustomerId" class="form-select" asp-items="ViewBag.CustomerId">
@@ -52,10 +53,10 @@
                 </div>
 
                 <!-- Product Section -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-3">
-                    <h5 class="text-secondary border-bottom pb-1 mb-3"><i class="fas fa-box"></i> Product Selection</h5>
+                <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-box"></i> Product Selection</h5>
                     <div class="row">
-                        <div class="col-4 mb-3">
+                        <div class="col-4 mb-2">
                             <label class="form-label">Category</label>
                             <select id="ProductCategory" asp-for="Order.ProductCategory" class="form-select">
                                 <option value="Regular">Regular</option>
@@ -64,22 +65,22 @@
                             </select>
                             <span asp-validation-for="Order.ProductCategory" class="text-danger small"></span>
                         </div>
-                        <div class="col-8 mb-3">
+                        <div class="col-8 mb-2">
                             <label asp-for="Order.ProductId" class="form-label"></label>
                             <select id="ProductId" asp-for="Order.ProductId" class="form-select" asp-items="ViewBag.ProductId"></select>
                         </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label asp-for="Order.ComboId" class="form-label"></label>
                         <select id="ComboId" asp-for="Order.ComboId" class="form-select" asp-items="ViewBag.ProductCombos"></select>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-2">
                             <label asp-for="Order.Qty" class="form-label"></label>
                             <input id="Qty" asp-for="Order.Qty" class="form-control" />
                             <span asp-validation-for="Order.Qty" class="text-danger small"></span>
                         </div>
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-8 mb-2">
                             <label asp-for="Order.Amount" class="form-label"></label>
                             <input id="Amount" asp-for="Order.Amount" class="form-control" />
                             <span asp-validation-for="Order.Amount" class="text-danger small"></span>
@@ -98,8 +99,8 @@
 
             <div class="col-lg-8">
                 <!-- Cart Section -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-3">
-                    <h5 class="text-secondary border-bottom pb-1 mb-3"><i class="fas fa-shopping-cart"></i> Cart</h5>
+                <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-shopping-cart"></i> Cart</h5>
                     <div class="table-responsive">
                         <table id="cartTable" class="table table-bordered table-sm small align-middle">
                             <thead class="table-secondary">
@@ -130,9 +131,9 @@
                 </div>
 
                 <!-- Payment Info -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-3">
-                    <h5 class="text-secondary border-bottom pb-1 mb-3"><i class="fas fa-credit-card"></i> Payment</h5>
-                    <div class="row mb-3">
+                <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-credit-card"></i> Payment</h5>
+                    <div class="row mb-2">
                         <div class="col-md-6">
                             <label asp-for="Order.PaymentMethod" class="form-label"></label>
                             <select asp-for="Order.PaymentMethod" class="form-select" asp-items="ViewBag.PaymentMethod"></select>
@@ -142,7 +143,7 @@
                             <input id="RefNo" asp-for="Order.RefNo" class="form-control" />
                         </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label asp-for="Order.Notes" class="form-label"></label>
                         <textarea asp-for="Order.Notes" class="form-control" rows="3"></textarea>
                     </div>
@@ -170,7 +171,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" id="customerSearchInput" class="form-control mb-3" placeholder="Enter name, customer ID, email, mobile..." />
+                    <input type="text" id="customerSearchInput" class="form-control mb-2" placeholder="Enter name, customer ID, email, mobile..." />
                     <table class="table table-sm table-hover table-bordered small">
                         <thead>
                             <tr>
@@ -189,181 +190,209 @@
         </div>
     </div>
 </div>
+    
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script>
-        //Get Customer Class to determine if Staff. Staff has different price
-        $('#CustomerId').on('change', function () {
-            var customerId = $(this).val();
+        // Show loader on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            showLoader();
+        });
 
-            if (customerId) {
-                $.ajax({
-                    url: '@Url.Page("Create", "CustomerClass")',
-                    type: 'GET',
-                    data: { id: customerId },
-                    success: function (res) {
-                        if (res.success) {
-                            $('#CustClassDisplay').text(res.custClassName);
-                            $('#Order_CustClass').val(res.custClassId);
-                            const selectedValue = $(this).val();
+        const loadTracker = {
+            customerClass: false,
+            productList: false,
+            productCombo: false
+        };
 
-                            if (res.custClassName !== 'Others') 
-                            { 
-                                $('#Price').prop('readonly', true);
-                            } else {
-                                $('#Price').prop('readonly', false);
-                            }
-
-                        } else {
-                            $('#CustClassDisplay').text("Not found");
-                        }
-                    },
-                    error: function () {
-                        alert('Error retrieving customer class');
-                    }
-                });
+        function checkAllLoaded() {
+            if (Object.values(loadTracker).every(v => v)) {
+                if (typeof hideLoader === "function") hideLoader();
             }
-        });
-    </script>
+        }
 
 
-    <script>
-        var amount = 0;
-        $(document).ready(function () {
-            $('#ProductId').change(function () {
-                var selectedProductId = $(this).val();
-                var custclasstxt = $('#CustClassDisplay').text();
-                var officeid  = $('#OfficeId').val();
-                $("#ComboId").empty();
-                $.getJSON(`?handler=ProductComboList&ProdId=${selectedProductId}`, (data) => {
-                    $.each(data, function (i, item) {
-                        $("#ComboId").append(`<option value="${data[i].value}">${data[i].text}</option>`);
-                    });
-                });
-                $.ajax({
-                    cache: false,
-                    type: "GET",
-                    url: "?handler=GetProducAmount",
-                    data: { __RequestVerificationToken: gettoken(), id: selectedProductId, custclass: custclasstxt, officeId: officeid },
-                    dataType: 'json',
-                    success: function (response) {
-                        amount = response;
-                        $("#Price").val(amount);
-                        var tot = $("#Qty").val() * amount;
-                        $("#Amount").val(tot);
-                    },
-                    failure: function (response) {
-                        alert('failure:' + response.responseText);
-                    },
-                    error: function (response) {
-                        $("#partialModal").find(".modal-body").html(response);
-                        alert('Error encountered. This record may already have been deleted.');
-                    }
-                });
-
-            });
-        });
-
-        // Get Token for authorization
         function gettoken() {
             return $('input[name="__RequestVerificationToken"]').val();
         }
 
-        //Calcualte on input of quantity
+        // Load customer class
+        function loadCustomerClass(customerId) {
+            return $.ajax({
+                url: '@Url.Page("Create", "CustomerClass")',
+                type: 'GET',
+                data: { id: customerId },
+                success: function (res) {
+                    if (res.success) {
+                        $('#CustClassDisplay').text(res.custClassName);
+                        $('#Order_CustClass').val(res.custClassId);
+                        $('#Price').prop('readonly', res.custClassName === 'Others' ? false : true);
+                        loadTracker.customerClass = true;
+                    } else {
+                        $('#CustClassDisplay').text("Not found");
+                    }
+                    checkAllLoaded();
+                },
+                error: function () {
+                    alert('Error retrieving customer class');
+                }
+            });
+        }
+
+        // Load product list
+        function loadProductList() {
+            const category = $('#ProductCategory').val();
+            const custclasstxt = $('#CustClassDisplay').text();
+
+            if (!category || !custclasstxt) return;
+
+            $("#ProductId").empty();
+            $.getJSON(`?handler=ProductList&ProdCat=${category}&custclass=${custclasstxt}`, function (data) {
+                $.each(data, function (i, item) {
+                    $("#ProductId").append(`<option value="${item.value}">${item.text}</option>`);
+                });
+                loadTracker.productList = true;
+                checkAllLoaded();
+            });
+        }
+
+        // Load combos and amount when product selected
+        function loadProductDetails(productId) {
+            const custclasstxt = $('#CustClassDisplay').text();
+            const officeid = $('#OfficeId').val();
+            $("#ComboId").empty();
+
+            $.getJSON(`?handler=ProductComboList&ProdId=${productId}`, function (data) {
+                $.each(data, function (i, item) {
+                    $("#ComboId").append(`<option value="${item.value}">${item.text}</option>`);
+                });
+                loadTracker.productCombo = true;
+                checkAllLoaded();
+            });
+
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "?handler=GetProducAmount",
+                data: { __RequestVerificationToken: gettoken(), id: productId, custclass: custclasstxt, officeId: officeid },
+                dataType: 'json',
+                success: function (response) {
+                    amount = response;
+                    $("#Price").val(amount);
+                    var tot = $("#Qty").val() * amount;
+                    $("#Amount").val(tot);
+                },
+                error: function () {
+                    alert('Error retrieving price.');
+                }
+            });
+        }
+
+        var amount = 0;
+
+        $(function () {
+            $('#CustomerId').on('change', function () {
+                const customerId = $(this).val();
+                loadTracker.customerClass = false;
+                loadTracker.productList = false;
+                if (customerId) {
+                    loadCustomerClass(customerId).done(() => {
+                        setTimeout(loadProductList, 300);
+                    });
+                }
+            });
+
+            $('#ProductCategory').on('change', function () {
+                loadTracker.productList = false;
+                loadProductList();
+            });
+
+            $('#ProductId').on('change', function () {
+                const selectedProductId = $(this).val();
+                loadTracker.productCombo = false;
+                loadProductDetails(selectedProductId);
+            });
+
+            $('#Qty').on('input', function () {
+                const tot = $(this).val() * amount;
+                $('#Amount').val(tot);
+            });
+        });
+
         $(document).ready(function () {
-            $("#Qty").on("input", function () {
-                var tot = $(this).val() * amount;
-                $("#Amount").val(tot);
-            });
+            const existingCustomerId = $('#CustomerId').val();
+            const existingCategory = $('#ProductCategory').val();
+            const existingProduct = $('#ProductId').val();
+
+            if (existingCustomerId) {
+                loadCustomerClass(existingCustomerId).done(() => {
+                    if (existingCategory) {
+                        loadProductList();
+
+                        if (existingProduct) {
+                            loadProductDetails(existingProduct);
+                        } else {
+                            // Assume no product details to load
+                            loadTracker.productCombo = true;
+                            checkAllLoaded();
+                        }
+                    } else {
+                        // No product category selected
+                        loadTracker.productList = true;
+                        loadTracker.productCombo = true;
+                        checkAllLoaded();
+                    }
+                });
+            } else {
+                // No customer selected at all
+                loadTracker.customerClass = true;
+                loadTracker.productList = true;
+                loadTracker.productCombo = true;
+                checkAllLoaded();
+            }
         });
 
-        $(function () {
-            $("#ProductCategory").on("change", function () {
-                var category = $(this).val();
-                $("#ProductId").empty();
-                $.getJSON(`?handler=ProductList&ProdCat=${category}`, (data) => {
-                    $.each(data, function (i, item) {
-                        $("#ProductId").append(`<option value="${data[i].value}">${data[i].text}</option>`);
-                    });
-                });
-            });
-        });
-
-        $(function () {
-            $("#OrderType").on("change", function () {
-                var type = $(this).val();
-                //alert(type);
-                $("#CustomerId").empty();
-                $("#CustomerId").append("<option value=''>Select</option>");
-                $.getJSON(`?handler=Customers`, (data) => {
-                    $.each(data, function (i, item) {
-                        $("#CustomerId").append(`<option value="${data[i].value}">${data[i].text}</option>`);
-                    });
-                });
-            });
-        });
     </script>
 
     <script>
-        //For Cart Processes
+        // Cart Scripts
         let cart = [];
 
         function addProduct() {
             const validationSummary = document.querySelector('.validation-summary-errors');
             if (validationSummary) {
-                validationSummary.innerHTML = ''; // Clear the error messages
-                validationSummary.style.display = 'none'; // Hide the summary div
+                validationSummary.innerHTML = '';
+                validationSummary.style.display = 'none';
             }
 
-            if (document.getElementById('CustomerId').value === "") {
-                toastr.options.positionClass = "toast-bottom-right";
-                toastr.options.closeButton = false;
-                toastr.options.showDuration = 100;
-                toastr.options.hideDuration = 1000;
-                toastr.options.timeOut = 5000;
+            if ($('#CustomerId').val() === "") {
                 toastr.warning('Please select a customer.');
                 return;
             }
 
-            const prodCat = document.getElementById('ProductCategory');
-            const select = document.getElementById('ProductId');
-            const selectedOption = select.options[select.selectedIndex];
-            const selectedText = select.options[select.selectedIndex].text;
-            const productId = parseInt(select.value);
+            const prodCat = $('#ProductCategory option:selected').text();
+            const selectedProductId = $('#ProductId').val();
+            const selectedProductText = $('#ProductId option:selected').text();
+            const comboId = $('#ComboId').val();
+            const comboText = $('#ComboId option:selected').text();
+            const price = parseFloat($('#Price').val());
+            let qty = parseInt($('#Qty').val()) || 1;
 
-            if (selectedOption.value == 0) {
-                toastr.options.positionClass = "toast-bottom-right";
-                toastr.options.closeButton = false;
-                toastr.options.showDuration = 100;
-                toastr.options.hideDuration = 1000;
-                toastr.options.timeOut = 5000;
-                toastr.warning('Please select a product.');
-                return;
-            }
-
-            const selectedCombo = document.getElementById('ComboId');
-            const selectedComboOption = selectedCombo.options[selectedCombo.selectedIndex] ?? null;
-            const selectedComboText = selectedCombo.options[selectedCombo.selectedIndex].text ?? null;
-            const combId = parseInt(selectedCombo.value);
-
-            const price = parseFloat(document.getElementById('Price').value);
-            let qty = parseInt(document.getElementById('Qty').value) ?? 1;
-            const quantity = isNaN(qty) ? 1 : qty;
-
-            const existing = cart.find(p => p.productId === productId);
+            const existing = cart.find(p => p.productId === parseInt(selectedProductId));
             if (existing) {
-                existing.quantity += quantity;
+                existing.quantity += qty;
             } else {
                 cart.push({
-                    productId: productId,
-                    productName: selectedText,
-                    productCombo: isNaN(combId) ? null : combId,
-                    comboName: selectedComboText,
+                    productId: parseInt(selectedProductId),
+                    productCat: prodCat,
+                    productName: selectedProductText,
+                    productCombo: comboId ? parseInt(comboId) : null,
+                    comboName: comboText,
                     price,
-                    quantity
+                    quantity: qty
                 });
             }
 
@@ -372,41 +401,34 @@
         }
 
         function updateCartTable() {
-            const tbody = document.querySelector('#cartTable tbody');
-            tbody.innerHTML = '';
+            const tbody = $('#cartTable tbody').empty();
             let total = 0;
 
-            cart.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                        <td class="col-4 align-middle">${item.productName}</td>
-                        <td class="col-5 align-middle">${item.comboName}</td>
-                        <td class="col-1 align-middle">₱${item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td >
-                        <td class="col-1">
-                            <input type="number" min="1" class="form-control input-sm align-middle" value="${item.quantity}" maxlength="5" onchange="editQuantity(${item.productId}, this.value)" />
-                        </td>
-                        <td class="col-1 align-middle">₱${(item.price * item.quantity).toFixed(2)}</td>
-                        <td><button type="button" class="btn btn-outline-danger btn-sm" title="Remove item" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                        `;
-                tbody.appendChild(row);
-                total += item.price * item.quantity;
-            });
+            if (cart.length === 0) {
+                tbody.append('<tr><td colspan="6" class="text-center text-muted">No items in cart.</td></tr>');
+            } else {
+                cart.forEach(item => {
+                    total += item.price * item.quantity;
+                    tbody.append(`
+                                <tr>
+                                    <td>${item.productName}</td>
+                                    <td>${item.comboName}</td>
+                                    <td>₱${item.price.toFixed(2)}</td>
+                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                    <td>₱${(item.price * item.quantity).toFixed(2)}</td>
+                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                </tr>`);
+                });
+            }
 
-            document.getElementById('grandTotal').innerText = total.toFixed(2);
-
-            document.getElementById("ProductCategory").value = "";
-            document.getElementById("ProductId").value = "";
-            document.getElementById("ComboId").value = "";
-            document.getElementById("Price").value = "";
-            document.getElementById("Qty").value = "";
-            document.getElementById("Amount").value = "";
-
+            $('#grandTotal').text(total.toFixed(2));
+            $('#ProductCategory, #ProductId, #ComboId, #Price, #Qty, #Amount').val('');
         }
 
-        function editQuantity(productId, newQty) {
+        function editQuantity(productId, qty) {
             const product = cart.find(p => p.productId === productId);
             if (product) {
-                product.quantity = parseInt(newQty);
+                product.quantity = parseInt(qty);
                 syncCartWithServer();
                 updateCartTable();
             }
@@ -414,46 +436,33 @@
 
         function removeProduct(productId) {
             cart = cart.filter(p => p.productId !== productId);
-            fetch('?handler=RemoveProduct', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': getRequestVerificationToken() },
-                body: JSON.stringify(productId)
-            }).then(() => {
-                updateCartTable();
-            });
+            syncCartWithServer();
+            updateCartTable();
         }
 
         function syncCartWithServer() {
-            //alert(cart.combId);
             fetch('?handler=SyncCart', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': getRequestVerificationToken()
+                    'RequestVerificationToken': gettoken()
                 },
                 body: JSON.stringify(cart)
             });
         }
 
         function saveOrder() {
-            if (!cart || cart.length === 0) {
-                toastr.options.positionClass = "toast-bottom-right";
-                toastr.options.closeButton = false;
-                toastr.options.showDuration = 100;
-                toastr.options.hideDuration = 1000;
-                toastr.options.timeOut = 5000;
-                toastr.warning('Your cart is empty. Please add at least one product.');
+            if (!cart.length) {
+                toastr.warning('Your cart is empty.');
                 return;
             }
 
-            const form = document.querySelector('form');
+            const form = $('form')[0];
             const formData = new FormData(form);
 
             fetch('?handler=SaveOrder', {
                 method: 'POST',
-                headers: {
-                    'RequestVerificationToken': getRequestVerificationToken()
-                },
+                headers: { 'RequestVerificationToken': gettoken() },
                 body: formData
             }).then(res => {
                 if (res.ok) {
@@ -461,14 +470,11 @@
                     cart = [];
                     updateCartTable();
                 } else {
-                    res.text().then(text => alert('Failed to save order: ' + text));
+                    res.text().then(text => alert('Failed: ' + text));
                 }
             }).catch(err => {
-                alert('Network error: ' + err.message);
+                alert('Error: ' + err.message);
             });
-        }
-        function getRequestVerificationToken() {
-            return document.querySelector('input[name="__RequestVerificationToken"]').value;
         }
     </script>
 
@@ -477,78 +483,67 @@
             $('#customerSearchModal').modal('show');
         }
 
-        // Live Customer search on input
         $('#customerSearchInput').on('input', function () {
             const keyword = $(this).val();
             if (keyword.length < 2) return;
 
-            $.ajax({
-                url: '?handler=SearchCustomer',
-                method: 'GET',
-                data: { term: keyword },
-                success: function (data) {
-                    const tbody = $('#customerSearchResults');
-                    tbody.empty();
-
-                    if (data.length === 0) {
-                        tbody.append('<tr><td colspan="4">No results found.</td></tr>');
-                        return;
-                    }
-
-                    data.forEach(customer => {
-                        tbody.append(`
-                            <tr>
-                            <td>${customer.custcode}</td>
-                                <td>${customer.name}</td>
-                                <td>${customer.email}</td>
-                                <td>${customer.phone}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>
-                                        Select
-                                    </button>
-                                </td>
-                            </tr>
-                        `);
-                    });
+            $.get('?handler=SearchCustomer', { term: keyword }, function (data) {
+                const tbody = $('#customerSearchResults').empty();
+                if (!data.length) {
+                    tbody.append('<tr><td colspan="5">No results found.</td></tr>');
+                    return;
                 }
+
+                data.forEach(customer => {
+                    tbody.append(`
+                                <tr>
+                                    <td>${customer.custcode}</td>
+                                    <td>${customer.name}</td>
+                                    <td>${customer.email}</td>
+                                    <td>${customer.phone}</td>
+                                    <td><button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>Select</button></td>
+                                </tr>
+                            `);
+                });
             });
         });
 
-        // When customer is selected
         function selectCustomer(customer) {
-            $('#Order_CustomerId').val(customer.id); // Update the select input
-            $('#customerSearchModal').modal('hide');
-
-            // Optionally populate other form fields if you have them:
+            $('#Order_CustomerId').val(customer.id);
             $('#CustomerId').val(customer.id).change();
-            //$('#CustomerEmail').val(customer.email);
+            $('#customerSearchModal').modal('hide');
         }
 
-        // Change Label and input type based on payment method
-            document.addEventListener("DOMContentLoaded", function () {
-                const paymentMethodSelect = document.querySelector('[name="Order.PaymentMethod"]');
-                const paymentRefLabel = document.getElementById("PaymentRef");
-                const refNoInput = document.getElementById("RefNo");
+        // Payment type switch
+        $(function () {
+            const methodSelect = $('[name="Order.PaymentMethod"]');
+            const paymentRefLabel = $('#PaymentRef');
+            const refNoInput = $('#RefNo');
 
-                function updatePaymentFields() {
-                    const selectedValue = paymentMethodSelect.value.toLowerCase();
-
-                    if (selectedValue === 'cash') {
-                        paymentRefLabel.textContent = "Cash Amount";
-                        refNoInput.type = "number";
-                        refNoInput.placeholder = "Enter cash amount";
-                    } else {
-                        paymentRefLabel.textContent = "Reference No.";
-                        refNoInput.type = "text";
-                        refNoInput.placeholder = "Enter reference number";
-                    }
+            function updateRefLabel() {
+                const method = methodSelect.val().toLowerCase();
+                if (method === 'cash') {
+                    paymentRefLabel.text("Cash Amount");
+                    refNoInput.attr("type", "number").attr("placeholder", "Enter cash amount");
+                } else {
+                    paymentRefLabel.text("Reference No.");
+                    refNoInput.attr("type", "text").attr("placeholder", "Enter reference number");
                 }
+            }
 
-                // Initialize on load
-                updatePaymentFields();
+            updateRefLabel();
+            methodSelect.on('change', updateRefLabel);
+        });
 
-                // Listen to changes
-                paymentMethodSelect.addEventListener("change", updatePaymentFields);
-            });
+        function hideLoader() {
+            const preloader = document.getElementById("preloader");
+            if (preloader) preloader.style.display = "none";
+        }
     </script>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <script>$('#ProductId').trigger('change');</script>
+    }
 }
+

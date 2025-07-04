@@ -61,7 +61,7 @@
 
 
                     <input asp-for="OfficeCountry.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
-                    <input asp-for="OfficeCountry.EncodedBy" type="hidden" value="ARMAN" />
+                    <input asp-for="OfficeCountry.EncodedBy" type="hidden" value="@User?.Identity.Name" />
 
 
                     <div class="form-group">

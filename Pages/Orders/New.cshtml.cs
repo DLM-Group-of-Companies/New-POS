@@ -69,16 +69,20 @@ namespace NLI_POS.Pages.Orders
             return new JsonResult(SectionList);
         }
 
-        public IActionResult OnGetProductList(string ProdCat)
+        public IActionResult OnGetProductList(string ProdCat, string? custclass)
         {
             ModelState.Clear();
 
-            List<SelectListItem> SectionList = (from d in _context.Products.Where(p => p.IsActive && p.ProductCategory == ProdCat)
-                                                select new SelectListItem
-                                                {
-                                                    Text = d.ProductName,
-                                                    Value = d.Id.ToString()
-                                                }).ToList();
+            List<SelectListItem> SectionList = _context.Products
+                .Where(p => p.IsActive && p.ProductCategory == ProdCat &&
+                           (custclass == "Staff" ? p.isStaffAvailable : true))
+                .Select(d => new SelectListItem
+                {
+                    Text = d.ProductName,
+                    Value = d.Id.ToString()
+                })
+                .ToList();
+
 
             //SectionList.Insert(0, new SelectListItem { Text = "--Select Product--", Value = "" });
             if (SectionList.Count == 0)
@@ -135,7 +139,7 @@ namespace NLI_POS.Pages.Orders
         public JsonResult OnGetGetProducAmount(int id, string? custclass, int officeId)
         {
             var OfficeCountry = _context.OfficeCountry.FirstOrDefault(o => o.Id == officeId); //Determine the country by officeid
-            var ProdAmount = _context.ProductPrices.FirstOrDefault(p => p.Id == id && p.CountryId == OfficeCountry.CountryId);
+            var ProdAmount = _context.ProductPrices.FirstOrDefault(p => p.ProductId == id && p.CountryId == OfficeCountry.CountryId);
 
             if (custclass == "Staff")
             {
@@ -290,6 +294,7 @@ namespace NLI_POS.Pages.Orders
                     CustomerId = Order.CustomerId,
                     OfficeId = Order.OfficeId,
                     OrderType = orderType,
+                    ProductCategory = item.ProductCat,
                     ProductId = item.ProductId,
                     ComboId = item.ProductCombo,
                     Qty = item.Quantity,
@@ -359,12 +364,13 @@ namespace NLI_POS.Pages.Orders
             await _context.SaveChangesAsync();
 
             HttpContext.Session.Remove("Cart");
-            return RedirectToPage("./Index");
+            return RedirectToPage("./Details", new { orderNo = orderNo });
         }
 
         public class ProductInput
         {
             public int ProductId { get; set; }
+            public string ProductCat { get; set; }
             public string ProductName { get; set; }
             public int? ProductCombo { get; set; }
             public string ComboName { get; set; }
@@ -375,6 +381,7 @@ namespace NLI_POS.Pages.Orders
         public class ProductItem
         {
             public int ProductId { get; set; }
+            public string ProductCat { get; set; }
             public string ProductName { get; set; }
             public int? ProductCombo { get; set; }
             public string ComboName { get; set; }

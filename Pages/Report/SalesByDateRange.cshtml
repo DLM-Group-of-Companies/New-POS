@@ -1,0 +1,149 @@
+﻿@page
+@model NLI_POS.Pages.Report.SalesByDateRangeModel
+
+@{
+    ViewData["Title"] = "Sales By Date Range";
+}
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary mb-0">
+            <i class="far fa-file-alt me-2"></i> Daily Sales Report
+        </h3>
+        <button class="btn btn-outline-danger" onclick="window.location = './Index';">
+            <i class="fas fa-times"></i> Close
+        </button>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-2">
+            <label for="officeFilter" class="form-label">Filter by Office</label>
+            <select id="officeFilter" class="form-select">
+                <option value="">All Offices</option>
+                @foreach (var office in Model.Offices.DistinctBy(o => o.Name))
+                {
+                    <option value="@office.Name">@office.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="minDate" class="form-label">Start Date</label>
+            <input type="date" id="minDate" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label for="maxDate" class="form-label">End Date</label>
+            <input type="date" id="maxDate" class="form-control" />
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="ordersTable" class="table table-bordered table-hover table-sm nowrap small w-100">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderNo)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderDate)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.CustCode)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.FirstName)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.LastName)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].ItemNo)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderType)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].ProductCategory)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Price)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Products)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].ProductCombos)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Office)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Qty)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Amount)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].PaymentMethod)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].RefNo)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Notes)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].EncodeDate)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].EncodedBy)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].UpdateDate)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].UpdateddBy)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Order)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(m => item.OrderNo)</td>
+                        <td>@Html.DisplayFor(m => item.OrderDate)</td>
+                        <td>@Html.DisplayFor(m => item.Customers.CustCode)</td>
+                        <td>@Html.DisplayFor(m => item.Customers.FirstName)</td>
+                        <td>@Html.DisplayFor(m => item.Customers.LastName)</td>
+                        <td>@Html.DisplayFor(m => item.ItemNo)</td>
+                        <td>@Html.DisplayFor(m => item.OrderType)</td>
+                        <td>@Html.DisplayFor(m => item.ProductCategory)</td>
+                        <td>@Html.DisplayFor(m => item.Price)</td>
+                        <td>@Html.DisplayFor(m => item.Products.ProductName)</td>
+                        <td>@Html.DisplayFor(m => item.ProductCombos.ProductsDesc)</td>
+                        <td>@Html.DisplayFor(m => item.Office.Name)</td>
+                        <td>@Html.DisplayFor(m => item.Qty)</td>
+                        <td>@Html.DisplayFor(m => item.Amount)</td>
+                        <td>@Html.DisplayFor(m => item.PaymentMethod)</td>
+                        <td>@Html.DisplayFor(m => item.RefNo)</td>
+                        <td>@Html.DisplayFor(m => item.Notes)</td>
+                        <td>@Html.DisplayFor(m => item.EncodeDate)</td>
+                        <td>@Html.DisplayFor(m => item.EncodedBy)</td>
+                        <td>@Html.DisplayFor(m => item.UpdateDate)</td>
+                        <td>@Html.DisplayFor(m => item.UpdateddBy)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            const officeIndex = 11;
+            const dateIndex = 1;
+            const selectedOffice = $('#officeFilter').val();
+            const min = $('#minDate').val();
+            const max = $('#maxDate').val();
+            const office = data[officeIndex];
+            const date = new Date(data[dateIndex]);
+
+            if (selectedOffice && office !== selectedOffice) return false;
+            if (min && new Date(min) > date) return false;
+            if (max && new Date(max) < date) return false;
+            return true;
+        });
+
+        $(document).ready(function () {
+            const table = $('#ordersTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-outline-success',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        className: 'btn btn-outline-danger',
+                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-outline-secondary',
+                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                    }
+                ],
+                columnDefs: [
+                    { targets: [16, 17, 18, 19, 20], visible: false }
+                ],
+                paging: true,
+                ordering: true,
+                scrollX: true,
+                responsive: false,
+                autoWidth: true
+            });
+
+            $('#officeFilter, #minDate, #maxDate').on('change', function () {
+                table.draw();
+            });
+        });
+    </script>
+}

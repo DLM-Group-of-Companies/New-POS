@@ -1,4 +1,5 @@
-﻿//For Printing receipt in the modal
+﻿
+//For Printing receipt in the modal
 function printModal() {
     const modalBody = document.querySelector('.modal-body').innerHTML;
     const printWindow = window.open('', '', 'width=800,height=600');
@@ -26,6 +27,50 @@ function printModal() {
     `);
     printWindow.document.close();
 }
+
+function printModalquarter() {
+    const modalBody = document.querySelector('.modal-body').innerHTML;
+    const printWindow = window.open('', '', 'width=800,height=600');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Print Purchase Order</title>
+                <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+                <style>
+                    @media print {
+                        @page {
+                            size: A4;
+                            margin: 0;
+                        }
+                        body {
+                            margin: 0;
+                            height: 100vh;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+                        .scaled-container {
+                            transform: scale(0.5); /* Scale down to 50% */
+                            transform-origin: top left;
+                            width: 210mm; /* Full A4 width */
+                            height: 297mm; /* Full A4 height */
+                            padding: 10mm;
+                        }
+                    }
+                </style>
+            </head>
+            <body onload="window.print(); window.close();">
+                <div class="scaled-container">
+                    ${modalBody}
+                </div>
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
 
 function emailModal() {
     const modalBodyHtml = document.querySelector('.modal-body').innerHTML;

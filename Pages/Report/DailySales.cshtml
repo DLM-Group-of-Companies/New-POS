@@ -1,0 +1,131 @@
+﻿@page
+@model NLI_POS.Pages.Report.DailySalesModel
+
+@{
+    ViewData["Title"] = "Daily Sales";
+}
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary mb-0">
+            <i class="far fa-file-alt me-2"></i> Daily Sales Report
+        </h3>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-2">
+                <label for="officeFilter" class="form-label">Filter by Office</label>
+                <select asp-for="Office" asp-items="Model.OfficeList" class="form-select"></select>
+            </div>
+            <div class="col-md-2">
+                <label for="dDate" class="form-label">Date</label>
+                <input type="date" id="dDate" name="Date" value="@(DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd"))" class="form-control" />
+            </div>
+            <div class="col-md-2 align-self-end">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+    </div>
+
+    <div class="table-responsive">
+        <table id="ordersTable" class="table table-bordered table-hover table-sm small w-100 text-nowrap">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderNo)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderDate)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.CustCode)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.FirstName)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.LastName)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].ItemNo)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderType)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].ProductCategory)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Products)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].ProductCombos)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Office)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Price)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Qty)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Amount)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].PaymentMethod)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].RefNo)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].Notes)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].EncodeDate)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].EncodedBy)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].UpdateDate)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].UpdateddBy)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Order)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(m => item.OrderNo)</td>
+                        <td>@Html.DisplayFor(m => item.OrderDate)</td>
+                        <td>@Html.DisplayFor(m => item.Customers.CustCode)</td>
+                        <td>@Html.DisplayFor(m => item.Customers.FirstName)</td>
+                        <td>@Html.DisplayFor(m => item.Customers.LastName)</td>
+                        <td>@Html.DisplayFor(m => item.ItemNo)</td>
+                        <td>@Html.DisplayFor(m => item.OrderType)</td>
+                        <td>@Html.DisplayFor(m => item.ProductCategory)</td>
+                        <td>@Html.DisplayFor(m => item.Products.ProductName)</td>
+                        <td>@Html.DisplayFor(m => item.ProductCombos.ProductsDesc)</td>
+                        <td>@Html.DisplayFor(m => item.Office.Name)</td>
+                        <td>@Html.DisplayFor(m => item.Price)</td>
+                        <td>@Html.DisplayFor(m => item.Qty)</td>
+                        <td>@Html.DisplayFor(m => item.Amount)</td>
+                        <td>@Html.DisplayFor(m => item.PaymentMethod)</td>
+                        <td>@Html.DisplayFor(m => item.RefNo)</td>
+                        <td>@Html.DisplayFor(m => item.Notes)</td>
+                        <td>@Html.DisplayFor(m => item.EncodeDate)</td>
+                        <td>@Html.DisplayFor(m => item.EncodedBy)</td>
+                        <td>@Html.DisplayFor(m => item.UpdateDate)</td>
+                        <td>@Html.DisplayFor(m => item.UpdateddBy)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let tableInitialized = false;
+
+        function canShowTable() {
+            return $('#officeFilter').val() && $('#dDate').val();
+        }
+
+        function initializeTable() {
+            const table = $('#ordersTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: ['excel', 'pdf', 'print'],
+                columnDefs: [
+                    { targets: [10, 14, 15, 16, 17, 18, 19, 20], visible: false }
+                ],
+                paging: true,
+                ordering: true,
+                scrollX: true,
+                responsive: false,
+                autoWidth: true,
+                searching: false
+            });
+
+            tableInitialized = true;
+        }
+
+        $(document).ready(function () {
+            //$('#ordersTable').hide(); // hide by default
+
+            $('#officeFilter, #dDate').on('change', function () {
+                if (canShowTable()) {
+                    $('#ordersTable').show();
+
+                    if (!tableInitialized) {
+                        initializeTable();
+                    }
+                }
+            });
+        });
+    </script>
+}

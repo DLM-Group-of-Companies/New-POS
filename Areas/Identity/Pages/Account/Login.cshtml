@@ -5,63 +5,60 @@
     ViewData["Title"] = "Log in";
 }
 
-<section class="h-100 gradient-form" >
-    <div class="container py-5 h-100 sha">
-        <div class="row d-flex justify-content-center align-items-center h-100">
+<section class="vh-100 gradient-form d-flex align-items-center">
+    <div class="container py-5">
+        <div class="row justify-content-center">
             <div class="col-xl-10">
                 <div class="card rounded-3 text-black shadow">
                     <div class="row g-0">
+                        <!-- Left side (login form) -->
                         <div class="col-lg-6">
                             <div class="card-body p-md-5 mx-md-4">
-
                                 <div class="text-center">
-                                  <img src="~/images/nli-logo.png" style="width: 185px;" alt="logo" />
-                                    <h3 class="mt-1 mb-5 pb-1 fw-bold">POINT OF SALE</h3> 
+                                    <img src="~/images/nli-logo.png" style="width: 185px;" alt="logo" />
+                                    <h3 class="mt-1 mb-5 pb-1 fw-bold">POINT OF SALE</h3>
                                 </div>
 
- 
                                 <form id="account" method="post" onsubmit="return validateAndShowLoader(this)">
                                     <p>Please login to your account</p>
                                     <hr />
                                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
                                     <div class="form-floating mb-3">
                                         <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                                         <label asp-for="Input.Email" class="form-label">Email</label>
                                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                                     </div>
+
                                     <div class="form-floating mb-3">
                                         <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
                                         <label asp-for="Input.Password" class="form-label">Password</label>
                                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                                     </div>
+
                                     <div class="checkbox mb-3">
                                         <label asp-for="Input.RememberMe" class="form-label">
                                             <input class="form-check-input" asp-for="Input.RememberMe" />
                                             @Html.DisplayNameFor(m => m.Input.RememberMe)
                                         </label>
                                     </div>
+
                                     <div>
                                         <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
                                     </div>
+
                                     <div class="pt-2">
-                                        <p>
-                                            <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none">Forgot your password?</a>
-                                        </p>
-                                        @* <p>
-                                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                                        </p>
-                                        <p>
-                                            <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                                        </p> *@
+                                        <p><a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none">Forgot your password?</a></p>
                                     </div>
                                 </form>
-
                             </div>
                         </div>
+
+                        <!-- Right side (branding) -->
                         <div class="col-lg-6 d-flex align-items-center bg-info bg-gradient">
-                            <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                            <div class="text-white px-3 py-4 p-md-5 mx-md-4 text-center">
                                 <h4 class="mb-4">We are more than just a company</h4>
-                                <img src="~/images/login.jpg" style="width: 400px;" alt="logo">
+                                <img src="~/images/login.jpg" class="img-fluid mb-4" alt="illustration">
                                 <p class="small mb-0">
                                     <b>Our Mission</b><br />
                                     To transform people’s lives through our amazing health products and rewarding business opportunities that will help them live healthier and happier.
@@ -69,11 +66,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> <!-- /.card -->
             </div>
         </div>
     </div>
 </section>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
