@@ -67,12 +67,12 @@
         {
             
             <!-- ✅ Sidebar for desktop (md+) only -->
-            <div class="sidebar-desktop d-none d-md-block bg-dark text-white">
+            <div class="sidebar-desktop d-none d-md-block bg-dark text-white sidebar-scrollable">
                 @await Html.PartialAsync("_SidebarPartial")
             </div>
 
             <!-- ✅ Mobile top navbar with logo and menu toggle -->
-            <nav class="navbar navbar-dark bg-dark d-md-none w-100">
+            <nav class="navbar navbar-dark bg-dark bg-gradient d-md-none w-100">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="/">
                         <img src="~/images/noblelife-white.png" alt="Logo" height="30" />
@@ -85,7 +85,7 @@
             </nav>
 
             <!-- ✅ Offcanvas for mobile only -->
-            <div class="offcanvas offcanvas-start bg-dark text-white d-md-none" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <div class="offcanvas offcanvas-start bg-dark bg-gradient text-white d-md-none" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -135,6 +135,18 @@
             document.getElementById("preloader").style.display = "flex";
         }
     </script>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('liveClock').textContent = now.toLocaleTimeString([], options);
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock(); // initialize immediately
+    </script>
+
 
     @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("Notyf")

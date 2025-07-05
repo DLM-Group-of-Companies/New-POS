@@ -7,6 +7,24 @@ namespace NLI_POS.Data
     {
         public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         {
+            var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
+
+            if (!dbContext.OfficeCountry.Any(o => o.Id == 1))
+            {
+                dbContext.OfficeCountry.Add(new OfficeCountry
+                {
+                    Id = 1,
+                    Name = "Manila HQ",
+                    OffCode="MHQ",
+                    isActive = true,
+                    CountryId=176,
+                    EncodeDate = DateTime.UtcNow.AddHours(8),
+                    EncodedBy = "System"
+                });
+                await dbContext.SaveChangesAsync();
+            }
+
+
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 

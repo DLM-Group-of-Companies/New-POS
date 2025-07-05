@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 
@@ -41,19 +42,53 @@ namespace NLI_POS.Pages.Customers
             ModelState.Remove("Customer.CustClasses");
 
             //-- Generate Customer ID
-            int lastID = 0;
-            if (_context.Customer.Count() > 0)
-            {
-                 lastID = _context.Customer.Max(p => p.Id) + 1;
-            }
-            else
-            {
-                 lastID = 1;
-            }
-            string lastIdPadded = lastID.ToString().PadLeft(6, '0');
-            var off = Customer.OfficeId;
+            //int lastID = 0;
+            //if (_context.Customer.Count() > 0)
+            //{
+            //     lastID = _context.Customer.Max(p => p.Id) + 1;
+            //}
+            //else
+            //{
+            //     lastID = 1;
+            //}
+            //string lastIdPadded = lastID.ToString().PadLeft(6, '0');
+            //var off = Customer.OfficeId;
 
-            Customer.CustCode = Customer.Country + off + DateTime.UtcNow.AddHours(8).ToString("yy") + lastIdPadded;
+            //Customer.CustCode = Customer.Country + off + DateTime.UtcNow.AddHours(8).ToString("yy") + lastIdPadded;
+
+            // Generate base code
+            int lastID = _context.Customer.Any() ? _context.Customer.Max(p => p.Id) + 1 : 1;
+            string off = Customer.OfficeId.ToString();
+            string baseCode = Customer.Country + off + DateTime.UtcNow.AddHours(8).ToString("yy");
+
+            string custCode = null;
+            bool isUnique = false;
+            int maxAttempts = 5;
+
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                string paddedId = lastID.ToString().PadLeft(6, '0');
+                custCode = baseCode + paddedId;
+
+                bool exists = await _context.Customer.AnyAsync(c => c.CustCode == custCode);
+                if (!exists)
+                {
+                    isUnique = true;
+                    break;
+                }
+
+                lastID++; // try next ID
+            }
+
+            // Check after retry attempts
+            if (!isUnique)
+            {
+                ModelState.AddModelError(string.Empty, "Unable to generate a unique Customer Code. Please try again.");
+                return Page();
+            }
+
+            Customer.CustCode = custCode;
+
 
             if (!ModelState.IsValid)
             {

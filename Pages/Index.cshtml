@@ -4,3 +4,48 @@
     ViewData["Title"] = "Noble Life - POS";
 }
 
+
+<div class="icon-container-main">
+    <div class="draggable-icon" title="Orders" style="top:100px;left:300px;">
+        <a href="/Orders/Index" class="text-dark">
+            <img src="/images/icons/orders.png" alt="Orders" class="shadow-lg" />
+        </a>
+    </div>
+    <div class="draggable-icon" title="Customers" style="top:100px;left:500px;">
+        <a href="/Customers/Index" class="text-dark">
+            <img src="/images/icons/customer.png" alt="Customers" class="shadow-lg" />
+        </a>
+    </div>
+    <div class="draggable-icon" title="Reports" style="top:100px;left:700px;">
+        <a href="/Report/DailySales" class="text-dark">
+            <img src="/images/icons/reports.png" alt="Reports" class="shadow-lg" />
+        </a>
+    </div>
+    <div class="draggable-icon" title="Products" style="top:300px;left:200px;">
+        <a href="/Products/Index" class="text-dark">
+            <img src="/images/icons/products.png" alt="Products" class="shadow-lg" />
+        </a>
+    </div>
+    <div class="draggable-icon" title="Inventory"  style="top:300px;left:400px;">
+        <a href="/Inventory/Index" class="text-dark">
+            <img src="/images/icons/inventory.png" alt="Inventory" class="shadow-lg" />
+        </a>
+    </div>
+    <div class="draggable-icon" title="Office" style="top:300px;left:600px;">
+        <a href="/Offices/Index" class="text-dark">
+            <img src="/images/icons/office.png" alt="Office" class="shadow-lg" />
+        </a>
+    </div>
+    <div class="draggable-icon" title="Users" style="top:300px;left:800px;">
+        <a href="/Users/Index" class="text-dark">
+            <img src="/images/icons/users.png" alt="Users" class="shadow-lg" />
+        </a>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        $(".draggable-icon").draggable();
+    });
+</script>

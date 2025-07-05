@@ -5,7 +5,7 @@
     ViewData["Title"] = "Prices";
 }
 <div class="container-fluid bg-white bg-gradient  shadow p-2">
-    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl text-danger" onclick="window.location = './Index';"></i> </span>
+    <span class="float-end" title="Close"><i class="fas fa-window-close fa-2xl text-danger" onclick="window.location = '../Index';"></i> </span>
     <h3>Prices</h3>
 
     <p>
@@ -85,8 +85,8 @@
 
                     <td>
                         <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                        <a asp-page="./Details" asp-route-id="@item.Id"><i class="far fa-edit mw-2"></i></a> 
+                        <a asp-page="./Delete" asp-route-id="@item.Id"><i class="fas fa-trash-alt me-2"></i></a>
                     </td>
                 </tr>
             }

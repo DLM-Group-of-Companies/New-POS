@@ -5,10 +5,12 @@
     ViewData["Title"] = "Edit";
 }
 
-<div class="container bg-white bg-gradient rounded-4 shadow p-4 ">
+<div class="container-fluid bg-white bg-gradient shadow p-2">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="text-primary"><i class="far fa-edit me-2"></i> Edit Product</h4>
-        <i class="fas fa-times fa-lg text-danger cursor-pointer" title="Close" onclick="window.location = './Index';"></i>
+        <h4 class="mb-0 text-primary">
+            <i class="far fa-edit me-2"></i>Edit Products
+        </h4>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
     </div>
     <hr />
 
@@ -191,17 +193,13 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />               
+                <button type="submit" value="Save" class="btn btn-success"><i class="far fa-save me-2"></i>Save</button>
             </div>
         </div>
 
         @Html.AntiForgeryToken()
     </form>
 
-
-    <div>
-        <a asp-page="Index">Back to List</a>
-    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="myListModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="myListModalLabel" aria-hidden="true">
@@ -229,7 +227,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" id="btnSaveCombo" class="btn btn-primary">Save Changes</button> @* //onclick="saveListData()" *@
+                        <button type="button" id="btnSaveCombo" class="btn btn-success"><i class="far fa-save me-2"></i>Save Changes</button> @* //onclick="saveListData()" *@
                     </div>
                 </form>
             </div>

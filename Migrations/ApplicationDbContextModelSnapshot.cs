@@ -636,12 +636,6 @@ namespace NLI_POS.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("BPPPrice")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<decimal>("CorpAcctPrice")
-                        .HasColumnType("decimal(65,30)");
-
                     b.Property<DateTime>("EncodeDate")
                         .HasColumnType("datetime(6)");
 
@@ -651,15 +645,6 @@ namespace NLI_POS.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<decimal>("MedPackPrice")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<decimal>("MemPrice")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<decimal>("NaturoPrice")
-                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("ProductCategory")
                         .IsRequired()
@@ -686,20 +671,12 @@ namespace NLI_POS.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("ProductType")
-                        .HasColumnType("longtext");
-
-                    b.Property<decimal>("RegPrice")
-                        .HasColumnType("decimal(65,30)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("SKU")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<decimal>("StaffPrice")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<decimal>("UnitCost")
-                        .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");

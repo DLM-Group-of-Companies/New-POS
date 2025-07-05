@@ -9,19 +9,12 @@
         <h4 class="mb-0 text-primary">
             <i class="fas fa-box"></i> Products
         </h4>
-        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
     </div>
     <hr />
     <p>
         <a asp-page="Create" class="btn btn-primary"><i class="fas fa-plus-square fa-xl"></i>  Add New</a>
     </p>
- @*    <select id="countryFilter" class="form-select w-auto mb-2">
-    <option value="">All Countries</option>
-    @foreach (var country in Model.Countries)
-    {
-        <option value="@country.Id">@country.Name</option>
-    }
-</select> *@
 
     <table id="ProductTable" class="table table-striped table-sm">
         <thead>
@@ -52,28 +45,28 @@
                 var rowClass = item.IsActive ? "" : "opacity-50";
                 <tr class="@rowClass">
                     <td hidden>@Html.DisplayFor(modelItem => item.Id)</td>
-                    <td>
+                    <td class="align-middle">
                         @Html.DisplayFor(modelItem => item.ProductCode)
                     </td>
-                    <td>
+                    <td class="align-middle">
                         @Html.DisplayFor(modelItem => item.ProductName)
                     </td>
-                    <td>
+                    <td class="align-middle">
                         @Html.DisplayFor(modelItem => item.ProductType)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.ProductCategory)
                     </td>
-                    <td>
+                    <td class="align-middle">
                         @Html.DisplayFor(modelItem => item.IsActive)
                     </td>
 
-                    <td>
-                        <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-page="./Details" asp-route-id="@item.Id">Details</a> 
-                        @if (User.IsInRole("ADMIN"))
+                    <td class="align-middle">
+                        <a asp-page="./Edit" class="btn btn-success btn-sm m-1"  title="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a>
+                        <a asp-page="./Details" class="btn btn-primary btn-sm m-1"  title="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a>
+                        @if (User.IsInRole("Admin"))
                         {
-                            <span> | </span> <a class="details btn btn-outline-danger btn-sm rounded-circle m-1" title="Delete" href="javascript:;"><i class="fas fa-trash-alt"></i> </a>
+                           <a class="details btn btn-danger btn-sm " title="Delete" href="javascript:;"><i class="fas fa-trash-alt"></i> </a>
                         }
                     </td>
                 </tr>

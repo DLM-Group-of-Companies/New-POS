@@ -1,7 +1,4 @@
-html {
-    font-size: 14px;
-}
-
+﻿
 @media (min-width: 768px) {
     html {
         font-size: 16px;
@@ -145,6 +142,12 @@ input[type="number"] {
     }
 }*/
 
+.sidebar-scrollable {
+    overflow-y: auto;
+    height: 100vh;
+}
+
+
 /* Desktop: show the sidebar */
 @media (min-width: 768px) {
     .sidebar-desktop {
@@ -172,4 +175,106 @@ input[type="number"] {
     #page-content {
         margin-left: 0 !important;
     }
+}
+
+/*Icons form Main*/
+/*.draggable-icon {
+    position: absolute;*/
+    /*width: 140px;
+    height: 140px;
+    background-color: #f8f9fa;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    display: flex;*/ /* Enable Flexbox */
+    /*justify-content: center;*/ /* Center horizontally */
+    /*align-items: center;*/ /* Center vertically */
+    /*cursor: move;
+}
+
+    .draggable-icon:hover {*/
+        /*background-color: #e2e6ea;*/
+    /*}
+
+.icon-img {
+    background-color: white;
+    border: 2px solid #dee2e6;*/ /* Light border */
+    /*border-radius: 12px;*/ /* Rounded corners (optional) */
+    /*padding: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    max-width: 100px;
+    max-height: 100px;
+    display: block;
+}*/
+
+/* Default (mobile-first): Flex layout */
+.icon-container-main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    position: static;
+}
+
+.draggable-icon {
+    position: static;
+    width: 30%;
+    max-width: 120px;
+    text-align: center;
+}
+
+    .draggable-icon img {
+        width: 100%;
+        padding: 8px;
+        border-radius: 12px;
+        background-color: white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+/* ✅ Desktop styles: enable absolute layout */
+@media (min-width: 768px) {
+    .icon-container-main {
+        position: relative;
+        height: 100vh;
+        padding: 0;
+    }
+
+    .draggable-icon {
+        position: absolute !important;
+        width: 100px;
+    }
+
+        .draggable-icon img {
+            width: 100%;
+        }
+}
+
+/* Sidebar nav styling */
+.nav.flex-column .nav-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* subtle divider */
+}
+
+.nav-link {
+    padding: 18px 20px;
+    font-size: 1rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+    .nav-link:hover,
+    .nav-link:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+        text-decoration: none;
+    }
+
+/* Nested menu */
+#reportsMenu .nav-link {
+    padding-left: 2.5rem;
+    font-size: 0.95rem;
+    border: none; /* remove bottom line for sub items */
+}
+
+/* Optional icon spacing if needed */
+.icon-container2 {
+    width: 24px;
+    display: inline-block;
 }

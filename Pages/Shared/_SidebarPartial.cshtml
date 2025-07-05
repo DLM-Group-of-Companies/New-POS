@@ -3,10 +3,14 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <a class="navbar-brand mb-4 d-block text-center pt-4" asp-page="/Index">
-    <img src="~/images/noblelife-white.png" alt="Logo" width="150" />
+    <img src="~/images/noblelife-white.png" alt="Logo" width="150" class="mx-auto d-block" />
 </a>
+
 <hr />
 <h4 class="text-center fw-bold">POINT OF SALE</h4>
+<p class="text-center text-info small">Today is @DateTime.UtcNow.AddHours(8).ToString("MMM dd, yyyy") <span id="liveClock" ></span></p>
+
+
 <hr />
 
 @if (SignInManager.IsSignedIn(User))
@@ -62,5 +66,9 @@
     </ul>
 
 }
-<hr />
-<partial name="_LoginPartial" />
+@* <hr /> *@
+
+<!-- Bottom User Menu -->
+<div class="mt-auto pt-3 border-top">
+<partial name="_LoginPartial" /> 
+</div>

@@ -36,7 +36,7 @@ namespace NLI_POS.Pages.Offices
                 return NotFound();
             }
             OfficeCountry = officecountry;
-           ViewData["CountryId"] = new SelectList(_context.Country, "Id", "Id");
+           ViewData["CountryId"] = new SelectList(_context.Country, "Id", "Name");
             return Page();
         }
 

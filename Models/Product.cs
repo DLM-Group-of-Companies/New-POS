@@ -22,6 +22,8 @@ namespace NLI_POS.Models
         public string ProductDescription { get; set; } = string.Empty;
 
         [Display(Name = "Product Type")]
+        [StringLength(20)]
+        [Column(TypeName = "varchar(20)")]
         public string? ProductType { get; set; }
 
         [Display(Name = "Category")]

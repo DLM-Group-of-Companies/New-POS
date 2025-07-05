@@ -2,14 +2,19 @@
 @model NLI_POS.Pages.Offices.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Office Details";
 }
-
-<h1>Details</h1>
+<div class="container-fluid bg-white bg-gradient  shadow p-2">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0 text-primary">
+            <i class="fa-solid fa-building me-2"></i> @ViewData["Title"]
+        </h4>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
+    </div>
+    <hr />
 
 <div>
-    <h4>OfficeCountry</h4>
-    <hr />
+
     <dl class="row">
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.OfficeCountry.Name)
@@ -80,6 +85,7 @@
     </dl>
 </div>
 <div>
-    <a asp-page="./Edit" asp-route-id="@Model.OfficeCountry.Id">Edit</a> |
+    <a asp-page="./Edit" asp-route-id="@Model.OfficeCountry.Id">Edit</a> 
     <a asp-page="./Index">Back to List</a>
+</div>
 </div>

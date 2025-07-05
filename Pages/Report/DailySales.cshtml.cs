@@ -29,10 +29,25 @@ namespace NLI_POS.Pages.Report
         public List<Order> Order { get; set; }
         public List<OfficeCountry> Offices { get; set; }
         public SelectList OfficeList { get; set; }
+
         public void OnGet()
         {
-            Offices = _context.OfficeCountry.Where(o=>o.isActive).ToList();
+            Offices = _context.OfficeCountry.Where(o => o.isActive).ToList();
+
+            // Set default Office if none selected
+            if (string.IsNullOrEmpty(Office))
+            {
+                Office = Offices.FirstOrDefault()?.Name;
+            }
+
+            // Set default Date to today if none selected
+            if (!Date.HasValue)
+            {
+                Date = DateTime.Today;
+            }
+
             OfficeList = new SelectList(Offices.DistinctBy(o => o.Name), "Name", "Name", Office);
+
             var query = _context.Orders
                 .Include(o => o.Customers)
                 .Include(o => o.Products)
@@ -52,6 +67,7 @@ namespace NLI_POS.Pages.Report
 
             Order = query.ToList();
         }
+
 
     }
 }

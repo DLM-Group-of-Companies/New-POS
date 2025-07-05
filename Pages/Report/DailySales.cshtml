@@ -7,23 +7,23 @@
 <div class="container-fluid bg-white bg-gradient rounded-3 shadow p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="text-primary mb-0">
-            <i class="far fa-file-alt me-2"></i> Daily Sales Report
+            <i class="fas fa-calendar-day me-2"></i> Daily Sales Report
         </h3>
-        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
     </div>
-
+    <hr />
     <div class="row g-3 mb-4">
         <form method="get" class="row g-3 mb-4">
             <div class="col-md-2">
-                <label for="officeFilter" class="form-label">Filter by Office</label>
+                <label for="officeFilter" class="form-label">Office</label>
                 <select asp-for="Office" asp-items="Model.OfficeList" class="form-select"></select>
             </div>
             <div class="col-md-2">
                 <label for="dDate" class="form-label">Date</label>
-                <input type="date" id="dDate" name="Date" value="@(DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd"))" class="form-control" />
+                <input type="date" id="dDate" name="Date" value="@(Model.Date?.ToString("yyyy-MM-dd"))" class="form-control" />
             </div>
             <div class="col-md-2 align-self-end">
-                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i> Filter</button>
             </div>
         </form>
 
@@ -36,8 +36,7 @@
                     <th>@Html.DisplayNameFor(m => m.Order[0].OrderNo)</th>
                     <th>@Html.DisplayNameFor(m => m.Order[0].OrderDate)</th>
                     <th>@Html.DisplayNameFor(m => m.Order[0].Customers.CustCode)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.FirstName)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.LastName)</th>
+                    <th>Customer</th>
                     <th>@Html.DisplayNameFor(m => m.Order[0].ItemNo)</th>
                     <th>@Html.DisplayNameFor(m => m.Order[0].OrderType)</th>
                     <th>@Html.DisplayNameFor(m => m.Order[0].ProductCategory)</th>
@@ -63,8 +62,7 @@
                         <td>@Html.DisplayFor(m => item.OrderNo)</td>
                         <td>@Html.DisplayFor(m => item.OrderDate)</td>
                         <td>@Html.DisplayFor(m => item.Customers.CustCode)</td>
-                        <td>@Html.DisplayFor(m => item.Customers.FirstName)</td>
-                        <td>@Html.DisplayFor(m => item.Customers.LastName)</td>
+                        <td>@Html.DisplayFor(m => item.Customers.FirstName) @Html.DisplayFor(m => item.Customers.LastName)</td>
                         <td>@Html.DisplayFor(m => item.ItemNo)</td>
                         <td>@Html.DisplayFor(m => item.OrderType)</td>
                         <td>@Html.DisplayFor(m => item.ProductCategory)</td>
@@ -90,18 +88,35 @@
 
 @section Scripts {
     <script>
-        let tableInitialized = false;
-
-        function canShowTable() {
-            return $('#officeFilter').val() && $('#dDate').val();
-        }
-
-        function initializeTable() {
+        $(document).ready(function () {
             const table = $('#ordersTable').DataTable({
                 dom: 'Bfrtip',
-                buttons: ['excel', 'pdf', 'print'],
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        className: 'btn btn-outline-success',
+                        exportOptions: {
+                            columns: ':visible'
+                        },
+                        filename: function () {
+                            const office = $('select[name="Office"]').val() || 'AllOffices';
+                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);
+                            return `DailySales_${office}_${date}`;
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        className: 'btn btn-outline-danger',
+                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-outline-secondary',
+                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                    }
+                ],
                 columnDefs: [
-                    { targets: [10, 14, 15, 16, 17, 18, 19, 20], visible: false }
+                    { targets: [13,14,15, 16, 17, 18, 19], visible: false }
                 ],
                 paging: true,
                 ordering: true,
@@ -111,21 +126,25 @@
                 searching: false
             });
 
-            tableInitialized = true;
-        }
+            // Custom filtering function for date
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                const selectedDate = $('#minDate').val(); // Format: yyyy-mm-dd
+                const orderDateStr = data[1]; // Column index of OrderDate
 
-        $(document).ready(function () {
-            //$('#ordersTable').hide(); // hide by default
+                if (!selectedDate) return true;
 
-            $('#officeFilter, #dDate').on('change', function () {
-                if (canShowTable()) {
-                    $('#ordersTable').show();
+                const selected = new Date(selectedDate);
+                const orderDate = new Date(orderDateStr);
 
-                    if (!tableInitialized) {
-                        initializeTable();
-                    }
-                }
+                // Compare by date only, ignore time
+                return selected.toDateString() === orderDate.toDateString();
             });
+
+            // Trigger redraw when filters change
+            // $('#officeFilter, #minDate').on('change', function () {
+            //     table.draw();
+            // });
         });
     </script>
+
 }
