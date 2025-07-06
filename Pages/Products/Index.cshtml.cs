@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
 
 namespace NLI_POS.Pages.Products
 {
+    [Authorize(Roles = "Admin,Accounting")]
     public class IndexModel : PageModel
     {
         private readonly NLI_POS.Data.ApplicationDbContext _context;

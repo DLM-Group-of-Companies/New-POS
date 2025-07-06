@@ -28,7 +28,7 @@ namespace NLI_POS.Data
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            string[] roleNames = { "Admin", "CS", "Accounting","Invetory" };
+            string[] roleNames = { "Admin", "CS", "Accounting","Inventory" };
 
             foreach (var roleName in roleNames)
             {

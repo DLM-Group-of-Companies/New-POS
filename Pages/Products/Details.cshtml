@@ -2,107 +2,186 @@
 @model NLI_POS.Pages.Products.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Product Details";
 }
 
-<h3>Details</h3>
-<div class="container bg-light bg-gradient">
-    <h4>Product</h4>
+
+<div class="container-fluid bg-white shadow p-3 rounded w-75">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0 text-primary">
+            <i class="fas fa-info-circle me-2"></i> Product Details
+        </h4>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '/Index';"></i>
+    </div>
     <hr />
-    <dl class="row" style="margin-left: auto;  margin-right: auto; max-width: fit-content;">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.ProductCode)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.ProductCode)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.ProductName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.ProductName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.ProductDescription)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.ProductDescription)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.ProductCategory)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.ProductCategory)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.SKU)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.SKU)
-        </dd>
-       @*  <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.UnitCost)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.UnitCost)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.RegPrice)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.RegPrice)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.MemPrice)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.MemPrice)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.StaffPrice)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.StaffPrice)
-        </dd> *@
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.IsActive)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.IsActive)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.EncodeDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.EncodeDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.EncodedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.EncodedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.UpdateDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.UpdateDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.UpdateddBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.UpdateddBy)
-        </dd>
-@*         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Products.ProductTypes)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Products.ProductTypes.Name)
-        </dd> *@
-    </dl>
+
+    <div class="accordion" id="detailsAccordion">
+
+        <!-- Product Information -->
+        <div class="accordion-item border-primary ">
+            <h2 class="accordion-header" id="headingProductInfo">
+                <button class="accordion-button btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductInfo" aria-expanded="true" aria-controls="collapseProductInfo">
+                    <i class="fas fa-box me-2"></i> Product Information
+                </button>
+            </h2>
+            <div id="collapseProductInfo" class="accordion-collapse collapse show" aria-labelledby="headingProductInfo" data-bs-parent="#detailsAccordion">
+                <div class="accordion-body bg-white">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Product Code</label>
+                            <div class="form-control border bg-light">@Model.Products.ProductCode</div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Product Name</label>
+                            <div class="form-control border bg-light">@Model.Products.ProductName</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Product Class</label>
+                            <div class="form-control border bg-light">@Model.Products.ProductClass</div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Description</label>
+                            <div class="form-control border bg-light">@Model.Products.ProductDescription</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Product Type</label>
+                            <div class="form-control border bg-light">@Model.Products.ProductType</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Category</label>
+                            <div class="form-control border bg-light">@Model.Products.ProductCategory</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">SKU</label>
+                            <div class="form-control border bg-light">@Model.Products.SKU</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="accordion-item border-success ">
+            <h2 class="accordion-header" id="headingPricing">
+                <button class="accordion-button collapsed btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePricing" aria-expanded="false" aria-controls="collapsePricing">
+                    <i class="fas fa-tags me-2"></i> Product Pricing
+                </button>
+            </h2>
+            <div id="collapsePricing" class="accordion-collapse collapse" aria-labelledby="headingPricing" data-bs-parent="#detailsAccordion">
+                <div class="accordion-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Select Country</label>
+                            <select id="countrySelector" class="form-select">
+                                <option value="">-- Select Country --</option>
+                                @foreach (var country in Model.Countries)
+                                {
+                                    <option value="@country.Id">@country.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="priceContainer">
+                        <div class="row mb-3">
+                            <div class="col-md-3"><label class="form-label">Unit Cost</label><div class="form-control border bg-light" id="unitCost">-</div></div>
+                            <div class="col-md-3"><label class="form-label">Reg Price</label><div class="form-control border bg-light" id="regPrice">-</div></div>
+                            <div class="col-md-3"><label class="form-label">Dist Price</label><div class="form-control border bg-light" id="distPrice">-</div></div>
+                            <div class="col-md-3"><label class="form-label">Staff Price</label><div class="form-control border bg-light" id="staffPrice">-</div></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-3"><label class="form-label">BPP Price</label><div class="form-control border bg-light" id="bppPrice">-</div></div>
+                            <div class="col-md-3"><label class="form-label">Med Pack Price</label><div class="form-control border bg-light" id="medPackPrice">-</div></div>
+                            <div class="col-md-3"><label class="form-label">Corp Acc Price</label><div class="form-control border bg-light" id="corpAccPrice">-</div></div>
+                            <div class="col-md-3"><label class="form-label">Naturo Price</label><div class="form-control border bg-light" id="naturoPrice">-</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Availability -->
+        <div class="accordion-item border-info">
+            <h2 class="accordion-header" id="headingAvailability">
+                <button class="accordion-button  btn-info collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAvailability" aria-expanded="false" aria-controls="collapseAvailability">
+                    <i class="fas fa-check-circle me-2"></i> Availability
+                </button>
+            </h2>
+            <div id="collapseAvailability" class="accordion-collapse collapse" aria-labelledby="headingAvailability" data-bs-parent="#detailsAccordion">
+                <div class="accordion-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Active</label>
+                            <div class="form-control border bg-light">@((Model.Products.IsActive) ? "Yes" : "No")</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Freebie Available</label>
+                            <div class="form-control border bg-light">@((Model.Products.isFreebieAvailable) ? "Yes" : "No")</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Staff Available</label>
+                            <div class="form-control border bg-light">@((Model.Products.isStaffAvailable) ? "Yes" : "No")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Combo -->
+        @if (Model.ProductCombos?.Any() == true)
+        {
+            <div class="accordion-item border-dark">
+                <h2 class="accordion-header" id="headingCombo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCombo" aria-expanded="false" aria-controls="collapseCombo">
+                        <i class="fas fa-layer-group me-2"></i> Product Combinations
+                    </button>
+                </h2>
+                <div id="collapseCombo" class="accordion-collapse collapse" aria-labelledby="headingCombo" data-bs-parent="#detailsAccordion">
+                    <div class="accordion-body">
+                        <partial name="_ProductComboPartial" model="Model.ProductCombos" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Products.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
-</div>
+
+@section Scripts {
+    <script>
+        
+        document.getElementById('countrySelector')?.addEventListener('change', function () {
+            showLoader();
+            const countryId = this.value;
+            const productId = @Model.Products.Id;
+
+            if (countryId) {
+                
+                fetch(`/Products/Edit?handler=Prices&countryId=${countryId}&id=${productId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('unitCost').textContent = data.unitCost ?? '-';
+                        document.getElementById('regPrice').textContent = data.regPrice ?? '-';
+                        document.getElementById('distPrice').textContent = data.distPrice ?? '-';
+                        document.getElementById('staffPrice').textContent = data.staffPrice ?? '-';
+                        document.getElementById('bppPrice').textContent = data.bppPrice ?? '-';
+                        document.getElementById('medPackPrice').textContent = data.medPackPrice ?? '-';
+                        document.getElementById('corpAccPrice').textContent = data.corpAccPrice ?? '-';
+                        document.getElementById('naturoPrice').textContent = data.naturoPrice ?? '-';
+                        hideLoader();
+                    });
+ 
+            } else {
+                // Clear fields
+                ['unitCost','regPrice','distPrice','staffPrice','bppPrice','medPackPrice','corpAccPrice','naturoPrice']
+                    .forEach(id => document.getElementById(id).textContent = '-');
+                    hideLoader();
+            }
+        });
+        
+    </script>
+}

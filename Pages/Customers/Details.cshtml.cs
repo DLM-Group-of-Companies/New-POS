@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Customers
 {
@@ -35,6 +36,12 @@ namespace NLI_POS.Pages.Customers
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
+            if (!User.HasPermission("View"))
+            {
+                TempData["ErrorMessage"] = "You are not authorized to perform this action.";
+                return RedirectToPage("./Index");
+            }
+
             if (id == null)
             {
                 return NotFound();

@@ -2,7 +2,7 @@
 @model NLI_POS.Pages.Products.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Product";
 }
 
 <div class="container-fluid bg-white bg-gradient shadow p-2">
@@ -457,6 +457,7 @@
             const countrySelect = document.getElementById("ProductPrice_CountryId");            
             let mainID = document.getElementById('ProdMainID').value;
             countrySelect.addEventListener("change", function () {
+                showLoader();
                 const countryId = this.value;
                 if (countryId) {
                     fetch(`/Products/Edit?handler=Prices&countryId=${countryId}&id=${mainID}`)
@@ -472,10 +473,12 @@
                                 document.getElementById("ProductPrice_MedPackPrice").value = data.medPackPrice;
                                 document.getElementById("ProductPrice_CorpAccPrice").value = data.corpAccPrice;
                                 document.getElementById("ProductPrice_NaturoPrice").value = data.naturoPrice;
+                                hideLoader();
                             } else {
                                 clearPriceFields();
                             }
                         });
+                        
                 } else {
                     clearPriceFields();
                 }

@@ -63,18 +63,21 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-
-            var mainTable = $('#mainTable').DataTable({ 
+            showLoader();
+            var mainTable = $('#mainTable').DataTable({
                 ajax: {
                     url: '@Url.Page("Index", "Main")',
                     data: function (d) {
                         d.officeId = $('#officeId').val();
                     },
                     dataSrc: 'data',
-                            error: function (xhr, error, thrown) {
-            console.warn('DataTable error:', error);
-            // Optionally handle gracefully
-        }
+                    error: function (xhr, error, thrown) {
+                        console.warn('DataTable error:', error);
+                        hideLoader(); // still hide loader even on failure
+                    },
+                    complete: function () {
+                        hideLoader(); // hide only when done
+                    }
                 },
                 columns: [
                     { data: 'products.productName' },
@@ -91,7 +94,7 @@
                         data: 'id',
                         orderable: false,
                         render: function (data) {
-                            return `<a href="/Orders/Edit?id=${data}">Edit</a>`;
+                            return `<a  class="btn btn-success btn-sm m-1" title="Edit" href="/Orders/Edit?id=${data}"><i class="far fa-edit"></i></a>`;
                         }
                     }
                 ],
@@ -123,7 +126,7 @@
                         data: 'id',
                         orderable: false,
                         render: function (data) {
-                            return `<a href="/Orders/Edit?id=${data}">Edit</a>`;
+                            return `<a  class="btn btn-success btn-sm m-1" title="Edit" href="/Orders/Edit?id=${data}"><i class="far fa-edit"></i></a>`;
                         }
                     }
                 ],
@@ -140,6 +143,7 @@
             });
 
             $('#officeId').on('change', function () {
+                showLoader();
                 mainTable.ajax.reload();
                 collTable.ajax.reload();
             });

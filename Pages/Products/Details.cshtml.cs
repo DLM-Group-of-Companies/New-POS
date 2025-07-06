@@ -12,32 +12,33 @@ namespace NLI_POS.Pages.Products
 {
     public class DetailsModel : PageModel
     {
-        private readonly NLI_POS.Data.ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public DetailsModel(NLI_POS.Data.ApplicationDbContext context)
+        public DetailsModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         public Product Products { get; set; } = default!;
+        public ProductPrice ProductPrice { get; set; }
+        public List<ProductCombo> ProductCombos { get; set; }
+        public List<Country> Countries { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var product = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
+            Products = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
+            if (Products == null)
                 return NotFound();
-            }
-            else
-            {
-                Products = product;
-            }
+
+            ProductPrice = await _context.ProductPrices.FirstOrDefaultAsync(p => p.ProductId == id);
+            ProductCombos = await _context.ProductCombos.Where(p => p.ProductId == id).ToListAsync();
+            Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
+
             return Page();
         }
     }
+
 }

@@ -1,21 +1,38 @@
 ﻿@page
 @model LogoutModel
 @{
-    ViewData["Title"] = "Log out";
+    ViewData["Title"] = "Log Out Confirmation";
 }
 
-<header>
-    <h1>@ViewData["Title"]</h1>
-    @{
-        if (User.Identity?.IsAuthenticated ?? false)
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg border-0 rounded-4 p-4" style="width: 400px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title text-primary mb-0">@ViewData["Title"]</h5>
+            <button class="btn btn-sm btn-outline-danger" title="Close" onclick="window.location.href='@Url.Page("/Index")'">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <hr />
+        <div class="text-center mb-4">
+            <i class="fa-regular fa-circle-question fa-10x text-danger mb-3"></i>
+            <p class="fw-semibold text-secondary">Are you sure you want to log out?</p>
+        </div>
+
+        @if (User.Identity?.IsAuthenticated ?? false)
         {
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
+            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index")" method="post">
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i> Log Out
+                    </button>
+                </div>
             </form>
         }
         else
         {
-            <p>You have successfully logged out of the application.</p>
+            <div class="alert alert-success text-center" role="alert">
+                You have successfully logged out of the application.
+            </div>
         }
-    }
-</header>
+    </div>
+</div>

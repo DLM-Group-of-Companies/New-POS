@@ -1,4 +1,24 @@
-﻿
+﻿/* ---------------------------------------
+   GLOBAL BASE STYLES
+---------------------------------------- */
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    padding-bottom: 50px;
+    background-image: url('/images/main.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
 @media (min-width: 768px) {
     html {
         font-size: 16px;
@@ -11,48 +31,131 @@
     }
 }
 
+/* ---------------------------------------
+   FORM CONTROLS & INPUTS
+---------------------------------------- */
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-html {
-    position: relative;
-    min-height: 100%;
-}
-
-body {
-    background-image: url('/images/main.jpg');
+/* Remove numeric input arrows */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
     margin: 0;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
-    padding-bottom: 50px;
-    /*padding-top: 65px;*/
-    width: 100vw;
-    overflow-x: hidden;
 }
 
-/*data table search*/
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* ---------------------------------------
+   TABLES & VALIDATION
+---------------------------------------- */
+
+.dataTable {
+    width: 100% !important;
+}
+
 .dataTables_filter {
-    padding: 10px; /* top/bottom 10px, left/right 20px */
+    padding: 10px;
 }
 
-/*Validation Summary*/
 .validation-summary-errors ul {
     margin-bottom: 2px;
     padding-left: 20px;
 }
 
-/*Preloader*/
+/* ---------------------------------------
+   TABS
+---------------------------------------- */
+
+.nav-tabs .nav-link.active {
+    font-weight: bold;
+    border-color: #343a40 #343a40 #fff;
+}
+
+.nav-tabs .nav-link {
+    border: 1px solid #ccc;
+    border-bottom: none;
+}
+
+/* ---------------------------------------
+   SIDEBAR LAYOUT
+---------------------------------------- */
+
+.sidebar-scrollable {
+    overflow-y: auto;
+    height: 100vh;
+}
+
+@media (min-width: 768px) {
+    .sidebar-desktop {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100vh;
+        z-index: 1030;
+    }
+
+    .with-sidebar #page-content {
+        margin-left: 250px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .sidebar-desktop {
+        display: none !important;
+        z-index: -1 !important;
+    }
+
+    #page-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* Sidebar nav */
+.nav.flex-column .nav-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-link {
+    padding: 18px 20px;
+    font-size: 1rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+    .nav-link:hover,
+    .nav-link:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+        text-decoration: none;
+    }
+
+/* Nested menu */
+#reportsMenu .nav-link {
+    padding-left: 2.5rem;
+    font-size: 0.95rem;
+    border: none;
+}
+
+/* ---------------------------------------
+   PRELOADER
+---------------------------------------- */
+
 #preloader {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgb(0, 0, 0, 0.5); /* 50% transparent dark background */
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -80,133 +183,11 @@ body {
     }
 }
 
-.cursor-move {
-    cursor: move;
-}
+/* ---------------------------------------
+   ICONS - MAIN PAGE
+---------------------------------------- */
 
-.dataTable {
-    width: 100% !important;
-}
-
-/*Remove numeric input arrows*/
-/* Chrome, Safari, Edge, Opera */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* Firefox */
-input[type="number"] {
-    -moz-appearance: textfield;
-}
-
-/*Tab`s active text a bold*/
-.nav-tabs .nav-link.active {
-    font-weight: bold;
-}
-
-/*.nav-tabs {
-    border-bottom: 1px solid #343a40;*/ /* dark gray */
-/*}*/
-
-/* Darker border for active tab */
-.nav-tabs .nav-link.active {
-    border-color: #343a40 #343a40 #ffff; /* top, sides, bottom */
-    font-weight: bold;
-}
-
-/* Optional: Darker border for non-active tabs */
-.nav-tabs .nav-link {
-    border: 1px solid #ccc;
-    border-bottom: none;
-}
-
-/*menu icons*/
-.icon-container {
-    width: 24px; /* or 28px depending on your needs */
-    display: inline-block;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-/* Hide sidebar and reset margin on small screens */
-/*@media (max-width: 767.98px) {
-    .sidebar-desktop {
-        background-color: red !important;
-        display: none !important;
-    }
-
-    #page-content {
-        margin-left: 0 !important;
-    }
-}*/
-
-.sidebar-scrollable {
-    overflow-y: auto;
-    height: 100vh;
-}
-
-
-/* Desktop: show the sidebar */
-@media (min-width: 768px) {
-    .sidebar-desktop {
-        display: block;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 250px;
-        height: 100vh;
-        z-index: 1030;
-    }
-
-    .with-sidebar #page-content {
-        margin-left: 250px;
-    }
-}
-
-/* Mobile: hide the sidebar */
-@media (max-width: 767.98px) {
-   .sidebar-desktop {
-        display: none !important;
-        z-index: -1 !important;
-    }
-
-    #page-content {
-        margin-left: 0 !important;
-    }
-}
-
-/*Icons form Main*/
-/*.draggable-icon {
-    position: absolute;*/
-    /*width: 140px;
-    height: 140px;
-    background-color: #f8f9fa;
-    border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    display: flex;*/ /* Enable Flexbox */
-    /*justify-content: center;*/ /* Center horizontally */
-    /*align-items: center;*/ /* Center vertically */
-    /*cursor: move;
-}
-
-    .draggable-icon:hover {*/
-        /*background-color: #e2e6ea;*/
-    /*}
-
-.icon-img {
-    background-color: white;
-    border: 2px solid #dee2e6;*/ /* Light border */
-    /*border-radius: 12px;*/ /* Rounded corners (optional) */
-    /*padding: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    max-width: 100px;
-    max-height: 100px;
-    display: block;
-}*/
-
-/* Default (mobile-first): Flex layout */
+/* Mobile layout - flex */
 .icon-container-main {
     display: flex;
     flex-wrap: wrap;
@@ -217,7 +198,6 @@ input[type="number"] {
 }
 
 .draggable-icon {
-    position: static;
     width: 30%;
     max-width: 120px;
     text-align: center;
@@ -231,7 +211,10 @@ input[type="number"] {
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
-/* ✅ Desktop styles: enable absolute layout */
+.cursor-move {
+    cursor: move;
+}
+
 @media (min-width: 768px) {
     .icon-container-main {
         position: relative;
@@ -247,34 +230,49 @@ input[type="number"] {
         .draggable-icon img {
             width: 100%;
         }
-}
 
-/* Sidebar nav styling */
-.nav.flex-column .nav-item {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* subtle divider */
-}
-
-.nav-link {
-    padding: 18px 20px;
-    font-size: 1rem;
-    transition: background-color 0.2s ease-in-out;
-}
-
-    .nav-link:hover,
-    .nav-link:focus {
-        background-color: rgba(255, 255, 255, 0.1);
-        text-decoration: none;
+    /* Icon positioning classes for desktop */
+    .pos-orders {
+        top: 100px;
+        left: 300px;
     }
 
-/* Nested menu */
-#reportsMenu .nav-link {
-    padding-left: 2.5rem;
-    font-size: 0.95rem;
-    border: none; /* remove bottom line for sub items */
+    .pos-customers {
+        top: 100px;
+        left: 500px;
+    }
+
+    .pos-reports {
+        top: 100px;
+        left: 700px;
+    }
+
+    .pos-products {
+        top: 300px;
+        left: 200px;
+    }
+
+    .pos-inventory {
+        top: 300px;
+        left: 400px;
+    }
+
+    .pos-office {
+        top: 300px;
+        left: 600px;
+    }
+
+    .pos-users {
+        top: 300px;
+        left: 800px;
+    }
 }
 
-/* Optional icon spacing if needed */
+/* Icon spacing in sidebar menu (if used) */
+.icon-container,
 .icon-container2 {
     width: 24px;
     display: inline-block;
+    text-align: center;
+    flex-shrink: 0;
 }

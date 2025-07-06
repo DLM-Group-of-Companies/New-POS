@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using NLI_POS.Models;
 
 namespace NLI_POS.Pages.Users
 {
+    [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
         public IList<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();

@@ -14,7 +14,7 @@ using NLI_POS.Models;
 
 namespace NLI_POS.Pages.Inventory
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Inventory")]
     public class IndexModel : PageModel
     {
         private readonly NLI_POS.Data.ApplicationDbContext _context;
@@ -31,9 +31,13 @@ namespace NLI_POS.Pages.Inventory
         [Display(Name ="Office")]
         public int? officeId { get; set; }
 
-        public void OnGet(int? officeId)
+        public IActionResult OnGet(int? officeId)
         {
-            //User.IsInRole("Admin");
+            if (!User.IsInRole("Admin") && !User.IsInRole("Inventory"))
+            {
+                TempData["ErrorMessage"] = "You are not authorized to perform this action.";
+                return RedirectToPage();
+            }
 
             var offices = _context.OfficeCountry
             .Where(o => o.isActive)
@@ -45,13 +49,8 @@ namespace NLI_POS.Pages.Inventory
             })
             .ToList();
 
-                //// Insert the default "--Select--" item at the top
-            //if (countries.Count > 1)
-            //{
-            //    countries.Insert(0, new SelectListItem { Value = "", Text = "--Select--" });
-            //}
-
             ViewData["OfficeId"] = offices;
+            return Page();
         }
 
         public async Task<JsonResult> OnGetMain(int? officeId)

@@ -24,6 +24,12 @@ namespace NLI_POS.Pages.Inventory
 
         public IActionResult OnGet(int officeId)
         {
+            if (!User.IsInRole("Admin") && !User.IsInRole("Inventory"))
+            {
+                TempData["ErrorMessage"] = "You are not authorized to perform this action.";
+                return RedirectToPage();
+            }
+
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry.Where(o => o.Id == officeId), "Id", "Name");
             //ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
 

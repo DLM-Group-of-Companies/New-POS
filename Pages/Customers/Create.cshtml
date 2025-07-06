@@ -176,4 +176,14 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(function () {
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                        toastr.error("@TempData["ErrorMessage"]");
+            </text>
+        }
+                });
+    </script>
 }

@@ -26,8 +26,7 @@
                 <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Manage/Index">
                     <span class="icon-container"><i class="fas fa-user-cog"></i></span> Manage Account
                 </a>
-                <a class="nav-link text-white" href="~/Identity/Account/Logout?returnUrl=@Url.Page("/Index", new { area = "" })"
-                   onclick="return confirm('Are you sure you want to logout?');">
+                <a class="nav-link text-white" href="~/Identity/Account/Logout?returnUrl=@Url.Page("/Index", new { area = "" })" >
                     <span class="icon-container"><i class="fas fa-sign-out-alt me-2"></i></span> Logout
                 </a>
             </div>

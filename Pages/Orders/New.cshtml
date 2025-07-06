@@ -534,11 +534,6 @@
             updateRefLabel();
             methodSelect.on('change', updateRefLabel);
         });
-
-        function hideLoader() {
-            const preloader = document.getElementById("preloader");
-            if (preloader) preloader.style.display = "none";
-        }
     </script>
 
     @if (!ViewData.ModelState.IsValid)

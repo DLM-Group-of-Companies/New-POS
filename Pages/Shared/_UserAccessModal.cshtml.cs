@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace NLI_POS.Pages
+namespace NLI_POS.Pages.Shared
 {
-    public class TestModel : PageModel
+    public class _UserAccessModalModel : PageModel
     {
         public void OnGet()
         {

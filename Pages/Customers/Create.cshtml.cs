@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Customers
 {
@@ -22,6 +23,12 @@ namespace NLI_POS.Pages.Customers
 
         public IActionResult OnGet()
         {
+            if (!User.HasPermission("Add"))
+            {
+                TempData["ErrorMessage"] = "You are not authorized to Add.";
+                return RedirectToPage("./Index");
+            }
+
             ViewData["CustClass"] = new SelectList(_context.CustClass, "Id", "Name");
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
             ViewData["Country"] = new SelectList(_context.Country, "Code", "Name");

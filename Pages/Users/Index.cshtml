@@ -37,10 +37,23 @@
                     <td>@user.OfficeCountry?.Name</td>
                     <td>
                         <div class="d-flex">
-                            <button class="btn btn-info btn-sm m-1 text-white " title="Manage Office Access" data-user-id="@user.Id" data-bs-toggle="modal" data-bs-target="#officeAccessModal" onclick="loadUserAccess(this)" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
+                            @* Office Access *@
+                            <button class="btn btn-info btn-sm m-1 text-white " title="Manage Office Access" 
+                            data-user-id="@user.Id" data-bs-toggle="modal" data-bs-target="#officeAccessModal" 
+                            onclick="loadUserAccess(this)" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
                                 <i class="fas fa-grip-horizontal"></i>
                             </button>
-                            <a href="../Identity/Account/Manage?pEmail=@user.Email" class="btn btn-success btn-sm m-1" title="Edit" aria-disabled='@( (user.UserName?.ToUpper() == "ADMIN").ToString().ToLower() ) ' style="@(user.UserName?.ToUpper() == "ADMIN" ? "pointer-events: none; opacity: 0.6;" : "")" )><i class="fas fa-edit"></i> </a>
+                            @* Manage Account*@
+                            <a href="../Identity/Account/Manage?pEmail=@user.Email" class="btn btn-success btn-sm m-1" title="Edit" 
+                            aria-disabled='@( (user.UserName?.ToUpper() == "ADMIN").ToString().ToLower() ) ' style="@(user.UserName?.ToUpper() == "ADMIN" ? "pointer-events: none; opacity: 0.6;" : "")" )>
+                            <i class="fas fa-edit"></i> </a>
+                            @* Manage Roles and Access *@
+                            <button class="btn btn-primary btn-sm m-1"
+                                    data-user-id="@user.Id" data-bs-toggle="modal" data-bs-target="#userAccessModal"
+                                    onclick="loadAccessModal('@user.Id')" title="Manage Access" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
+                                <i class="fas fa-tasks"></i>
+                            </button>                          
+
                         </div>
                     </td>
                 </tr>
@@ -59,6 +72,21 @@
             </div>
             <div class="modal-body" id="userAccessModalBody">
                 <!-- dynamic content will go here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Access Modal -->
+<div class="modal fade" id="userAccessModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-shield-alt me-2"></i>User Roles & Access</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userAccessModalContainer">
+                <!-- Partial will be loaded here -->
             </div>
         </div>
     </div>
@@ -248,5 +276,40 @@
 
     </script>
 
+    @* Call Modal for Claims and Roles *@
+    <script>
+        function loadAccessModal(userId) {
+            $('#userAccessModalContainer').html(`<div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status"></div><p>Loading...</p></div>`);
+
+            $.get(`/Users/UserAccess?userId=${userId}`, function (modalHtml) {
+                $('#userAccessModalContainer').html(modalHtml);
+                // const modal = new bootstrap.Modal(document.getElementById('userAccessModal'));
+                const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('userAccessModal'));
+                modal.show();
+            });
+        }
+
+        $(document).on('submit', '#userAccessForm', function (e) {
+            showLoader();
+            e.preventDefault();
+            const form = $(this);
+            const data = form.serialize();
+
+            $.post('/Users/UserAccess?handler=Assign', data)
+                .done(function (res) {
+                    if (res.success) {
+                        hideLoader();
+                        bootstrap.Modal.getInstance(document.getElementById('userAccessModal')).hide();
+                        toastr.success('Roles and Access updated!');
+                    }
+                })
+                .fail(function () {
+                    hideLoader();
+                    toastr.error('Error saving roles and claims.');
+                });
+        });
+
+    </script>
 
 }

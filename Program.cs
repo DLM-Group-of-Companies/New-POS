@@ -17,12 +17,14 @@ var connectionString = builder.Configuration.GetConnectionString("NLPOSLiveConn"
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+//builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
-    .AddDefaultUI(); 
+    .AddDefaultUI();
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 

@@ -6,7 +6,7 @@ using NLI_POS.Models;
 
 namespace NLI_POS.Pages.Orders
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,CS")]
     public class IndexModel : PageModel
     {
         private readonly NLI_POS.Data.ApplicationDbContext _context;
