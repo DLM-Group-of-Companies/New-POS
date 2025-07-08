@@ -75,7 +75,7 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null)
+                if (user == null || !user.IsActive)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return Page();

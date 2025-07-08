@@ -6,7 +6,7 @@ using NLI_POS.Models;
 
 namespace NLI_POS.Pages.Products
 {
-    [Authorize(Roles = "Admin,Accounting")]
+    [Authorize(Roles = "Admin,Accounting,Inventory")]
     public class IndexModel : PageModel
     {
         private readonly NLI_POS.Data.ApplicationDbContext _context;

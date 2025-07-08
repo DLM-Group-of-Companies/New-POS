@@ -1,5 +1,6 @@
 ﻿@page
 @model NLI_POS.Pages.Orders.NewModel
+@using System.Text.Json
 
 @{
     ViewData["Title"] = "New Order";
@@ -20,12 +21,12 @@
             <div class="col-lg-4">
                 <!-- Office and Date Section -->
                 <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-building"></i> Office Info</h5>
+                    <h5 class="text-secondary border-bottom pb-1 mb-2 "><i class="fas fa-building text-primary"></i> Office Info</h5>
                     <input type="hidden" asp-for="Order.OrderNo" />
                     <div class="row">
                         <div class="col-6 mb-2">
                             <label asp-for="Order.OfficeId" class="form-label"></label>
-                            <select id="OfficeId" asp-for="Order.OfficeId" class="form-select" asp-items="ViewBag.OfficeId"></select>
+                            <select id="OfficeId" asp-for="Order.OfficeId" class="form-select" asp-items="Model.OfficeList"></select>
                         </div>
                         <div class="col-6 mb-2">
                             <label asp-for="Order.OrderDate" class="form-label"></label>
@@ -37,7 +38,7 @@
 
                 <!-- Customer Section -->
                 <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-user"></i> Customer Info</h5>
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-user text-success"></i> Customer Info</h5>
                     <label asp-for="Order.CustomerId" class="form-label"></label>
                     <div class="input-group mb-2">
                         <select asp-for="Order.CustomerId" id="CustomerId" class="form-select" asp-items="ViewBag.CustomerId">
@@ -54,7 +55,7 @@
 
                 <!-- Product Section -->
                 <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-box"></i> Product Selection</h5>
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-box text-info"></i> Product Selection</h5>
                     <div class="row">
                         <div class="col-4 mb-2">
                             <label class="form-label">Category</label>
@@ -100,7 +101,7 @@
             <div class="col-lg-8">
                 <!-- Cart Section -->
                 <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-shopping-cart"></i> Cart</h5>
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-shopping-cart text-secondary"></i> Cart</h5>
                     <div class="table-responsive">
                         <table id="cartTable" class="table table-bordered table-sm small align-middle">
                             <thead class="table-secondary">
@@ -132,13 +133,19 @@
 
                 <!-- Payment Info -->
                 <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-credit-card"></i> Payment</h5>
+                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-credit-card text-warning"></i> Payment</h5>
                     <div class="row mb-2">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label asp-for="Order.PaymentMethod" class="form-label"></label>
                             <select asp-for="Order.PaymentMethod" class="form-select" asp-items="ViewBag.PaymentMethod"></select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label asp-for="Order.PaidAmount" class="form-label">Paid Amount</label>
+                            <input asp-for="Order.PaidAmount" class="form-control" id="paidAmount" />
+                            <span asp-validation-for="Order.PaidAmount" class="text-danger small"></span>
+                            <div id="paymentError" class="text-danger small mb-2" style="display:none;"></div>
+                        </div>
+                        <div class="col-md-4">
                             <label id="PaymentRef" class="form-label">Reference No.</label>
                             <input id="RefNo" asp-for="Order.RefNo" class="form-control" />
                         </div>
@@ -190,7 +197,7 @@
         </div>
     </div>
 </div>
-    
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -221,6 +228,7 @@
 
         // Load customer class
         function loadCustomerClass(customerId) {
+            showLoader();
             return $.ajax({
                 url: '@Url.Page("Create", "CustomerClass")',
                 type: 'GET',
@@ -244,6 +252,7 @@
 
         // Load product list
         function loadProductList() {
+            showLoader();
             const category = $('#ProductCategory').val();
             const custclasstxt = $('#CustClassDisplay').text();
 
@@ -261,6 +270,7 @@
 
         // Load combos and amount when product selected
         function loadProductDetails(productId) {
+            showLoader();
             const custclasstxt = $('#CustClassDisplay').text();
             const officeid = $('#OfficeId').val();
             $("#ComboId").empty();
@@ -295,6 +305,7 @@
 
         $(function () {
             $('#CustomerId').on('change', function () {
+                showLoader();
                 const customerId = $(this).val();
                 loadTracker.customerClass = false;
                 loadTracker.productList = false;
@@ -306,11 +317,13 @@
             });
 
             $('#ProductCategory').on('change', function () {
+                showLoader();
                 loadTracker.productList = false;
                 loadProductList();
             });
 
             $('#ProductId').on('change', function () {
+                showLoader();
                 const selectedProductId = $(this).val();
                 loadTracker.productCombo = false;
                 loadProductDetails(selectedProductId);
@@ -346,6 +359,7 @@
                         checkAllLoaded();
                     }
                 });
+                hideLoader();
             } else {
                 // No customer selected at all
                 loadTracker.customerClass = true;
@@ -410,14 +424,14 @@
                 cart.forEach(item => {
                     total += item.price * item.quantity;
                     tbody.append(`
-                                <tr>
-                                    <td>${item.productName}</td>
-                                    <td>${item.comboName}</td>
-                                    <td>₱${item.price.toFixed(2)}</td>
-                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                    <td>₱${(item.price * item.quantity).toFixed(2)}</td>
-                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                </tr>`);
+                                                                <tr>
+                                                                    <td>${item.productName}</td>
+                                                                    <td>${item.comboName}</td>
+                                                                    <td>₱${item.price.toFixed(2)}</td>
+                                                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                    <td>₱${(item.price * item.quantity).toFixed(2)}</td>
+                                                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                                </tr>`);
                 });
             }
 
@@ -496,14 +510,14 @@
 
                 data.forEach(customer => {
                     tbody.append(`
-                                <tr>
-                                    <td>${customer.custcode}</td>
-                                    <td>${customer.name}</td>
-                                    <td>${customer.email}</td>
-                                    <td>${customer.phone}</td>
-                                    <td><button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>Select</button></td>
-                                </tr>
-                            `);
+                                                                <tr>
+                                                                    <td>${customer.custcode}</td>
+                                                                    <td>${customer.name}</td>
+                                                                    <td>${customer.email}</td>
+                                                                    <td>${customer.phone}</td>
+                                                                    <td><button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>Select</button></td>
+                                                                </tr>
+                                                            `);
                 });
             });
         });
@@ -523,9 +537,13 @@
             function updateRefLabel() {
                 const method = methodSelect.val().toLowerCase();
                 if (method === 'cash') {
-                    paymentRefLabel.text("Cash Amount");
-                    refNoInput.attr("type", "number").attr("placeholder", "Enter cash amount");
+                    // paymentRefLabel.text("Cash Amount");
+                    // refNoInput.attr("type", "number").attr("placeholder", "Enter cash amount");
+                    $('#PaymentRef').hide();
+                    $('#RefNo').hide();
                 } else {
+                    $('#PaymentRef').show();
+                    $('#RefNo').show();
                     paymentRefLabel.text("Reference No.");
                     refNoInput.attr("type", "text").attr("placeholder", "Enter reference number");
                 }
@@ -540,5 +558,22 @@
     {
         <script>$('#ProductId').trigger('change');</script>
     }
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
+                            let totalText = document.getElementById('grandTotal').textContent;
+                                let grandTotal = parseFloat(totalText) || 0;
+
+                                            if (paidAmount < grandTotal) {
+                                                        hideLoader();
+                    e.preventDefault();
+                    document.getElementById('paymentError').style.display = 'block';
+                    document.getElementById('paymentError').textContent =
+                                `Paid amount (₱${paidAmount.toFixed(2)}) is less than the total amount due (₱${grandTotal.toFixed(2)}). Please correct the payment.`;
+
+                                    }
+                                });
+    </script>
 }
 

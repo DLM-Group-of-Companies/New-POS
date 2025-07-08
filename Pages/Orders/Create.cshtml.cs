@@ -193,7 +193,7 @@ namespace NLI_POS.Pages.Orders
                 // Check if product is a promo bundle
                 if (product != null && product.ProductCategory == "Promo")
                 {
-                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == item.ProductId);
+                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == item.ProductCombo);
 
                     if (combo != null)
                     {
@@ -237,6 +237,16 @@ namespace NLI_POS.Pages.Orders
                 }
             }
 
+            // Step 1: Calculate cart total
+            decimal cartTotal = cart.Sum(item => item.Price * item.Quantity);
+
+            // Step 2: Compare with PaidAmount
+            if (Order.PaidAmount != cartTotal)
+            {
+                ModelState.AddModelError(string.Empty, $"Paid amount (₱{Order.PaidAmount:N2}) does not match the total amount due (₱{cartTotal:N2}). Please correct the payment.");
+                await LoadDropdownsAsync();
+                return Page();
+            }
 
             // Setup base order data
             string orderNo = "";
@@ -245,7 +255,7 @@ namespace NLI_POS.Pages.Orders
             do //Generate Order Number and make sure it will not have duplicates incase multiple users saved record at same time
             {
                 long ticks = DateTime.UtcNow.Ticks;
-                orderNo = $"MLAHQ-{ticks.ToString().Substring(0, 10)}";
+                orderNo = $"{Order.Office.OffCode}-{ticks.ToString().Substring(0, 10)}";
 
                 isUnique = !_context.Orders.Any(o => o.OrderNo == orderNo);
             } while (!isUnique);

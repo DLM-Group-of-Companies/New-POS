@@ -38,7 +38,7 @@ namespace NLI_POS.Pages.Inventory
             .ToList();
 
             ViewData["ProductId"] = new SelectList(
-                _context.Products
+                _context.Products.Where(p=>p.ProductCategory!="Promo")
                     .Where(p => !usedProductIds.Contains(p.Id))
                     .Select(p => new
                     {
@@ -60,6 +60,13 @@ namespace NLI_POS.Pages.Inventory
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync(int officeId)
         {
+            var userTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
+            var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, userTimeZone);
+
+            InventoryStock.EncodeDate = localTime;
+            InventoryStock.EncodedBy = User?.Identity.Name;
+
+            
             if (!ModelState.IsValid)
             {
                 return Page();

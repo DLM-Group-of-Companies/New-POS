@@ -9,31 +9,38 @@
     }
 
     string eMail = Context.Request.Query["pEmail"];
-}
-<div class="container-fluid p-3 rounded bg-light">
-    <span class="float-end" title="Close"><i class="fas fa-times-circle fa-xl" onclick="window.location = '/';"></i> </span>
-@if (eMail == null)
-{
-    <h2>Manage your account</h2>
 
-    <h4>Change your account settings</h4>
-}
-else
-{
-    <h2>Manage account</h2>
+    string pTitle;
 
-    <h4>Change account settings</h4>
+    if (eMail == null)
+    {
+        pTitle = "Manage your account"; 
+    }
+    else
+    {
+        pTitle = "Manage User's Account"; 
+    }
 }
 
-<hr />
-<div class="row ">
-    <div class="col-md-3 ">
-        <partial name="_ManageNav" />
+<div class="container bg-white shadow rounded-4 p-4 my-4 w-50">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="fas fa-user-cog  fa-xl text-primary me-2"></i> @pTitle</h4>
+        <a title="Close" class="text-danger fa-2xl" style="cursor: pointer;" onclick="window.location = '/';">
+            <i class="fas fa-window-close"></i>
+        </a>
     </div>
-    <div class="col-md-9">
-        @RenderBody()
+
+    <hr />
+
+
+    <div class="row ">
+        <div class="col-md-4 ">
+            <partial name="_ManageNav" />
+        </div>
+        <div class="col-md-8">
+            @RenderBody()
+        </div>
     </div>
-</div>
 </div>
 @section Scripts {
     @RenderSection("Scripts", required: false)

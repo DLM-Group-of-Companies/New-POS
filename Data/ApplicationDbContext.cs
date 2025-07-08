@@ -1,15 +1,43 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
+using NLI_POS.Models.Base;
 
 namespace NLI_POS.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
             : base(options)
         {
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var username = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "SYSTEM";
+            var now = DateTime.UtcNow;
+
+            foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.EncodeDate = now;
+                    entry.Entity.EncodedBy = username;
+                }
+
+                if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.UpdateDate = now;
+                    entry.Entity.UpdatedBy = username;
+                }
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
         public DbSet<Customer> Customer { get; set; }
         public DbSet<CustClass> CustClass { get; set; }
         public DbSet<Country> Country { get; set; }

@@ -5,6 +5,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using NLI_POS.Data;
 using NLI_POS.Models;
@@ -16,18 +17,19 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         private ApplicationDbContext _context;
-        [BindProperty]
-        public IList<string> role { get; set; }
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
+            SignInManager<ApplicationUser> signInManager, 
+            RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         public string Username { get; set; }
@@ -48,6 +50,11 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
         }
+
+        [BindProperty]
+        public List<string> SelectedRoles { get; set; } = new();
+        public List<SelectListItem> AllRoles { get; set; }
+
 
         private async Task LoadAsync(ApplicationUser user)
         {
@@ -72,8 +79,19 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
                     return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
                 }
 
+                var userRoles = await _userManager.GetRolesAsync(user);
+                SelectedRoles = userRoles.ToList();
+
+                AllRoles = _roleManager.Roles
+            .Select(r => new SelectListItem
+            {
+                Value = r.Name,
+                Text = r.Name,
+                Selected = userRoles.Contains(r.Name) // ✅ Preselect here too
+            }).ToList();
+
                 Fullname = user.FullName;
-                role = await _userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);                
                 await LoadAsync(user);
             }
             else
@@ -82,7 +100,8 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
                 if (sUser != null)
                 {
                     Fullname = sUser.FullName;
-                    role = await _userManager.GetRolesAsync(sUser);
+                    var userRoles = await _userManager.GetRolesAsync(sUser);
+                    SelectedRoles = userRoles.ToList();
                     await LoadAsync(sUser);
                 }
             }

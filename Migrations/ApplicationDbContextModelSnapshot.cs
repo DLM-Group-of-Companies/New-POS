@@ -183,6 +183,9 @@ namespace NLI_POS.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("tinyint(1)");
 
@@ -252,6 +255,10 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.ToTable("Country");
@@ -268,11 +275,10 @@ namespace NLI_POS.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("EncodeDate")
+                    b.Property<DateTime?>("EncodeDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("EncodedBy")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Name")
@@ -282,7 +288,7 @@ namespace NLI_POS.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UpdateddBy")
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -330,11 +336,10 @@ namespace NLI_POS.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<DateTime>("EncodeDate")
+                    b.Property<DateTime?>("EncodeDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("EncodedBy")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("FirstName")
@@ -383,7 +388,7 @@ namespace NLI_POS.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UpdateddBy")
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -403,14 +408,30 @@ namespace NLI_POS.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("EncodeDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EncodedBy")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("OfficeId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
                     b.Property<int>("StockQty")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -485,11 +506,10 @@ namespace NLI_POS.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<DateTime>("EncodeDate")
+                    b.Property<DateTime?>("EncodeDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("EncodedBy")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Name")
@@ -509,7 +529,7 @@ namespace NLI_POS.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UpdateddBy")
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("longtext");
 
                     b.Property<bool>("isActive")
@@ -539,12 +559,14 @@ namespace NLI_POS.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EncodeDate")
+                    b.Property<DateTime?>("EncodeDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("EncodedBy")
-                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("IsVoided")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int?>("ItemNo")
                         .HasColumnType("int");
@@ -566,6 +588,9 @@ namespace NLI_POS.Migrations
                     b.Property<string>("OrderType")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<decimal>("PaidAmount")
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
@@ -591,8 +616,17 @@ namespace NLI_POS.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UpdateddBy")
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("longtext");
+
+                    b.Property<string>("VoidReason")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("VoidedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("VoidedDate")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -636,11 +670,10 @@ namespace NLI_POS.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("EncodeDate")
+                    b.Property<DateTime?>("EncodeDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("EncodedBy")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsActive")
@@ -675,13 +708,12 @@ namespace NLI_POS.Migrations
                         .HasColumnType("varchar(20)");
 
                     b.Property<string>("SKU")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UpdateddBy")
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("longtext");
 
                     b.Property<bool>("isFreebieAvailable")
@@ -772,7 +804,7 @@ namespace NLI_POS.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UpdateddBy")
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -831,11 +863,10 @@ namespace NLI_POS.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("EncodeDate")
+                    b.Property<DateTime?>("EncodeDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("EncodedBy")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("OfficeId")
@@ -844,7 +875,7 @@ namespace NLI_POS.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UpdateddBy")
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("longtext");
 
                     b.Property<string>("UserId")

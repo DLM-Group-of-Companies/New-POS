@@ -20,6 +20,8 @@ namespace NLI_POS.Models
         [ForeignKey("OfficeCountry")]
         public int OfficeId { get; set; }
 
+        public bool IsActive { get; set; } = true;
+
         [ValidateNever]
         public virtual OfficeCountry OfficeCountry { get; set; }
     }

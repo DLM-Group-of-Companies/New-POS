@@ -92,7 +92,7 @@
                 </div>
                 <!-- PRODUCT PRICING -->
                 <hr class="my-4" />
-               
+
                 <div class="row g-2">
                     <div class="col-md-9">
                         <h5 class="text-secondary"><i class="fas fa-tags me-2"></i>Product Price Details</h5>
@@ -154,6 +154,7 @@
                     </div>
                 </div>
 
+                <hr />
                 <!-- Active Switch & Hidden Fields -->
                 <div class="row g-2 mt-2 align-items-center">
                     <div class="col-md-4">
@@ -182,8 +183,8 @@
 
                 <input asp-for="Products.EncodeDate" type="hidden" />
                 <input asp-for="Products.EncodedBy" type="hidden" />
-                <input asp-for="Products.UpdateDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
-                <input asp-for="Products.UpdateddBy" type="hidden" value="@User.Identity?.Name" />
+                <input asp-for="Products.UpdateDate" type="hidden" />
+                <input asp-for="Products.UpdatedBy" type="hidden" />
 
             </div>
             <div id="comboColumn" class="col-md-5 p-2 border border-info rounded" style="display:none">
@@ -260,9 +261,9 @@
                 url: "?handler=ProductList",
                 success: function (data) {
                     let newselect = `<select id='ProductComboList[${rowCount}][1]'
-                                                                             asp-for='ProductComboList[${rowCount}][1]'
-                                                                             name='ProductComboList[${rowCount}][1]'
-                                                                             class='form-control'>`;
+                                                                                     asp-for='ProductComboList[${rowCount}][1]'
+                                                                                     name='ProductComboList[${rowCount}][1]'
+                                                                                     class='form-control'>`;
 
                     $.each(data, function (i, item) {
                         newselect += `<option value="${item.value}">${item.text}</option>`;
@@ -271,34 +272,34 @@
                     newselect += "</select>";
 
                     let newitem = `
-                                                        <div class="row p-1 inputRow">
-                                                            <div class="col-8">
-                                                                <div class="form-group">${newselect}</div>
-                                                            </div>
-                                                            <div class="col-2">
-                                                                <input type="hidden" id="ProductComboList[${rowCount}][0]"
-                                                                       asp-for="ProductComboList[${rowCount}][0]"
-                                                                       name="ProductComboList[${rowCount}][0]"
-                                                                       value="${mainID}">
-                                                                <input type="number" id="ProductComboList[${rowCount}][2]"
-                                                                       asp-for="ProductComboList[${rowCount}][2]"
-                                                                       name="ProductComboList[${rowCount}][2]"
-                                                                       class="form-control">
-                                                            </div>
-                                                                    <div class="col-2 d-flex justify-content-center">
-                                                                        <button type="button" class="removeRow btn btn-danger btn-sm m-1" title="Remove">
-                                                                            <i class="fas fa-minus-circle"></i>
-                                                                        </button>
-                                    
-                                                                        <button id="addRow" type="button" onclick="getSelText(${rowCount});addProductComboRow()"
-                                                                                class="btn btn-success btn-sm m-1" title="Save">
-                                                                            <i class="fas fa-plus-circle"></i>
-                                                                        </button>
-                                                                        <input type="hidden" id="ProductComboList[${rowCount}][3]"
-                                                                       asp-for="ProductComboList[${rowCount}][3]"
-                                                                       name="ProductComboList[${rowCount}][3]">
+                                                                <div class="row p-1 inputRow">
+                                                                    <div class="col-8">
+                                                                        <div class="form-group">${newselect}</div>
                                                                     </div>
-                                                        </div>`;
+                                                                    <div class="col-2">
+                                                                        <input type="hidden" id="ProductComboList[${rowCount}][0]"
+                                                                               asp-for="ProductComboList[${rowCount}][0]"
+                                                                               name="ProductComboList[${rowCount}][0]"
+                                                                               value="${mainID}">
+                                                                        <input type="number" id="ProductComboList[${rowCount}][2]"
+                                                                               asp-for="ProductComboList[${rowCount}][2]"
+                                                                               name="ProductComboList[${rowCount}][2]"
+                                                                               class="form-control">
+                                                                    </div>
+                                                                            <div class="col-2 d-flex justify-content-center">
+                                                                                <button type="button" class="removeRow btn btn-danger btn-sm m-1" title="Remove">
+                                                                                    <i class="fas fa-minus-circle"></i>
+                                                                                </button>
+
+                                                                                <button id="addRow" type="button" onclick="getSelText(${rowCount});addProductComboRow()"
+                                                                                        class="btn btn-success btn-sm m-1" title="Save">
+                                                                                    <i class="fas fa-plus-circle"></i>
+                                                                                </button>
+                                                                                <input type="hidden" id="ProductComboList[${rowCount}][3]"
+                                                                               asp-for="ProductComboList[${rowCount}][3]"
+                                                                               name="ProductComboList[${rowCount}][3]">
+                                                                            </div>
+                                                                </div>`;
 
                     $("#newRow").append(newitem);
                 },
@@ -454,7 +455,7 @@
     <script>
         // Retrieve prices based on country
         document.addEventListener("DOMContentLoaded", function () {
-            const countrySelect = document.getElementById("ProductPrice_CountryId");            
+            const countrySelect = document.getElementById("ProductPrice_CountryId");
             let mainID = document.getElementById('ProdMainID').value;
             countrySelect.addEventListener("change", function () {
                 showLoader();
@@ -478,7 +479,7 @@
                                 clearPriceFields();
                             }
                         });
-                        
+
                 } else {
                     clearPriceFields();
                 }

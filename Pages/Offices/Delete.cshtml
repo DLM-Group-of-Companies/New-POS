@@ -19,6 +19,12 @@
             @Html.DisplayFor(model => model.OfficeCountry.Name)
         </dd>
         <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.OfficeCountry.OffCode)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.OfficeCountry.OffCode)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.OfficeCountry.Address)
         </dt>
         <dd class="col-sm-10">
@@ -67,16 +73,16 @@
             @Html.DisplayFor(model => model.OfficeCountry.UpdateDate)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.UpdateddBy)
+            @Html.DisplayNameFor(model => model.OfficeCountry.UpdatedBy)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.UpdateddBy)
+            @Html.DisplayFor(model => model.OfficeCountry.UpdatedBy)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.OfficeCountry.Country)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.Country.Id)
+            @Html.DisplayFor(model => model.OfficeCountry.Country.Name)
         </dd>
     </dl>
     

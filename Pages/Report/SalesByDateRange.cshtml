@@ -18,7 +18,7 @@
         <div class="col-md-2">
             <label for="officeFilter" class="form-label">Filter by Office</label>
             <select id="officeFilter" class="form-select">
-                <option value="">All Offices</option>
+                @* <option value="">All Offices</option> *@
                 @foreach (var office in Model.Offices.DistinctBy(o => o.Name))
                 {
                     <option value="@office.Name">@office.Name</option>
@@ -59,7 +59,7 @@
                     <th>@Html.DisplayNameFor(m => m.Order[0].EncodeDate)</th>
                     <th>@Html.DisplayNameFor(m => m.Order[0].EncodedBy)</th>
                     <th>@Html.DisplayNameFor(m => m.Order[0].UpdateDate)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].UpdateddBy)</th>
+                    <th>@Html.DisplayNameFor(m => m.Order[0].UpdatedBy)</th>
                 </tr>
             </thead>
             <tbody>
@@ -86,7 +86,7 @@
                         <td>@Html.DisplayFor(m => item.EncodeDate)</td>
                         <td>@Html.DisplayFor(m => item.EncodedBy)</td>
                         <td>@Html.DisplayFor(m => item.UpdateDate)</td>
-                        <td>@Html.DisplayFor(m => item.UpdateddBy)</td>
+                        <td>@Html.DisplayFor(m => item.UpdatedBy)</td>
                     </tr>
                 }
             </tbody>

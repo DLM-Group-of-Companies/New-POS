@@ -7,6 +7,7 @@ using MimeKit;
 using NLI_POS.Models;
 using MailKit.Net.Smtp;
 using MimeKit.Text;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Orders
 {
@@ -21,6 +22,7 @@ namespace NLI_POS.Pages.Orders
             _env = env;
         }
 
+        [BindProperty]
         public Order Order { get; set; } = default!;
         public IList<Order> OrderList { get; set; } = default!;
 
@@ -32,7 +34,7 @@ namespace NLI_POS.Pages.Orders
                 return NotFound();
             }
 
-            var order = await _context.Orders.Include(o => o.Office).Include(o=>o.Customers).ThenInclude(c => c.CustClasses).Include(p=>p.ProductCombos).FirstOrDefaultAsync(m => m.OrderNo == orderNo);
+            var order = await _context.Orders.Include(o => o.Office).Include(o => o.Customers).ThenInclude(c => c.CustClasses).Include(p => p.ProductCombos).FirstOrDefaultAsync(m => m.OrderNo == orderNo);
             if (order == null)
             {
                 return NotFound();
@@ -42,9 +44,76 @@ namespace NLI_POS.Pages.Orders
                 Order = order;
             }
 
-            var orderlist =  _context.Orders.Include(o=>o.Products).Where(m => m.OrderNo == order.OrderNo).ToList();
+            var orderlist = _context.Orders.Include(o => o.Products).Where(m => m.OrderNo == order.OrderNo).ToList();
             OrderList = orderlist;
             return Page();
+        }
+
+
+        public async Task<IActionResult> OnPostVoidAsync()
+        {
+            if (Order == null || string.IsNullOrEmpty(Order.OrderNo))
+                return NotFound();
+
+            var order = await _context.Orders
+                .Include(o => o.Products)
+                .FirstOrDefaultAsync(o => o.OrderNo == Order.OrderNo);
+
+            if (order == null)
+                return NotFound();
+
+            if (order.IsVoided)
+                return RedirectToPage(new { orderNo = order.OrderNo });
+
+            // Flag as void
+            order.IsVoided = true;
+            order.VoidedDate = DateTime.Now;
+            order.VoidedBy = User.Identity?.Name ?? "System";
+
+            // Restock items
+            // ✅ Reverse the inventory
+            if (order.Products != null && order.Products.ProductCategory == "Promo")
+            {
+                // Promo: unpack the combo
+                var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == order.ComboId);
+                if (combo != null)
+                {
+                    var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
+                    var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
+
+                    for (int i = 0; i < productIds.Count; i++)
+                    {
+                        int componentProductId = productIds[i];
+                        int restockQty = qtyList[i] * order.Qty.Value;
+
+                        var inventory = await _context.InventoryStocks
+                            .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == order.OfficeId);
+
+                        if (inventory != null)
+                        {
+                            inventory.StockQty += restockQty;
+                            _context.InventoryStocks.Update(inventory);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Regular product
+                var inventory = await _context.InventoryStocks
+                    .FirstOrDefaultAsync(i => i.ProductId == order.ProductId && i.OfficeId == order.OfficeId);
+
+                if (inventory != null)
+                {
+                    inventory.StockQty += order.Qty.Value;
+                    _context.InventoryStocks.Update(inventory);
+                }
+            }
+
+             await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Order has been successfully voided.";
+            return RedirectToPage(new { orderNo = order.OrderNo });
         }
 
         public class EmailRequest

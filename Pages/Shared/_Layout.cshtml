@@ -67,7 +67,8 @@
 
     @* <div class="d-flex"> *@
         <div>
-        @if (!isLoginPage)
+        @* @if (!isLoginPage) *@
+        @if (User.Identity.IsAuthenticated)
         {
             
             <!-- ✅ Sidebar for desktop (md+) only -->

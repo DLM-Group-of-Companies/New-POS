@@ -58,12 +58,20 @@
                         @Html.DisplayFor(modelItem => item.ProductCategory)
                     </td>
                     <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.IsActive)
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success opacity-75">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary opacity-50">No</span>
+                        }
+                        
                     </td>
 
                     <td class="align-middle">
-                        <a asp-page="./Edit" class="btn btn-success btn-sm m-1"  title="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a>
-                        <a asp-page="./Details" class="btn btn-primary btn-sm m-1"  title="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a>
+                        <a asp-page="./Edit" class="btn btn-success btn-sm "  title="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a>
+                        <a asp-page="./Details" class="btn btn-primary btn-sm "  title="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a>
                         @if (User.IsInRole("Admin"))
                         {
                            <a class="details btn btn-danger btn-sm " title="Delete" href="javascript:;"><i class="fas fa-trash-alt"></i> </a>

@@ -3,11 +3,10 @@
 
 @{
     ViewData["Title"] = "Edit";
+    Layout = "";
 }
 
-<h1>Edit</h1>
-
-<h4>InventoryStock</h4>
+<h4>Edit Inventory Stock</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -29,15 +28,14 @@
                 <select asp-for="InventoryStock.OfficeId" class="form-control" asp-items="ViewBag.OfficeId"></select>
                 <span asp-validation-for="InventoryStock.OfficeId" class="text-danger"></span>
             </div>
+
+            <input asp-for="InventoryStock.EncodedBy" type="hidden" />
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-page="./Index">Back to List</a>
 </div>
 
 @section Scripts {

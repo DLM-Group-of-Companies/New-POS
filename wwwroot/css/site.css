@@ -2,22 +2,21 @@
    GLOBAL BASE STYLES
 ---------------------------------------- */
 
-html {
+html, body {
     position: relative;
     min-height: 100%;
-}
-
-body {
     margin: 0;
-    padding-bottom: 50px;
+    padding-bottom: 60px;
     background-image: url('/images/main.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    width: 100vw;
-    overflow-x: hidden;
+    /* Fix scrollbar issue */
+    width: 100%; /* ✅ Use this */
+    overflow: hidden; /* ✅ Prevent horizontal scroll */
 }
+
 
 @media (min-width: 768px) {
     html {
@@ -26,9 +25,9 @@ body {
 }
 
 @media screen and (max-width: 1366px) {
-    html {
+/*    html {
         font-size: 12px;
-    }
+    }*/
 }
 
 /* ---------------------------------------
@@ -275,4 +274,18 @@ input[type="number"] {
     display: inline-block;
     text-align: center;
     flex-shrink: 0;
+}
+
+.hover-border {
+    border: 2px solid transparent; /* Initial transparent border */
+    transition: border-color 0.3s ease; /* Smooth transition on hover */
+}
+
+    .hover-border:hover {
+        border-color: orange; /* Change border color on hover */
+    }
+
+.table-scroll-container {
+    height: calc(100vh - 200px); /* Adjust depending on nav/footer height */
+    overflow-y: auto;
 }

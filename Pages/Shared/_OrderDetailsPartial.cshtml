@@ -39,20 +39,21 @@
                 <td></td>
             </tr>
             @{
-                decimal refNoValue = decimal.TryParse(Model.First().RefNo?.ToString(), out var r) ? r : 0;
+                //decimal refNoValue = decimal.TryParse(Model.First().RefNo?.ToString(), out var r) ? r : 0;
+                decimal paidAmount = Model.First().PaidAmount;
                 var totalAmount = Model.Sum(i => i.Amount ?? 0);
-                var change = refNoValue - totalAmount;
+                var change = paidAmount - totalAmount;
                 var paymentmode = @Model.First().PaymentMethod;
             }
             <tr class="table-light">
                 @if (paymentmode.ToLower() == "cash")
                 {
                     <td colspan="6" class="text-end">Payment Mode: @paymentmode </td>
-                    <td class="text-end">@refNoValue.ToString("N2")</td>
+                    <td class="text-end">@paidAmount.ToString("N2")</td>
                 }
                 else
                 {
-                    <td colspan="6" class="text-end">Payment Mode: @paymentmode (Reference #: @refNoValue) </td>
+                    <td colspan="6" class="text-end">Payment Mode: @paymentmode (Reference #: @Model.First().RefNo) </td>
                 }
                 <td></td>
             </tr>

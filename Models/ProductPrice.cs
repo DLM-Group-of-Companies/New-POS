@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using NLI_POS.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NLI_POS.Models
 {
-    public class ProductPrice
+    public class ProductPrice : AuditableEntity
     {
         [Key]
         public int Id { get; set; }
@@ -35,10 +36,10 @@ namespace NLI_POS.Models
         [Display(Name = "Naturopath")]
         public decimal NaturoPrice { get; set; } = decimal.Zero;
 
-        public DateTime? EncodeDate { get; set; } 
-        public string? EncodedBy { get; set; } 
-        public DateTime? UpdateDate { get; set; }
-        public string? UpdateddBy { get; set; }
+        //public DateTime? EncodeDate { get; set; } 
+        //public string? EncodedBy { get; set; } 
+        //public DateTime? UpdateDate { get; set; }
+        //public string? UpdateddBy { get; set; }
 
         [ValidateNever]
         public virtual Product? Product { get; set; }

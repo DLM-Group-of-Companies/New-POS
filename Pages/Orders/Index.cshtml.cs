@@ -32,7 +32,8 @@ namespace NLI_POS.Pages.Orders
                     o.OfficeId,
                     o.OrderType,
                     CustomerName = o.Customers.FirstName + " " + o.Customers.LastName,
-                    OfficeName = o.Office.Name
+                    OfficeName = o.Office.Name,
+                    o.IsVoided
                 })
                 .Select(g => new
                 {
@@ -40,6 +41,7 @@ namespace NLI_POS.Pages.Orders
                     OrderDate = g.Key.OrderDate,
                     CustomerName = g.Key.CustomerName,
                     Office = g.Key.OfficeName,
+                    isVoided = g.Key.IsVoided,
                     TotAmount = g.Sum(x => x.Amount)
                 })
                 .ToList();

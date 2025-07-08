@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NLI_POS.Models.Base;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NLI_POS.Models
 {
-    public class OfficeCountry
+    public class OfficeCountry : AuditableEntity
     {
         [Key]
         public int Id { get; set; }
@@ -34,10 +35,10 @@ namespace NLI_POS.Models
         [Display(Name = "Country")]
         public int CountryId { get; set; }
 
-        public DateTime EncodeDate { get; set; }
-        public string EncodedBy { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public string? UpdateddBy { get; set; }
+        //public DateTime EncodeDate { get; set; }
+        //public string EncodedBy { get; set; }
+        //public DateTime? UpdateDate { get; set; }
+        //public string? UpdateddBy { get; set; }
 
         public virtual Country Country { get; set; }
     }

@@ -244,7 +244,7 @@ namespace NLI_POS.Pages.Products
             if (isProductModified)
             {
                 Products.UpdateDate = DateTime.UtcNow.AddHours(8);
-                Products.UpdateddBy = User.Identity?.Name;
+                Products.UpdatedBy = User.Identity?.Name;
                 _context.Attach(Products).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }

@@ -4,88 +4,97 @@
 @{
     ViewData["Title"] = "Office Details";
 }
-<div class="container-fluid bg-white bg-gradient  shadow p-2">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0 text-primary">
-            <i class="fa-solid fa-building me-2"></i> @ViewData["Title"]
-        </h4>
-        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
+
+<div class="container-fluid px-4 py-3 w-75">
+    <div class="card shadow-lg rounded-4 border-0">
+        <div class="card-header d-flex justify-content-between align-items-center rounded-top-4">
+            <h4 class="mb-0">
+                <i class="fa-solid fa-building me-2"></i> @ViewData["Title"]
+            </h4>
+            <button class="btn btn-sm btn-light text-danger" title="Close" onclick="window.location='./Index'">
+                <i class="fas fa-window-close fa-2xl text-danger"></i>
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-md-8">
+                    <label class="fw-semibold text-secondary">Office Code</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.OffCode</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold text-secondary">Active</label><br/>
+                    <span class="badge @(Model.OfficeCountry.isActive ? "bg-success" : "bg-danger")">
+                        @(Model.OfficeCountry.isActive ? "Yes" : "No")
+                    </span>
+
+                </div>
+
+                <div class="col-md-8">
+                    <label class="fw-semibold text-secondary">Office Name</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.Name</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold text-secondary">Country</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.Country?.Name &nbsp;</div>
+                </div>
+
+                <div class="col-md-8">
+                    <label class="fw-semibold text-secondary">Address</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.Address</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold text-secondary">Remarks</label>
+                    <textarea class="form-control bg-light" rows="2" readonly>@Model.OfficeCountry.Remarks</textarea>
+
+                </div>
+
+                <div class="col-md-8">
+                    <label class="fw-semibold text-secondary">Email</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.Email</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold text-secondary">Contact No</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.ContactNo</div>
+                </div>
+                <hr/>
+                <div class="col-md-3">
+                    <label class="fw-semibold text-secondary">Encoded By</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.EncodedBy</div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="fw-semibold text-secondary">Encode Date</label>
+                    <div class="form-control bg-light">
+                        @Model.OfficeCountry?.EncodeDate?.ToString("yyyy-MM-dd") ?? ""
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="fw-semibold text-secondary">Updated By</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.UpdatedBy &nbsp;</div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="fw-semibold text-secondary">Update Date</label>
+                    <div class="form-control bg-light">@Model.OfficeCountry.UpdateDate?.ToString("yyyy-MM-dd")&nbsp;</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-footer bg-light d-flex justify-content-between rounded-bottom-4">
+            <a asp-page="./Index" class="btn btn-outline-secondary">
+                <i class="fas fa-chevron-left"></i> Back to List
+            </a>
+            <a asp-page="./Edit" asp-route-id="@Model.OfficeCountry.Id" class="btn btn-outline-primary">
+                <i class="fas fa-edit"></i> Edit Office
+            </a>
+        </div>
     </div>
-    <hr />
-
-<div>
-
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.Address)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.Address)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.ContactNo)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.ContactNo)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.Remarks)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.Remarks)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.isActive)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.isActive)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.EncodeDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.EncodeDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.EncodedBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.EncodedBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.UpdateDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.UpdateDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.UpdateddBy)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.UpdateddBy)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OfficeCountry.Country)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OfficeCountry.Country.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.OfficeCountry.Id">Edit</a> 
-    <a asp-page="./Index">Back to List</a>
-</div>
 </div>

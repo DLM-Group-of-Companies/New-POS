@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using NLI_POS.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NLI_POS.Models
 {
-    public class Product
+    public class Product: AuditableEntity
     {
         [Key]
         public int Id { get; set; }
@@ -34,7 +35,7 @@ namespace NLI_POS.Models
         [StringLength(10)]
         public string? ProductClass { get; set; } //Main or Collateral
 
-        public string SKU { get; set; }
+        public string? SKU { get; set; }
 
         [Display(Name = "Freebie Available")]
         public bool isStaffAvailable { get; set; }
@@ -43,10 +44,6 @@ namespace NLI_POS.Models
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
-        public DateTime EncodeDate { get; set; }
-        public string EncodedBy { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public string? UpdateddBy { get; set; }
 
     }
 }

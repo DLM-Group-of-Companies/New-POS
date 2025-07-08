@@ -14,7 +14,12 @@
                role="button"
                aria-expanded="false"
                title="Click here to manage account or logout.">
-                <span>
+                @{
+                    var fullName = User.FindFirst("FullName")?.Value;
+                    var nameLength = fullName?.Length ?? 0;
+                    var spanClass = nameLength > 13 ? "small" : "";
+                }
+                <span class="@spanClass">
                     <span class="icon-container">
                         <i class="fas fa-user-circle fa-xl me-2 "></i>
                     </span>

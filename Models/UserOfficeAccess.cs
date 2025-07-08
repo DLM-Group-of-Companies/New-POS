@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using NLI_POS.Models.Base;
 
 namespace NLI_POS.Models
 {
-    public class UserOfficeAccess
+    public class UserOfficeAccess : AuditableEntity
     {
         [Required]
         public int Id { get; set; }
@@ -17,10 +18,10 @@ namespace NLI_POS.Models
         [ForeignKey("OfficeCountry")]
         public int OfficeId {  get; set; }
 
-        public DateTime EncodeDate { get; set; }
-        public string EncodedBy { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public string? UpdateddBy { get; set; }
+        //public DateTime EncodeDate { get; set; }
+        //public string EncodedBy { get; set; }
+        //public DateTime? UpdateDate { get; set; }
+        //public string? UpdateddBy { get; set; }
 
         [ValidateNever]
         public virtual ApplicationUser User { get; set; }

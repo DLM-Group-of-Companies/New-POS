@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using NLI_POS.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NLI_POS.Models
 {
-    public class Customer
+    public class Customer : AuditableEntity
     {
         [Key]
         public int Id { get; set; }
@@ -42,12 +43,13 @@ namespace NLI_POS.Models
 
         [Required]
         public string Gender { get; set; }
+
         [Required]
         [DataType(DataType.Date)]
         public DateTime Birthday { get; set; }
 
         [Display(Name = "Civil Status")]
-        public string CivilStat { get; set; }
+        public string? CivilStat { get; set; }
 
         [StringLength(200)]
         public string? Address1 { get; set; }
@@ -71,10 +73,10 @@ namespace NLI_POS.Models
         [StringLength(500)]
         public string? Notes { get; set; }
 
-        public DateTime EncodeDate { get; set; }
-        public string EncodedBy { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public string? UpdateddBy { get; set; }
+        //public DateTime EncodeDate { get; set; }
+        //public string EncodedBy { get; set; }
+        //public DateTime? UpdateDate { get; set; }
+        //public string? UpdateddBy { get; set; }
 
         [ValidateNever]
         [Display(Name = "Office")]

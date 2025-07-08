@@ -15,24 +15,24 @@ namespace NLI_POS.Migrations
             migrationBuilder.AlterDatabase()
                 .Annotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.CreateTable(
-                name: "AspNetRoles",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    NormalizedName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+            //migrationBuilder.CreateTable(
+            //    name: "AspNetRoles",
+            //    columns: table => new
+            //    {
+            //        Id = table.Column<string>(type: "varchar(255)", nullable: false)
+            //            .Annotation("MySql:CharSet", "utf8mb4"),
+            //        Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+            //            .Annotation("MySql:CharSet", "utf8mb4"),
+            //        NormalizedName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+            //            .Annotation("MySql:CharSet", "utf8mb4"),
+            //        ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true)
+            //            .Annotation("MySql:CharSet", "utf8mb4")
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+            //    })
+            //    .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Country",
@@ -152,30 +152,30 @@ namespace NLI_POS.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.CreateTable(
-                name: "AspNetRoleClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    RoleId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClaimType = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClaimValue = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+            //migrationBuilder.CreateTable(
+            //    name: "AspNetRoleClaims",
+            //    columns: table => new
+            //    {
+            //        Id = table.Column<int>(type: "int", nullable: false)
+            //            .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+            //        RoleId = table.Column<string>(type: "varchar(255)", nullable: false)
+            //            .Annotation("MySql:CharSet", "utf8mb4"),
+            //        ClaimType = table.Column<string>(type: "longtext", nullable: true)
+            //            .Annotation("MySql:CharSet", "utf8mb4"),
+            //        ClaimValue = table.Column<string>(type: "longtext", nullable: true)
+            //            .Annotation("MySql:CharSet", "utf8mb4")
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+            //        table.ForeignKey(
+            //            name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+            //            column: x => x.RoleId,
+            //            principalTable: "AspNetRoles",
+            //            principalColumn: "Id",
+            //            onDelete: ReferentialAction.Cascade);
+            //    })
+            //    .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "OfficeCountry",

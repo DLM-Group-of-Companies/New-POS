@@ -8,7 +8,7 @@
 
 <hr />
 <h4 class="text-center ">POINT OF SALE</h4>
-<p class="text-center text-info small">Today is @DateTime.UtcNow.AddHours(8).ToString("MMM dd, yyyy") <span id="liveClock" ></span></p>
+<p class="text-center text-info small "><span class="small">Today is @DateTime.UtcNow.AddHours(8).ToString("MMM dd, yyyy") <span id="liveClock"></span></span></p>
 
 <hr />
 
@@ -39,8 +39,9 @@
                 <i class="fas fa-chevron-down small"></i>
             </a>
             <div class="collapse ps-4" id="reportsMenu">
-                <a class="nav-link text-white" asp-page="/Report/DailySales">Daily Sales</a>
-                <a class="nav-link text-white" asp-page="/Report/SalesByDateRange">Sales by Date Range</a>
+                <a class="nav-link text-white" asp-page="/Report/DailySales"><i class="fas fa-calendar-day me-2"></i>Daily Sales</a>
+                <a class="nav-link text-white" asp-page="/Report/SalesByDateRange"><i class="fas fa-calendar-week me-2"></i>Sales by Date Range</a>
+                <a class="nav-link text-white" asp-page="/Report/SalesByDateRange"><i class="fas fa-calendar-alt me-2"></i>Monthly Sales</a>
             </div>
         </li>
 

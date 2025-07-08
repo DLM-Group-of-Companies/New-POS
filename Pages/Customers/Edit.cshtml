@@ -154,7 +154,7 @@
         <input asp-for="Customer.EncodedBy" type="hidden" />
 
         <input asp-for="Customer.UpdateDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
-        <input asp-for="Customer.UpdateddBy" type="hidden" value="@User?.Identity.Name" />
+        <input asp-for="Customer.UpdatedBy" type="hidden" value="@User?.Identity.Name" />
 
         <hr />
         <div class="form-group">

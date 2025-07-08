@@ -23,14 +23,15 @@ namespace NLI_POS.Pages.Orders
         [BindProperty]
         public Order Order { get; set; } = default!;
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        //public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(string? orderNo)
         {
-            if (id == null)
+            if (orderNo == null)
             {
                 return NotFound();
             }
 
-            var order =  await _context.Orders.FirstOrDefaultAsync(m => m.Id == id);
+            var order =  await _context.Orders.FirstOrDefaultAsync(m => m.OrderNo== orderNo);
             if (order == null)
             {
                 return NotFound();

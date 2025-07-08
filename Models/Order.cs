@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using NLI_POS.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NLI_POS.Models
 {
-    public class Order
+    public class Order : AuditableEntity
     {
         [Key]
         public int Id { get; set; }
@@ -54,6 +55,9 @@ namespace NLI_POS.Models
         [Display(Name = "Payment Method")]
         public string PaymentMethod { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
+        public decimal PaidAmount { get; set; }
+
         [Display(Name = "Reference No.")]
         [StringLength(40)]
         public string? RefNo { get; set; }
@@ -61,10 +65,16 @@ namespace NLI_POS.Models
         [StringLength(500)]
         public string? Notes { get; set; }
 
-        public DateTime EncodeDate { get; set; } = DateTime.UtcNow.AddHours(8);
-        public string EncodedBy { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public string? UpdateddBy { get; set; }
+        public bool IsVoided { get; set; }
+        public DateTime? VoidedDate { get; set; }
+        public string? VoidedBy { get; set; }
+        public string? VoidReason { get; set; }
+
+
+        //public DateTime EncodeDate { get; set; } = DateTime.UtcNow.AddHours(8);
+        //public string EncodedBy { get; set; }
+        //public DateTime? UpdateDate { get; set; }
+        //public string? UpdateddBy { get; set; }
 
         [ValidateNever]
         public virtual Product Products { get; set; }

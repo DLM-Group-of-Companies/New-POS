@@ -37,13 +37,13 @@
                     <td class="align-middle">@Html.DisplayFor(modelItem => item.ContactNo)</td>
                     <td class="align-middle">@Html.DisplayFor(modelItem => item.isActive)</td>
                     <td class="align-middle">
-                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-success btn-sm m-1" title="Edit">
+                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-success btn-sm" title="Edit">
                             <i class="far fa-edit"></i>
                         </a>
-                        <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm m-1" title="Details">
+                        <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm" title="Details">
                             <i class="fas fa-info-circle"></i>
                         </a>
-                        <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm m-1" title="Delete">
+                        <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Delete">
                             <i class="fas fa-trash-alt"></i>
                         </a>
                     </td>

@@ -60,6 +60,33 @@
     </div>
 </div>
 
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <!-- Optional: Modal header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Inventory</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <!-- Spinner -->
+                <div id="editInventoryModalLoader" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Loaded form content -->
+                <div id="editInventoryModalContent" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -93,9 +120,16 @@
                     {
                         data: 'id',
                         orderable: false,
-                        render: function (data) {
-                            return `<a  class="btn btn-success btn-sm m-1" title="Edit" href="/Orders/Edit?id=${data}"><i class="far fa-edit"></i></a>`;
-                        }
+    render: function (data, type, row) {
+        return `
+            <button class="btn btn-success btn-sm m-1 edit-btn"
+                    data-id="${data}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editModal"
+                    title="Edit">
+                <i class="far fa-edit"></i>
+            </button>`;
+    }
                     }
                 ],
                 responsive: true,
@@ -126,7 +160,7 @@
                         data: 'id',
                         orderable: false,
                         render: function (data) {
-                            return `<a  class="btn btn-success btn-sm m-1" title="Edit" href="/Orders/Edit?id=${data}"><i class="far fa-edit"></i></a>`;
+                            return `<a  class="btn btn-success btn-sm m-1" title="Edit" href="/Inventory/Edit?id=${data}"><i class="far fa-edit"></i></a>`;
                         }
                     }
                 ],
@@ -158,4 +192,23 @@
             }
         });
     </script>
+
+    <script>
+$(document).on('click', '.edit-btn', function () {
+    const id = $(this).data('id');
+    const url = `/Inventory/Edit?id=${id}&handler=Partial`;
+
+    $('#editInventoryModalLoader').show();                // show spinner
+    $('#editInventoryModalContent').hide().empty();       // clear previous content
+
+    $('#editModal').modal('show');                        // show modal
+
+    // Load partial view
+    $('#editInventoryModalContent').load(url, function () {
+        $('#editInventoryModalLoader').hide();            // hide spinner
+        $('#editInventoryModalContent').fadeIn();         // show content
+    });
+});
+</script>
+
 }

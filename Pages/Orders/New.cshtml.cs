@@ -1,23 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Orders
 {
-    public class NewModel : PageModel
+    [Authorize(Roles = "Admin,CS")]
+    public class NewModel : BasePageModel
     {
         private readonly NLI_POS.Data.ApplicationDbContext _context;
+        protected readonly UserManager<ApplicationUser> _userManager;
 
-        public NewModel(NLI_POS.Data.ApplicationDbContext context)
+        public NewModel(NLI_POS.Data.ApplicationDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
             _context = context;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
         public List<ProductItem> SelectedProducts { get; set; } = new();
+        //public List<ProductItem> Cart { get; set; } = new List<ProductItem>();
+        public List<SelectListItem> OfficeList { get; set; }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
             SelectedProducts = HttpContext.Session.GetObject<List<ProductItem>>("Cart") ?? new List<ProductItem>();
 
@@ -30,7 +38,8 @@ namespace NLI_POS.Pages.Orders
                 .ToList();
 
             ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
-            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            OfficeList = await GetUserOfficesAsync(); //Filters office by Office Assignment
             ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
 
             var products = _context.Products.Where(p => p.IsActive)
@@ -145,7 +154,7 @@ namespace NLI_POS.Pages.Orders
             {
                 return new JsonResult(ProdAmount?.StaffPrice);
             }
-            else if (custclass == "Standard Distributor")
+            else if (custclass == "Standard Distributor" || custclass == "Legacy")
             {
                 return new JsonResult(ProdAmount?.DistPrice);
             }
@@ -193,6 +202,7 @@ namespace NLI_POS.Pages.Orders
             ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
             ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
+            ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
         }
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
@@ -216,7 +226,7 @@ namespace NLI_POS.Pages.Orders
                 // Check if product is a promo bundle
                 if (product != null && product.ProductCategory == "Promo")
                 {
-                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == item.ProductId);
+                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == item.ProductCombo);
 
                     if (combo != null)
                     {
@@ -260,18 +270,28 @@ namespace NLI_POS.Pages.Orders
                 }
             }
 
+            decimal cartTotal = cart.Sum(item => item.Price * item.Quantity);
+
+            //// Compare with PaidAmount
+            //if (Order.PaidAmount < cartTotal)
+            //{
+            //    ModelState.AddModelError(string.Empty, $"Paid amount (₱{Order.PaidAmount:N2}) is less than the total amount due (₱{cartTotal:N2}). Please correct the payment.");
+            //    await LoadDropdownsAsync(); 
+            //    return Page();
+            //}
 
             // Setup base order data
             string orderNo = "";
             bool isUnique = false;
+            var off = await _context.OfficeCountry.FirstOrDefaultAsync(o => o.Id == Order.OfficeId);
 
-            do //Generate Order Number and make sure it will not have duplicates incase multiple users saved record at same time
-            {
+            //do //Generate Order Number and make sure it will not have duplicates incase multiple users saved record at same time
+            //{                
                 long ticks = DateTime.UtcNow.Ticks;
-                orderNo = $"MLAHQ-{ticks.ToString().Substring(0, 10)}";
+                orderNo = $"{off?.OffCode}-{ticks.ToString().Substring(0, 10)}";
 
-                isUnique = !_context.Orders.Any(o => o.OrderNo == orderNo);
-            } while (!isUnique);
+            //    isUnique = !await _context.Orders.AnyAsync(o => o.OrderNo == orderNo);
+            //} while (!isUnique);
 
 
             DateTime encodeDate = DateTime.UtcNow.AddHours(8);
@@ -303,6 +323,7 @@ namespace NLI_POS.Pages.Orders
                     PaymentMethod = Order.PaymentMethod,
                     RefNo = Order.RefNo,
                     EncodedBy = User.Identity.Name,
+                    PaidAmount = Order.PaidAmount,
                     ItemNo = itemNo++
                 };
 
@@ -320,7 +341,7 @@ namespace NLI_POS.Pages.Orders
                 if (product != null && product.ProductCategory == "Promo")
                 {
                     // Promo 
-                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == item.ProductId);
+                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == item.ProductCombo);
                     if (combo != null)
                     {
                         var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
@@ -364,6 +385,7 @@ namespace NLI_POS.Pages.Orders
             await _context.SaveChangesAsync();
 
             HttpContext.Session.Remove("Cart");
+            TempData["SuccessMessage"] = "Order has been successfully submitted.";
             return RedirectToPage("./Details", new { orderNo = orderNo });
         }
 

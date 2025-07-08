@@ -149,11 +149,16 @@
                     </div>
                     <hr />
                     <div class="row  pb-4">
-                        <div class="col-lg-6 col-md-6 col-sm-12 col-12 form-group">
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-12 form-group">
                             <label asp-for="Order.PaymentMethod" class="control-label"></label>
                             <select asp-for="Order.PaymentMethod" class="form-control" asp-items="ViewBag.PaymentMethod"></select>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-12 col-12 form-group">
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-12 form-group">
+                            <label asp-for="Order.PaidAmount" class="control-label"></label>
+                            <input asp-for="Order.PaidAmount" class="form-control" />
+                            <span asp-validation-for="Order.PaidAmount" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-12 form-group">
                             <label asp-for="Order.RefNo" class="control-label"></label>
                             <input asp-for="Order.RefNo" class="form-control" />
                         </div>
@@ -220,7 +225,9 @@
 
     <script>
         //Get Customer Class to determine if Staff. Staff has different price
+
         $('#CustomerId').on('change', function () {
+            showLoader();
             var customerId = $(this).val();
 
             if (customerId) {
@@ -236,6 +243,9 @@
                             $('#CustClassDisplay').text("Not found");
                         }
                     },
+                    complete: function () {
+                        hideLoader(); // hide only when done
+                    },
                     error: function () {
                         alert('Error retrieving customer class');
                     }
@@ -249,6 +259,7 @@
         var amount = 0;
         $(document).ready(function () {
             $('#ProductId').change(function () {
+                showLoader();
                 var selectedProductId = $(this).val();
                 var custclasstxt = $('#CustClassDisplay').text();
                 $("#ComboId").empty();
@@ -268,6 +279,9 @@
                         $("#Price").val(amount);
                         var tot = $("#Qty").val() * amount;
                         $("#Amount").val(tot);
+                    },
+                    complete: function () {
+                        hideLoader(); // hide only when done
                     },
                     failure: function (response) {
                         alert('failure:' + response.responseText);
@@ -296,18 +310,33 @@
 
         $(function () {
             $("#ProductCategory").on("change", function () {
+                showLoader();
                 var category = $(this).val();
                 $("#ProductId").empty();
-                $.getJSON(`?handler=ProductList&ProdCat=${category}`, (data) => {
-                    $.each(data, function (i, item) {
-                        $("#ProductId").append(`<option value="${data[i].value}">${data[i].text}</option>`);
+
+                // Show the loader before the request
+                showLoader();
+
+                $.getJSON(`?handler=ProductList&ProdCat=${category}`)
+                    .done(function (data) {
+                        $.each(data, function (i, item) {
+                            $("#ProductId").append(`<option value="${item.value}">${item.text}</option>`);
+                        });
+                    })
+                    .fail(function () {
+                        toastr.error("Failed to load products.");
+                    })
+                    .always(function () {
+                        // Always hide loader after request completes
+                        hideLoader();
                     });
-                });
             });
         });
 
+
         $(function () {
             $("#OrderType").on("change", function () {
+                showLoader();
                 var type = $(this).val();
                 $("#CustomerId").empty();
                 $("#CustomerId").append("<option value=''>Select</option>");

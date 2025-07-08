@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 
@@ -28,10 +29,20 @@ namespace NLI_POS.Pages.Products
         //To Display existing combos
         public ProductCombo ProductCombs { get; set; }
 
-        public IActionResult OnGet(int? Id)
+        [BindProperty]
+        public string ProductClassInput { get; set; }
+
+        [BindProperty]
+        public ProductPrice ProductPrice { get; set; }
+
+        public List<Country> Countries { get; set; } = new(); // For dropdown
+
+        public async Task<IActionResult> OnGetAsync(int? Id)
         {
+            ProductClassInput = "Collateral"; //Default
             ViewData["ProductType"] = new SelectList(_context.ProductTypes, "Name", "Name");
             ViewData["Product"] = new SelectList(_context.Products.OrderBy(p=>p.ProductName), "Id", "ProductName");
+            Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
             ProductCombos = _context.ProductCombos.Where(p => p.ProductId == Id).ToList();
             return Page();
         }
@@ -70,9 +81,10 @@ namespace NLI_POS.Pages.Products
                 ModelState.Remove("ProductCombos[" + i + "].Products");                
             }
 
-            ModelState.Remove("Products.ProductTypes");
+            //ModelState.Remove("Products.ProductTypes");
 
-            
+            Products.ProductClass = ProductClassInput; //Assign Main or Coll
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -88,8 +100,15 @@ namespace NLI_POS.Pages.Products
                 ProductCombos[j].ProductId = lastId;
             }
             
-
             _context.ProductCombos.AddRange(ProductCombos);
+            await _context.SaveChangesAsync();
+
+            // Set the foreign key
+            ProductPrice.ProductId = Products.Id;
+            ProductPrice.EncodeDate = DateTime.UtcNow.AddHours(8);
+            ProductPrice.EncodedBy = User?.Identity?.Name ?? "SYSTEM";
+
+            _context.ProductPrices.Add(ProductPrice);
             await _context.SaveChangesAsync();
 
             if (Products.ProductCategory == "Promo")

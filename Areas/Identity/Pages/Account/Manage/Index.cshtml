@@ -5,51 +5,48 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 <div class="container-fluid bg-white bg-gradient  shadow p-2">
-<h3>@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
-<div class="row">
-    <div class="col-md-6">
-        <form id="profile-form" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
-                <label asp-for="Username" class="form-label"></label>
-            </div>
-                <div class="form-group">
-                    <label asp-for="Fullname"></label>
-                    <input asp-for="Fullname" class="form-control text-capitalize" />
+    <h3>@ViewData["Title"]</h3>
+    <partial name="_StatusMessage" for="StatusMessage" />
+    <hr />
+    <div class="row">
+        <div>
+            <form id="profile-form" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
+                    <label asp-for="Username" class="form-label"></label>
                 </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label asp-for="Input.PhoneNumber" class="form-label"></label>
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-            </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Fullname" class="form-control text-capitalize" />
+                    <label asp-for="Fullname"></label>
+                    
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
+                    <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                </div>
                 <div class="form-group">
                     <label>Role</label>
                     @{
-                        if (User.IsInRole("ADMIN"))
+                        if (User.IsInRole("Admin"))
                         {
-                            <select asp-for="@Model.role" name="ddlRole" class="form-control text-black-50">
-                                <option value="USER">Staff</option>
-                                <option value="RO">Branch Officer</option>
-                                <option value="ADMIN">Administrator</option>
+                            <select asp-for="@Model.SelectedRoles" asp-items="Model.AllRoles" name="ddlRole" class="form-select text-black-50" multiple size="6">
+                                <option value="">-- Select Role --</option>
                             </select>
                         }
                         else
                         {
-                            <select asp-for="@Model.role" name="ddlRole" class="form-control text-black-50" >
-                                <option value="USER">Staff</option>
-                                <option value="RO">Branch Officer</option>
-                                <option value="ADMIN">Administrator</option>
+                            <select asp-for="@Model.SelectedRoles" asp-items="Model.AllRoles" name="ddlRole" class="form-select text-black-50" multiple size="5" disabled>
                             </select>
                         }
                     }
 
                 </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
-        </form>
+                <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary mt-3">Save</button>
+            </form>
+        </div>
     </div>
-</div>
 </div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

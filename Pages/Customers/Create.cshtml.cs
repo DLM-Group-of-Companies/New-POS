@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,16 +13,18 @@ using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Customers
 {
-    public class CreateModel : PageModel
+    public class CreateModel : BasePageModel
     {
-        private readonly NLI_POS.Data.ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
+        protected readonly UserManager<ApplicationUser> _userManager;
 
-        public CreateModel(NLI_POS.Data.ApplicationDbContext context)
+        public CreateModel(NLI_POS.Data.ApplicationDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
             if (!User.HasPermission("Add"))
             {
@@ -29,14 +32,27 @@ namespace NLI_POS.Pages.Customers
                 return RedirectToPage("./Index");
             }
 
-            ViewData["CustClass"] = new SelectList(_context.CustClass, "Id", "Name");
-            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            //ViewData["CustClass"] = new SelectList(_context.CustClass, "Id", "Name");
+            try
+            {
+                ViewData["CustClass"] = new SelectList(await _context.CustClass.ToListAsync(), "Id", "Name");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to load CustClass", ex);
+            }
+
+
+            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            OfficeList = await GetUserOfficesAsync();
             ViewData["Country"] = new SelectList(_context.Country, "Code", "Name");
             return Page();
         }
 
         [BindProperty]
         public Customer Customer { get; set; } = default!;
+
+        public List<SelectListItem> OfficeList { get; set; }
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
