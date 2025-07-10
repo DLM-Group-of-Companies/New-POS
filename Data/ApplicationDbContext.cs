@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
 using NLI_POS.Models.Base;
+using static NLI_POS.Pages.Orders.NewModel;
 
 namespace NLI_POS.Data
 {
@@ -66,5 +67,8 @@ namespace NLI_POS.Data
         public DbSet<UserOfficeAccess> UserOfficesAccess { get; set; }
         public DbSet<PaymentMethods> PaymentMethods { get; set; }
         public DbSet<ProductPrice> ProductPrices { get; set; }
+        public DbSet<OrderPayment> OrderPayments { get; set; }
+        public DbSet<ProductItem> ProductItems { get; set; }
+        public DbSet<OrderDetails> OrderDetails { get; set; }
     }
 }

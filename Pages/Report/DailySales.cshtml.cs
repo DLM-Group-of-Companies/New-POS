@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Models.ViewModels;
 
 namespace NLI_POS.Pages.Report
 {
@@ -29,6 +25,7 @@ namespace NLI_POS.Pages.Report
         public List<Order> Order { get; set; }
         public List<OfficeCountry> Offices { get; set; }
         public SelectList OfficeList { get; set; }
+        public OrderSummaryViewModel OrderSummary { get; set; }
 
         public void OnGet()
         {
@@ -50,10 +47,11 @@ namespace NLI_POS.Pages.Report
 
             var query = _context.Orders
                 .Include(o => o.Customers)
-                .Include(o => o.Products)
-                .Include(o => o.ProductCombos)
                 .Include(o => o.Office)
+                .Include(o => o.ProductItems)  // ✅ This includes the items with product info already flattened
+                .Include(o => o.Payments)
                 .AsQueryable();
+
 
             if (!string.IsNullOrEmpty(Office))
             {

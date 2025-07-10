@@ -26,8 +26,9 @@ namespace NLI_POS.Pages.Report
         {
             Order = await _context.Orders
                 .Include(o => o.Customers)
-                .Include(o => o.Products)
-                .Include(o => o.ProductCombos)
+                //.Include(o => o.Product)
+                //.Include(o => o.ProductCombos)
+                .Include(o => o.ProductItems)
                 .Include(o => o.Office)
                 .ToListAsync();
 

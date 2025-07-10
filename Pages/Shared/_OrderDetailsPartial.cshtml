@@ -1,5 +1,4 @@
-﻿@model IList<NLI_POS.Models.Order>
-
+﻿@model NLI_POS.Models.ViewModels.OrderSummaryViewModel
 
 <div class="table-responsive">
     <table class="table table-bordered table-hover shadow-sm rounded bg-white">
@@ -9,63 +8,72 @@
                 <th>Category</th>
                 <th>Item(s)</th>
                 <th>Sub-Item(s)</th>
-                <th class="text-end">@Html.DisplayNameFor(model => model[0].Price)</th>
-                <th class="text-end">@Html.DisplayNameFor(model => model[0].Qty)</th>
-                <th class="text-end">@Html.DisplayNameFor(model => model[0].Amount)</th>
+                <th class="text-end">Price</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Amount</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @if (Model.ProductItems != null && Model.ProductItems.Any())
             {
-                <tr>
-                    <td>@item.ItemNo</td>
-                    <td>@item.Products.ProductCategory</td>
-                    <td>@item.Products.ProductName</td>
-                    <td>@item.ProductCombos?.ProductsDesc</td>
-                    <td class="text-end">@item.Price?.ToString("N2")</td>
-                    <td class="text-end">@item.Qty?.ToString("0")</td>
-                    <td class="text-end">@item.Amount?.ToString("N2")</td>
-                    <td></td>
-                </tr>
+                int index = 1;
+                foreach (var item in Model.ProductItems)
+                {
+                    <tr>
+                        <td>@(index++)</td>
+                        <td>@item.ProductCat</td>
+                        <td>@item.ProductName</td>
+                        <td>@item.ComboName</td>
+                        <td class="text-end">@item.Price.ToString("N2")</td>
+                        <td class="text-end">@item.Quantity.ToString("0")</td>
+                        <td class="text-end">@item.Amount.ToString("N2")</td>
+                        <td></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="8" class="text-center text-muted">No items found.</td></tr>
             }
         </tbody>
         <tfoot class="table-light fw-bold">
             <tr>
                 <td colspan="4" class="text-end">Total:</td>
-                <td class="text-end">@Model.Sum(i => i.Price ?? 0).ToString("N2")</td>
-                <td class="text-end">@Model.Sum(i => i.Qty ?? 0).ToString("0")</td>
-                <td class="text-end">@Model.Sum(i => i.Amount ?? 0).ToString("N2")</td>
-                <td></td>
-            </tr>
-            @{
-                //decimal refNoValue = decimal.TryParse(Model.First().RefNo?.ToString(), out var r) ? r : 0;
-                decimal paidAmount = Model.First().PaidAmount;
-                var totalAmount = Model.Sum(i => i.Amount ?? 0);
-                var change = paidAmount - totalAmount;
-                var paymentmode = @Model.First().PaymentMethod;
-            }
-            <tr class="table-light">
-                @if (paymentmode.ToLower() == "cash")
-                {
-                    <td colspan="6" class="text-end">Payment Mode: @paymentmode </td>
-                    <td class="text-end">@paidAmount.ToString("N2")</td>
-                }
-                else
-                {
-                    <td colspan="6" class="text-end">Payment Mode: @paymentmode (Reference #: @Model.First().RefNo) </td>
-                }
+                <td class="text-end">@Model.ProductItems.Sum(i => i.Price).ToString("N2")</td>
+                <td class="text-end">@Model.ProductItems.Sum(i => i.Quantity).ToString("0")</td>
+                <td class="text-end">@Model.ProductItems.Sum(i => i.Amount).ToString("N2")</td>
                 <td></td>
             </tr>
 
-            @if (paymentmode.ToLower() == "cash")
+            @* Payment Summary *@
+            @{
+                var paidAmount = Model.Order.TotPaidAmount;
+                var totalAmount = Model.ProductItems.Sum(i => i.Amount);
+                var change = paidAmount - totalAmount;
+
+                var payments = Model.Payments;
+                var isCash = payments.All(p => p.PayMethod?.ToLower() == "cash");
+            }
+
+            @foreach (var payment in Model.Payments)
             {
+                <tr class="table-light">
+                    <td colspan="4" class="text-end">Payment Method:</td>
+                    <td colspan="2" class="text-end">@payment.PayMethod</td>
+                    <td class="text-end">@payment.Amount.ToString("N2")</td>
+                    <td class="text-muted small">@(!string.IsNullOrWhiteSpace(payment.ReferenceNo) ? $"Ref#: {payment.ReferenceNo}" : "")</td>
+                </tr>
+            }
+
+@*             @if (isCash)
+            { *@
                 <tr class="table-light">
                     <td colspan="6" class="text-end">Change:</td>
                     <td class="text-end">@change.ToString("N2")</td>
                     <td></td>
                 </tr>
-            }
+            @* } *@
         </tfoot>
     </table>
 </div>

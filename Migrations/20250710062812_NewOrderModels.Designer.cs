@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NLI_POS.Data;
 
@@ -11,9 +12,11 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250710062812_NewOrderModels")]
+    partial class NewOrderModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -617,42 +620,6 @@ namespace NLI_POS.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("NLI_POS.Models.OrderDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ComboId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<string>("ProductCategory")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ComboId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderDetails");
-                });
-
             modelBuilder.Entity("NLI_POS.Models.OrderPayment", b =>
                 {
                     b.Property<int>("Id")
@@ -1126,21 +1093,6 @@ namespace NLI_POS.Migrations
                     b.Navigation("Customers");
 
                     b.Navigation("Office");
-                });
-
-            modelBuilder.Entity("NLI_POS.Models.OrderDetails", b =>
-                {
-                    b.HasOne("NLI_POS.Models.ProductCombo", "ProductCombos")
-                        .WithMany()
-                        .HasForeignKey("ComboId");
-
-                    b.HasOne("NLI_POS.Models.Product", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductId");
-
-                    b.Navigation("ProductCombos");
-
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OrderPayment", b =>

@@ -16,101 +16,21 @@
     <p>
         <a class="btn btn-primary btn-gradient" asp-page="Create"><i class="fas fa-user-plus"></i> Add Customer</a>
     </p>
-    <div class="table-scroll-container">
-        <table id="customerTable" class="table table-striped table-sm">
+
+    <table id="customerTable" class="table table-striped table-sm">
         <thead class="table-primary">
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Customer[0].CustCode)
-                </th>
-
-                <th>
-                    @Html.DisplayNameFor(model => model.Customer[0].FirstName)
-                </th>
-
-                <th>
-                    @Html.DisplayNameFor(model => model.Customer[0].LastName)
-                </th>
-
-                <th>
-                    Contact Number(s)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Customer[0].Email)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Customer[0].City)
-                </th>
-
-@* 
-                <th>
-                    @Html.DisplayNameFor(model => model.Customer[0].OfficeCountry)
-                </th> *@
-                <th>
-                    @Html.DisplayNameFor(model => model.Customer[0].CustClasses)
-                </th>
-                <th></th>
+                <th>Cust Code</th>
+                <th>Full Name</th>
+                <th>Contact No.</th>
+                <th>Email</th>
+                <th>City</th>
+                <th>Class</th>
+                <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach (var item in Model.Customer)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CustCode)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.FirstName)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.LastName)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.MobileNo)
-                        @if (!string.IsNullOrWhiteSpace(item.LandlineNo))
-                        {
-                            <span> | @Html.DisplayFor(modelItem => item.LandlineNo)</span>
-                        }
-
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.City)
-                    </td>
-
-@*                     <td>
-                        @Html.DisplayFor(modelItem => item.OfficeCountry.Name)
-                    </td> *@
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CustClasses.Name)
-                    </td>
-                    <td class="text-nowrap">
-                        
-                            <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-success btn-sm" title="Edit"><i class="fas fa-user-edit"></i></a>
-                            <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm " title="Details"><i class="fas fa-user-tag"></i></a>
-                            @* <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Delete"><i class="fas fa-user-times"></i></a> *@
-                            <button type="button"
-                                    class="btn btn-danger btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteCustomerModal"
-                                    data-id="@item.Id"
-                                    data-name="@($"{@item.CustCode}: {item.FirstName} {item.LastName}")"
-                                    title="Delete">
-                                <i class="fas fa-user-times"></i>
-                            </button>
-
-                       
-                    </td>
-                </tr>
-            }
-        </tbody>
     </table>
-</div>
+
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -152,91 +72,89 @@
     var canDelete = User.HasPermission("Delete");
 }
 
-<script>
-    document.getElementById("preloader").style.display = "flex";
+@section Scripts {
+    <script>
+        const userCanDelete = @User.HasPermission("Delete").ToString().ToLower();
 
-    $(document).ready(function () {
-        $('#customerTable').DataTable({
-            responsive: true,
-            dom: 'Bfrtip',
-            responsive: true,
-            buttons: [
-                {
-                    extend: 'copy',
-                    className: 'btn btn-sm btn-outline-secondary',
-                    exportOptions: { columns: ':not(:last-child)' }
+        $(document).ready(function () {
+            const table = $('#customerTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '@Url.Page("Index", "Data")',
+                    type: 'GET'
                 },
-                {
-                    extend: 'csv',
-                    className: 'btn btn-sm btn-outline-success',
-                    exportOptions: { columns: ':not(:last-child)' }
-                },
-                {
-                    extend: 'excel',
-                    className: 'btn btn-sm btn-outline-success',
-                    exportOptions: { columns: ':not(:last-child)' }
-                },
-                {
-                    extend: 'pdfHtml5',
-                    orientation: 'landscape',
-                    className: 'btn btn-sm btn-outline-danger',
-                    exportOptions: { columns: ':not(:last-child)' }
-                },
-                {
-                    extend: 'print',
-                    className: 'btn btn-sm btn-outline-dark',
-                    exportOptions: { columns: ':not(:last-child)' }
+                columns: [
+                    { data: 'custCode' },
+                    { data: 'fullName' },
+                    { data: 'mobile' },
+                    { data: 'email' },
+                    { data: 'city' },
+                    { data: 'className' },
+                    {
+                        data: 'id',
+                        render: function (data, type, row) {
+                            let name = `${row.custCode}: ${row.firstName} ${row.lastName}`;
+                            return `
+                                <a href="/Customers/Edit?id=${data}" class="btn btn-success btn-sm" title="Edit"><i class="fas fa-user-edit"></i></a>
+                        <a href="/Customers/Details?id=${data}" class="btn btn-primary btn-sm" title="Details"><i class="fas fa-user-tag"></i></a>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal" data-id="${data}" data-name="${name}" title="Delete">
+                            <i class="fas fa-user-times"></i>
+                        </button>
+                        `;
+                        },
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            // Optional: Preloader logic (only if you have #preloader in your HTML)
+            $('#customerTable').on('preXhr.dt', function () {
+                showLoader();
+            });
+            $('#customerTable').on('xhr.dt', function () {
+                hideLoader();
+            });
+
+            // Delete modal logic
+            const deleteModal = document.getElementById('deleteCustomerModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                if (!userCanDelete) {
+                    event.preventDefault();
+                    toastr.error("You are not authorized to delete.");
+                    return;
                 }
 
-            ],
-            columnDefs: [
-                { responsivePriority: 1, targets: 0 },  // CustCode (important)
-                { responsivePriority: 2, targets: 1 },  // FirstName
-                { responsivePriority: 3, targets: 2 },  // LastName
-                { responsivePriority: 4, targets: 3 },  // Contact Numbers
-                { responsivePriority: 5, targets: 4 },  // Province
-                { responsivePriority: 6, targets: 5 },  // City
-                // { responsivePriority: 7, targets: 6 },  // OfficeCountry
-                { responsivePriority: 7, targets: 7 },  // CustClasses
-                { responsivePriority: 10001, targets: 7 } // Edit/Delete links - lowest priority
-            ],
-            initComplete: function () {
-                // Hide the loader when DataTable finishes initializing
-                document.getElementById("preloader").style.display = "none";
-            }
+                const button = event.relatedTarget;
+                const customerId = button.getAttribute('data-id');
+                const customerName = button.getAttribute('data-name');
+
+                document.getElementById('deleteCustomerId').value = customerId;
+                document.getElementById('deleteCustomerName').textContent = customerName;
+            });
         });
-    });
+    </script>
 
-    // Show loader on AJAX request
-    $('#customerTable').on('preXhr.dt', function () {
-        $('#preloader').show();
-    });
+    <script>
+        const userCanDelete = @User.HasPermission("Delete").ToString().ToLower(); // outputs true or false
 
-    // Hide loader when data is loaded
-    $('#customerTable').on('xhr.dt', function () {
-        $('#preloader').hide();
-    });
+        // Listen to modal's "show" event
+        const deleteModal = document.getElementById('deleteCustomerModal');
 
-</script>
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            if (!userCanDelete) {
+                event.preventDefault(); // 🔴 Stop the modal from opening
+                toastr.error("You are not authorized to delete.");
+                return;
+            }
 
-<script>
-    const userCanDelete = @User.HasPermission("Delete").ToString().ToLower(); // outputs true or false
+            const button = event.relatedTarget;
+            const customerId = button.getAttribute('data-id');
+            const customerName = button.getAttribute('data-name');
 
-    // Listen to modal's "show" event
-    const deleteModal = document.getElementById('deleteCustomerModal');
-
-    deleteModal.addEventListener('show.bs.modal', function (event) {
-        if (!userCanDelete) {
-            event.preventDefault(); // 🔴 Stop the modal from opening
-            toastr.error("You are not authorized to delete.");
-            return;
-        }
-
-        const button = event.relatedTarget;
-        const customerId = button.getAttribute('data-id');
-        const customerName = button.getAttribute('data-name');
-
-        document.getElementById('deleteCustomerId').value = customerId;
-        document.getElementById('deleteCustomerName').textContent = customerName;
-    });
-</script>
+            document.getElementById('deleteCustomerId').value = customerId;
+            document.getElementById('deleteCustomerName').textContent = customerName;
+        });
+    </script>
+}

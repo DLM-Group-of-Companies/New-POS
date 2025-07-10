@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using NLI_POS.Data;
 using NLI_POS.Models;
 using NLI_POS.Services;
+using System.Linq.Dynamic.Core;
 
 namespace NLI_POS.Pages.Customers
 {
@@ -22,13 +18,74 @@ namespace NLI_POS.Pages.Customers
             _context = context;
         }
 
-        public IList<Customer> Customer { get;set; } = default!;
+        public IList<Customer> Customer { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Customer = await _context.Customer
+            //Customer = await _context.Customer
+            //    .Include(c => c.CustClasses)
+            //    .Include(c => c.OfficeCountry).ToListAsync();
+        }
+
+        public async Task<IActionResult> OnGetDataAsync()
+        {
+            var requestForm = Request.Query;
+
+            var draw = requestForm["draw"].FirstOrDefault();
+            var start = Convert.ToInt32(requestForm["start"]);
+            var length = Convert.ToInt32(requestForm["length"]);
+            var sortColumnIndex = Convert.ToInt32(requestForm["order[0][column]"]);
+            var sortDirection = requestForm["order[0][dir]"].FirstOrDefault();
+            var searchValue = requestForm["search[value]"].FirstOrDefault();
+
+            string[] columnNames = { "custCode", "fullName", "email", "mobile", "landline", "city", "className" };
+
+
+            var query = _context.Customer
                 .Include(c => c.CustClasses)
-                .Include(c => c.OfficeCountry).ToListAsync();
+                .Include(c => c.OfficeCountry)
+                .AsNoTracking()
+                .Select(c => new
+                {
+                    id = c.Id,
+                    custCode = c.CustCode,
+                    fullName = c.FirstName + " " + c.LastName,
+                    email = c.Email,
+                    mobile = c.MobileNo,
+                    landline = c.LandlineNo,
+                    city = c.City,
+                    country = c.OfficeCountry != null ? c.OfficeCountry.Name : "",
+                    className = c.CustClasses != null ? c.CustClasses.Name : ""
+                });
+
+            if (!string.IsNullOrWhiteSpace(searchValue))
+            {
+                query = query.Where(c =>
+                c.custCode.Contains(searchValue) ||
+                    c.fullName.Contains(searchValue) ||
+                    c.email.Contains(searchValue) ||
+                    c.mobile.Contains(searchValue) ||
+                    c.landline.Contains(searchValue) ||
+                    c.city.Contains(searchValue) ||
+                    c.className.Contains(searchValue));
+            }
+
+            var totalRecords = await query.CountAsync();
+
+            var sortedColumn = columnNames[sortColumnIndex];
+            var data = await query
+                .OrderBy($"{sortedColumn} {sortDirection}")
+                .Skip(start)
+                .Take(length)
+                .ToListAsync();
+
+            return new JsonResult(new
+            {
+                draw = draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = totalRecords,
+                data = data
+            });
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int id)

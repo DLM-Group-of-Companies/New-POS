@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NLI_POS.Migrations;
 using NLI_POS.Models;
 using NLI_POS.Services;
 
@@ -23,38 +24,37 @@ namespace NLI_POS.Pages.Orders
 
         public List<ProductItem> SelectedProducts { get; set; } = new();
         public List<OfficeSelectItem> OfficeList { get; set; }
+
         [BindProperty]
-        public Order Order { get; set; } = default!;
+        public Order Order { get; set; } = new();
+
         [BindProperty]
-        public List<OrderPayment> Payments { get; set; } = new(); //Payment Methods
+        public List<OrderPayment> Payments { get; set; } = new();
+
+        [BindProperty]
+        public List<OrderDetails> OrderDetails { get; set; } = new();
+
 
         public async Task<IActionResult> OnGetAsync()
         {
             SelectedProducts = HttpContext.Session.GetObject<List<ProductItem>>("Cart") ?? new List<ProductItem>();
 
-            var customer = _context.Customer
-                .Select(p => new
+            ViewData["CustomerId"] = new SelectList(_context.Customer
+                .Select(c => new
                 {
-                    Id = p.Id,
-                    FullName = p.CustCode + " | " + p.FirstName + " " + p.LastName
-                })
-                .ToList();
-
-            ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
-            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+                    c.Id,
+                    FullName = c.CustCode + " | " + c.FirstName + " " + c.LastName
+                }), "Id", "FullName");
             OfficeList = await GetUserOfficesAsync(); //Filters office by Office Assignment
-            ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
 
-            var products = _context.Products.Where(p => p.IsActive)
-            .Select(p => new { p.Id, p.ProductName })
-            .ToList();
 
-            // Insert default item at the top
-            products.Insert(0, new { Id = 0, ProductName = "-- Select --" });
+            //ViewData["ProductId"] = new SelectList(await _context.Products
+            //    .Where(p => p.IsActive)
+            //    .Select(p => new { p.Id, p.ProductName })
+            //    .ToListAsync(), "Id", "ProductName");
 
-            ViewData["ProductId"] = new SelectList(products, "Id", "ProductName");
+            ViewData["PaymentMethod"] = new SelectList(await _context.PaymentMethods.ToListAsync(), "Name", "Name");
 
-            //ViewData["ProductCombos"] = new SelectList(_context.ProductCombos, "Id", "ProductsDesc");
             return Page();
         }
 
@@ -64,7 +64,7 @@ namespace NLI_POS.Pages.Orders
                 .Where(p => p.IsActive && p.ProductCategory == categoryId)
                 .Select(p => new { id = p.Id, name = p.ProductName })
                 .ToList();
-
+                
             return new JsonResult(products);
         }
 
@@ -95,15 +95,13 @@ namespace NLI_POS.Pages.Orders
                 })
                 .ToList();
 
-
-            //SectionList.Insert(0, new SelectListItem { Text = "--Select Product--", Value = "" });
             if (SectionList.Count == 0)
             {
                 SectionList.Insert(0, new SelectListItem { Text = "No Product Available", Value = "" });
             }
             else
             {
-                SectionList.Insert(0, new SelectListItem { Text = "--Select--", Value = "" });
+                SectionList.Insert(0, new SelectListItem { Text = "-- Select --", Value = "" });
             }
             return new JsonResult(SectionList);
         }
@@ -210,13 +208,13 @@ namespace NLI_POS.Pages.Orders
         {
 
             var cart = HttpContext.Session.GetObject<List<ProductItem>>("Cart");
-            if (cart == null || !cart.Any())
-            {
-                ModelState.AddModelError("", "Cart is empty. Please add products.");
-                await LoadDropdownsAsync(); // Reload select lists
-                ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
-                return Page();
-            }
+            //if (cart == null || !cart.Any())
+            //{
+            //    ModelState.AddModelError("", "Cart is empty. Please add products.");
+            //    await LoadDropdownsAsync(); // Reload select lists
+            //    ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
+            //    return Page();
+            //}
 
             // Check inventory before proceeding
             foreach (var item in cart)
@@ -287,8 +285,8 @@ namespace NLI_POS.Pages.Orders
 
             //do //Generate Order Number and make sure it will not have duplicates incase multiple users saved record at same time
             //{                
-                long ticks = DateTime.UtcNow.Ticks;
-                orderNo = $"{off?.OffCode}-{ticks.ToString().Substring(0, 10)}";
+            long ticks = DateTime.UtcNow.Ticks;
+            orderNo = $"{off?.OffCode}-{ticks.ToString().Substring(0, 10)}";
 
             //    isUnique = !await _context.Orders.AnyAsync(o => o.OrderNo == orderNo);
             //} while (!isUnique);
@@ -302,40 +300,8 @@ namespace NLI_POS.Pages.Orders
 
             string orderType = oType?.CustClasses?.Name ?? "Others";
 
-            int itemNo = 1;
-
-            foreach (var item in cart)
-            {
-                var order = new Order
-                {
-                    OrderNo = orderNo,
-                    OrderDate = encodeDate.Date,
-                    EncodeDate = encodeDate,
-                    CustomerId = Order.CustomerId,
-                    OfficeId = Order.OfficeId,
-                    OrderType = orderType,
-                    ProductCategory = item.ProductCat,
-                    ProductId = item.ProductId,
-                    ComboId = item.ProductCombo,
-                    Qty = item.Quantity,
-                    Price = item.Price,
-                    Amount = item.Price * item.Quantity,
-                    PaymentMethod = Order.PaymentMethod,
-                    RefNo = Order.RefNo,
-                    EncodedBy = User.Identity.Name,
-                    PaidAmount = Payments.Sum(p => p.Amount),
-                    ItemNo = itemNo++
-                };
-
-
-                _context.Orders.Add(order);
-            }
-
-            await _context.SaveChangesAsync();
-
-
-            //Payment Methods
-            var orders = new Order
+            // Parent Order
+            var order = new Order
             {
                 OrderNo = orderNo,
                 OrderDate = encodeDate.Date,
@@ -344,20 +310,50 @@ namespace NLI_POS.Pages.Orders
                 OfficeId = Order.OfficeId,
                 OrderType = orderType,
                 EncodedBy = User.Identity.Name,
-                PaidAmount = Payments.Sum(p => p.Amount),
-                Notes = Order.Notes,
-                PaymentMethod = null, // Remove if you use multiple payments
-                RefNo = null // Remove if you use multiple payments
+                TotPaidAmount = Payments.Sum(p => p.Amount),
+                Notes = Order.Notes
             };
 
-            orders.Payments = Payments;
-            //foreach (var payment in Payments)
-            //{
-                //payment.Order = orders; // optional if navigation property is configured
-                                       // OR just rely on Order.Payments collection being assigned
-            //}
-            _context.Orders.Add(orders);
+            // Attach Product Items
+            int itemNo = 1;
+            order.ProductItems = cart.Select(item => new ProductItem
+            {
+                ProductId = item.ProductId,
+                ProductCat = item.ProductCat,
+                ProductName = item.ProductName,
+                ProductCombo = item.ProductCombo,
+                ComboName = item.ComboName,
+                Price = item.Price,
+                Quantity = item.Quantity,
+                Amount = item.Price * item.Quantity,
+                ItemNo = itemNo++
+            }).ToList();
+
+            // Attach Payments
+            order.Payments = Payments;
+
+            // Save entire order graph
+            _context.Orders.Add(order);
             await _context.SaveChangesAsync();
+
+            // Save OrderDetails (normalized version of product items)
+            foreach (var item in order.ProductItems)
+            {
+                var detail = new OrderDetails
+                {
+                    OrderId = order.Id,
+                    ProductId = item.ProductId,
+                    ComboId = item.ProductCombo,
+                    ProductCategory = item.ProductCat,
+                    Price = item.Price,
+                    Quantity = item.Quantity
+                    // No need to assign TotalPrice; it's a computed property
+                };
+
+                _context.OrderDetails.Add(detail);
+            }
+            await _context.SaveChangesAsync();
+
 
             // ✅ Update the inventory
             foreach (var item in cart)
@@ -415,12 +411,67 @@ namespace NLI_POS.Pages.Orders
             return RedirectToPage("./Details", new { orderNo = orderNo });
         }
 
+        //public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId)
+        //{
+        //    var stock = await _context.InventoryStocks
+        //        .FirstOrDefaultAsync(s => s.ProductId == productId && s.OfficeId == officeId);
+
+        //    return new JsonResult(stock?.StockQty ?? 0);
+        //}
+
+        //Verify Stocks
         public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId)
         {
-            var stock = await _context.InventoryStocks
-                .FirstOrDefaultAsync(s => s.ProductId == productId && s.OfficeId == officeId);
+            // Get the product to determine if it's Promo or Regular
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
-            return new JsonResult(stock?.StockQty ?? 0);
+            if (product == null)
+            {
+                return new JsonResult(0);
+            }
+
+            if (product.ProductCategory == "Promo")
+            {
+                // It's a promo item — find the corresponding combo
+                var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == productId);
+
+                if (combo == null)
+                {
+                    return new JsonResult(0); // No combo found
+                }
+
+                var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
+                var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
+
+                int minBundles = int.MaxValue;
+
+                for (int i = 0; i < productIds.Count; i++)
+                {
+                    int componentId = productIds[i];
+                    int requiredQtyPerBundle = qtyList[i];
+
+                    var stock = await _context.InventoryStocks
+                        .FirstOrDefaultAsync(s => s.ProductId == componentId && s.OfficeId == officeId);
+
+                    int available = stock?.StockQty ?? 0;
+
+                    // Determine how many full bundles can be made based on this component
+                    int bundles = available / requiredQtyPerBundle;
+
+                    if (bundles < minBundles)
+                        minBundles = bundles;
+                }
+
+                return new JsonResult(minBundles);
+            }
+            else
+            {
+                // Regular product
+                var stock = await _context.InventoryStocks
+                    .FirstOrDefaultAsync(s => s.ProductId == productId && s.OfficeId == officeId);
+
+                return new JsonResult(stock?.StockQty ?? 0);
+            }
         }
 
 
@@ -438,6 +489,11 @@ namespace NLI_POS.Pages.Orders
 
         public class ProductItem
         {
+            public int Id { get; set; }
+
+            public int OrderId { get; set; }                 // Foreign key
+            public virtual Order Order { get; set; }         // Navigation property
+
             public int ProductId { get; set; }
             public string ProductCat { get; set; }
             public string ProductName { get; set; }
@@ -445,7 +501,11 @@ namespace NLI_POS.Pages.Orders
             public string ComboName { get; set; }
             public decimal Price { get; set; }
             public int Quantity { get; set; }
+            public decimal Amount { get; set; }
+
+            public int ItemNo { get; set; } // optional
         }
+
 
         public IActionResult OnPostSyncCart([FromBody] List<ProductItem> updatedCart)
         {
@@ -515,7 +575,9 @@ namespace NLI_POS.Pages.Orders
         {
             //Search Customers via Modal
             var results = _context.Customer
-                .Where(c => c.FirstName.Contains(term) || c.LastName.Contains(term) || c.CustCode.Contains(term) || c.MobileNo.Contains(term) || c.Email.Contains(term))
+                .Where(c => (c.FirstName + " " + c.LastName).Contains(term) ||  // Full name
+                    c.FirstName.Contains(term) || c.LastName.Contains(term) || c.CustCode.Contains(term) || 
+                    c.MobileNo.Contains(term) || c.Email.Contains(term))
                 .Select(c => new
                 {
                     id = c.Id,

@@ -47,7 +47,7 @@ namespace NLI_POS.Pages.Customers
                 return NotFound();
             }
 
-            var customer = await _context.Customer.Include(c=>c.OfficeCountry).Include(c=>c.CustClasses).FirstOrDefaultAsync(m => m.Id == id);
+            var customer = await _context.Customer.Include(c => c.OfficeCountry).Include(c => c.CustClasses).FirstOrDefaultAsync(m => m.Id == id);
             ViewData["Country"] = _context.Country.FirstOrDefault(c => c.Code == customer.Country).Name;
             if (customer == null)
             {
@@ -57,10 +57,11 @@ namespace NLI_POS.Pages.Customers
             {
                 Customer = customer;
                 Order = _context.Orders
-                    .Where(o=>o.CustomerId== id)
+                    .Where(o => o.CustomerId == id)
                           .Include(o => o.Customers)
                           .Include(o => o.Office)
-                          .Include(o => o.Products)
+                //.Include(o => o.Product)
+                .Include(o => o.ProductItems)
                           .AsEnumerable()
                           .GroupBy(o => new
                           {
@@ -78,7 +79,7 @@ namespace NLI_POS.Pages.Customers
                               OrderDate = g.Key.OrderDate,
                               CustomerName = g.Key.CustomerName,
                               Office = g.Key.OfficeName,
-                              TotAmount = (decimal)g.Sum(x => x.Amount)
+                              TotAmount = (decimal)g.Sum(x => x.TotPaidAmount)
                           })
                           .ToList();
             }

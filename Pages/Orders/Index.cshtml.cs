@@ -23,7 +23,7 @@ namespace NLI_POS.Pages.Orders
             var orders = _context.Orders
                 .Include(o => o.Customers)
                 .Include(o => o.Office)
-                .Include(o => o.Products)
+                .Include(o => o.ProductItems)
                 .GroupBy(o => new
                 {
                     o.OrderNo,
@@ -42,7 +42,7 @@ namespace NLI_POS.Pages.Orders
                     CustomerName = g.Key.CustomerName,
                     Office = g.Key.OfficeName,
                     isVoided = g.Key.IsVoided,
-                    TotAmount = g.Sum(x => x.Amount)
+                    TotAmount = g.Sum(x => x.TotPaidAmount)
                 })
                 .ToList();
 

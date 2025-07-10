@@ -2,6 +2,7 @@
 using NLI_POS.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static NLI_POS.Pages.Orders.NewModel;
 
 namespace NLI_POS.Models
 {
@@ -10,7 +11,7 @@ namespace NLI_POS.Models
         [Key]
         public int Id { get; set; }
 
-        //[Required]
+        [Required]
         [Display(Name = "Order No.")]
         public string OrderNo { get; set; }
 
@@ -31,36 +32,8 @@ namespace NLI_POS.Models
         [Display(Name = "Order Type")]
         public string OrderType { get; set; }
 
-        [Display(Name = "Product Category")]
-        [StringLength(20)]
-        public string? ProductCategory { get; set; }
 
-        [ForeignKey("Products")]
-        [Display(Name = "Product")]
-        public int? ProductId { get; set; }
-
-        [ForeignKey("ProductCombos")]
-        [Display(Name = "Product Combination")]
-        public int? ComboId { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
-        public decimal? Price { get; set; }
-
-        [Display(Name = "Quantity")]
-        public int? Qty { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
-        public decimal? Amount { get; set; }
-
-        [Display(Name = "Payment Method")]
-        public string PaymentMethod { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
-        public decimal PaidAmount { get; set; }
-
-        [Display(Name = "Reference No.")]
-        [StringLength(40)]
-        public string? RefNo { get; set; }
+        public decimal TotPaidAmount { get; set; }
 
         [StringLength(500)]
         public string? Notes { get; set; }
@@ -70,16 +43,8 @@ namespace NLI_POS.Models
         public string? VoidedBy { get; set; }
         public string? VoidReason { get; set; }
 
+        public virtual ICollection<ProductItem> ProductItems { get; set; } = new List<ProductItem>();
 
-        //public DateTime EncodeDate { get; set; } = DateTime.UtcNow.AddHours(8);
-        //public string EncodedBy { get; set; }
-        //public DateTime? UpdateDate { get; set; }
-        //public string? UpdateddBy { get; set; }
-
-        [ValidateNever]
-        public virtual Product Products { get; set; }
-        [ValidateNever]
-        public virtual ProductCombo ProductCombos { get; set; }
         [ValidateNever]
         public virtual Customer Customers { get; set; }
         [ValidateNever]

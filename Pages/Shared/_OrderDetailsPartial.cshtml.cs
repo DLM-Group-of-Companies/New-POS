@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using NLI_POS.Data;
-using NLI_POS.Models;
+using NLI_POS.Models.ViewModels;
 
 namespace NLI_POS.Pages.Shared
 {
@@ -19,15 +14,51 @@ namespace NLI_POS.Pages.Shared
             _context = context;
         }
 
-        public IList<Order> Order { get;set; } = default!;
+        //public IList<Order> Order { get;set; } = default!;
 
-        public async Task OnGetAsync()
+        public OrderSummaryViewModel OrderSummary { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(int? id)
         {
-            Order = await _context.Orders
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var order = await _context.Orders
                 .Include(o => o.Customers)
                 .Include(o => o.Office)
-                .Include(o => o.ProductCombos)
-                .Include(o => o.Products).ToListAsync();
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            var items = await _context.ProductItems
+                .Where(p => p.OrderId == order.Id)
+                .ToListAsync();
+
+            var payments = await _context.OrderPayments
+                .Where(p => p.OrderId == order.Id)
+                .ToListAsync();
+
+            OrderSummary = new OrderSummaryViewModel
+            {
+                Order = order,
+                ProductItems = await _context.ProductItems
+                    .Where(p => p.OrderId == order.Id)
+                    .ToListAsync(),
+
+                Payments = await _context.OrderPayments
+                    .Where(p => p.OrderId == order.Id)
+                    .ToListAsync()
+            };
+
+
+            return Page();
         }
+
+
     }
 }

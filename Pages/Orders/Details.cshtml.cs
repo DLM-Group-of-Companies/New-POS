@@ -8,6 +8,8 @@ using NLI_POS.Models;
 using MailKit.Net.Smtp;
 using MimeKit.Text;
 using NLI_POS.Services;
+using NLI_POS.Models.ViewModels;
+using static NLI_POS.Pages.Orders.NewModel;
 
 namespace NLI_POS.Pages.Orders
 {
@@ -24,31 +26,124 @@ namespace NLI_POS.Pages.Orders
 
         [BindProperty]
         public Order Order { get; set; } = default!;
-        public IList<Order> OrderList { get; set; } = default!;
-
+        public OrderSummaryViewModel OrderSummary { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string? orderNo)
         {
-            if (orderNo == null)
+            if (string.IsNullOrEmpty(orderNo))
             {
                 return NotFound();
             }
 
-            var order = await _context.Orders.Include(o => o.Office).Include(o => o.Customers).ThenInclude(c => c.CustClasses).Include(p => p.ProductCombos).FirstOrDefaultAsync(m => m.OrderNo == orderNo);
-            if (order == null)
+            var baseOrder = await _context.Orders
+                .Include(o => o.Office)
+                .Include(o => o.Customers)
+                    .ThenInclude(c => c.CustClasses)
+                .FirstOrDefaultAsync(o => o.OrderNo == orderNo);
+
+            if (baseOrder == null)
             {
                 return NotFound();
             }
-            else
-            {
-                Order = order;
-            }
 
-            var orderlist = _context.Orders.Include(o => o.Products).Where(m => m.OrderNo == order.OrderNo).ToList();
-            OrderList = orderlist;
+            Order = baseOrder;
+
+            // Load associated line items (product rows)
+            var productItems = await _context.ProductItems
+                .Where(pi => pi.OrderId == baseOrder.Id)
+                .Select(pi => new ProductItem
+                {
+                    ProductId = pi.ProductId,
+                    ProductCat = pi.ProductCat,
+                    ProductName = pi.ProductName,
+                    ProductCombo = pi.ProductCombo,
+                    ComboName = pi.ComboName,
+                    Price = pi.Price,
+                    Quantity = pi.Quantity,
+                    Amount = pi.Price * pi.Quantity
+                })
+                .ToListAsync();
+
+            var payments = await _context.OrderPayments
+                .Where(p => p.OrderId == baseOrder.Id)
+                .ToListAsync();
+
+            OrderSummary = new OrderSummaryViewModel
+            {
+                Order = baseOrder,
+                ProductItems = productItems,
+                Payments = payments
+            };
+
             return Page();
         }
 
+
+        //public async Task<IActionResult> OnPostVoidAsync()
+        //{
+        //    if (Order == null || string.IsNullOrEmpty(Order.OrderNo))
+        //        return NotFound();
+
+        //    var order = await _context.Orders
+        //        .Include(o => o.ProductItems)
+        //        .FirstOrDefaultAsync(o => o.OrderNo == Order.OrderNo);
+
+        //    if (order == null)
+        //        return NotFound();
+
+        //    if (order.IsVoided)
+        //        return RedirectToPage(new { orderNo = order.OrderNo });
+
+        //    // Flag as void
+        //    order.IsVoided = true;
+        //    order.VoidedDate = DateTime.Now;
+        //    order.VoidedBy = User.Identity?.Name ?? "System";
+
+        //    // Restock items
+        //    // ✅ Reverse the inventory
+        //    if (order.Products != null && order.Products.ProductCategory == "Promo")
+        //    {
+        //        // Promo: unpack the combo
+        //        var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == order.ComboId);
+        //        if (combo != null)
+        //        {
+        //            var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
+        //            var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
+
+        //            for (int i = 0; i < productIds.Count; i++)
+        //            {
+        //                int componentProductId = productIds[i];
+        //                int restockQty = qtyList[i] * order.Qty.Value;
+
+        //                var inventory = await _context.InventoryStocks
+        //                    .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == order.OfficeId);
+
+        //                if (inventory != null)
+        //                {
+        //                    inventory.StockQty += restockQty;
+        //                    _context.InventoryStocks.Update(inventory);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // Regular product
+        //        var inventory = await _context.InventoryStocks
+        //            .FirstOrDefaultAsync(i => i.ProductId == order.ProductId && i.OfficeId == order.OfficeId);
+
+        //        if (inventory != null)
+        //        {
+        //            inventory.StockQty += order.Qty.Value;
+        //            _context.InventoryStocks.Update(inventory);
+        //        }
+        //    }
+
+        //     await _context.SaveChangesAsync();
+
+        //    TempData["SuccessMessage"] = "Order has been successfully voided.";
+        //    return RedirectToPage(new { orderNo = order.OrderNo });
+        //}
 
         public async Task<IActionResult> OnPostVoidAsync()
         {
@@ -56,7 +151,6 @@ namespace NLI_POS.Pages.Orders
                 return NotFound();
 
             var order = await _context.Orders
-                .Include(o => o.Products)
                 .FirstOrDefaultAsync(o => o.OrderNo == Order.OrderNo);
 
             if (order == null)
@@ -67,54 +161,65 @@ namespace NLI_POS.Pages.Orders
 
             // Flag as void
             order.IsVoided = true;
-            order.VoidedDate = DateTime.Now;
+            order.VoidedDate = DateTime.UtcNow.AddHours(8);
             order.VoidedBy = User.Identity?.Name ?? "System";
+            _context.Orders.Update(order);
 
-            // Restock items
-            // ✅ Reverse the inventory
-            if (order.Products != null && order.Products.ProductCategory == "Promo")
+            // ✅ Load all associated items
+            var productItems = await _context.ProductItems
+                .Where(p => p.OrderId == order.Id)
+                .ToListAsync();
+
+            foreach (var item in productItems)
             {
-                // Promo: unpack the combo
-                var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == order.ComboId);
-                if (combo != null)
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product == null) continue;
+
+                if (product.ProductCategory == "Promo")
                 {
-                    var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
-                    var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
-
-                    for (int i = 0; i < productIds.Count; i++)
+                    // Promo: restock components
+                    var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == item.ProductCombo);
+                    if (combo != null)
                     {
-                        int componentProductId = productIds[i];
-                        int restockQty = qtyList[i] * order.Qty.Value;
+                        var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
+                        var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
 
-                        var inventory = await _context.InventoryStocks
-                            .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == order.OfficeId);
-
-                        if (inventory != null)
+                        for (int i = 0; i < productIds.Count; i++)
                         {
-                            inventory.StockQty += restockQty;
-                            _context.InventoryStocks.Update(inventory);
+                            int componentProductId = productIds[i];
+                            int restockQty = qtyList[i] * item.Quantity;
+
+                            var inventory = await _context.InventoryStocks
+                                .FirstOrDefaultAsync(inv => inv.ProductId == componentProductId && inv.OfficeId == order.OfficeId);
+
+                            if (inventory != null)
+                            {
+                                inventory.StockQty += restockQty;
+                                _context.InventoryStocks.Update(inventory);
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                // Regular product
-                var inventory = await _context.InventoryStocks
-                    .FirstOrDefaultAsync(i => i.ProductId == order.ProductId && i.OfficeId == order.OfficeId);
-
-                if (inventory != null)
+                else
                 {
-                    inventory.StockQty += order.Qty.Value;
-                    _context.InventoryStocks.Update(inventory);
+                    // Regular product restock
+                    var inventory = await _context.InventoryStocks
+                        .FirstOrDefaultAsync(inv => inv.ProductId == item.ProductId && inv.OfficeId == order.OfficeId);
+
+                    if (inventory != null)
+                    {
+                        inventory.StockQty += item.Quantity;
+                        _context.InventoryStocks.Update(inventory);
+                    }
                 }
             }
 
-             await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Order has been successfully voided.";
             return RedirectToPage(new { orderNo = order.OrderNo });
         }
+
 
         public class EmailRequest
         {
