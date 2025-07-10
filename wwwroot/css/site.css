@@ -1,22 +1,30 @@
 ﻿/* ---------------------------------------
    GLOBAL BASE STYLES
 ---------------------------------------- */
-
 html, body {
-    position: relative;
-    min-height: 100%;
     margin: 0;
-    padding-bottom: 60px;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden; /* prevents horizontal scroll */
+
     background-image: url('/images/main.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    /* Fix scrollbar issue */
-    width: 100%; /* ✅ Use this */
-    overflow: hidden; /* ✅ Prevent horizontal scroll */
 }
 
+    /* Wrap content in a container that reserves space for the footer */
+    body > .content-wrapper {
+        min-height: calc(100vh - 80px); /* Adjust to match your footer height */
+        padding-bottom: 80px; /* Avoid content hiding under footer */
+        box-sizing: border-box;
+    }
+
+.main-content {
+    padding-bottom: 40px; /* 👈 Same or slightly more than footer height */
+}
 
 @media (min-width: 768px) {
     html {
@@ -65,6 +73,9 @@ input[type="number"] {
     padding: 10px;
 }
 
+/*.paginate_button{
+    font-size:small;
+}*/
 .validation-summary-errors ul {
     margin-bottom: 2px;
     padding-left: 20px;
@@ -214,7 +225,7 @@ input[type="number"] {
     cursor: move;
 }
 
-@media (min-width: 768px) {
+/*@media (min-width: 768px) {
     .icon-container-main {
         position: relative;
         height: 100vh;
@@ -228,10 +239,10 @@ input[type="number"] {
 
         .draggable-icon img {
             width: 100%;
-        }
+        }*/
 
     /* Icon positioning classes for desktop */
-    .pos-orders {
+    /*.pos-orders {
         top: 100px;
         left: 300px;
     }
@@ -265,7 +276,114 @@ input[type="number"] {
         top: 300px;
         left: 800px;
     }
+}*/
+
+.icon-container-main {
+    display: flex;
+    height: calc(100vh - 60px); /* reserve space for footer */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem; /* adds spacing between icons */
+    padding: 1rem;
+    /*height: auto;*/
 }
+
+.icon-wrapper {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem; /* spacing inside wrapper too */
+}
+
+.draggable-icon {
+    position: static;
+    width: 100px;
+    text-align: center;
+}
+
+    .draggable-icon img {
+        width: 100%;
+        height: auto;
+    }
+
+:root {
+    --footer-height: 60px;
+}
+
+@media (min-width: 768px) {
+    .icon-container-main {
+        height: calc(100vh - var(--footer-height));
+    }
+
+    .icon-wrapper {
+        height: calc(400px - var(--footer-height));
+    }
+}
+
+@media (min-width: 768px) {
+    .icon-container-main {
+        position: relative;
+        height: calc(100vh - 60px); /* reserve space for footer */
+        /*height: 100vh;*/
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .icon-wrapper {
+        position: relative;
+        width: 600px; /* adjust based on total icon spread */
+        height: 400px; /* adjust based on number of rows */
+    }
+
+    .draggable-icon {
+        position: absolute !important;
+        width: 100px;
+    }
+
+        .draggable-icon img {
+            width: 100%;
+        }
+
+    /* Icon positions relative to wrapper */
+    .pos-orders {
+        top: 0;
+        left: 0;
+    }
+
+    .pos-customers {
+        top: 0;
+        left: 200px;
+    }
+
+    .pos-reports {
+        top: 0;
+        left: 400px;
+    }
+
+    .pos-products {
+        top: 200px;
+        left: 0;
+    }
+
+    .pos-inventory {
+        top: 200px;
+        left: 200px;
+    }
+
+    .pos-office {
+        top: 200px;
+        left: 400px;
+    }
+
+    .pos-users {
+        top: 400px;
+        left: 200px;
+    }
+    /* optional third row */
+}
+
 
 /* Icon spacing in sidebar menu (if used) */
 .icon-container,

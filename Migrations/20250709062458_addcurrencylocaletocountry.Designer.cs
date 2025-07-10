@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NLI_POS.Data;
 
@@ -11,9 +12,11 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709062458_addcurrencylocaletocountry")]
+    partial class addcurrencylocaletocountry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -648,34 +651,6 @@ namespace NLI_POS.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("NLI_POS.Models.OrderPayment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PayMethod")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ReferenceNo")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderPayment");
-                });
-
             modelBuilder.Entity("NLI_POS.Models.PaymentMethods", b =>
                 {
                     b.Property<int>("Id")
@@ -1087,17 +1062,6 @@ namespace NLI_POS.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("NLI_POS.Models.OrderPayment", b =>
-                {
-                    b.HasOne("NLI_POS.Models.Order", "Order")
-                        .WithMany("Payments")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
             modelBuilder.Entity("NLI_POS.Models.ProductCombo", b =>
                 {
                     b.HasOne("NLI_POS.Models.Product", "Products")
@@ -1145,11 +1109,6 @@ namespace NLI_POS.Migrations
                     b.Navigation("OfficeCountry");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NLI_POS.Models.Order", b =>
-                {
-                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

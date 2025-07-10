@@ -22,8 +22,11 @@ namespace NLI_POS.Pages.Orders
         }
 
         public List<ProductItem> SelectedProducts { get; set; } = new();
-        //public List<ProductItem> Cart { get; set; } = new List<ProductItem>();
-        public List<SelectListItem> OfficeList { get; set; }
+        public List<OfficeSelectItem> OfficeList { get; set; }
+        [BindProperty]
+        public Order Order { get; set; } = default!;
+        [BindProperty]
+        public List<OrderPayment> Payments { get; set; } = new(); //Payment Methods
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -186,9 +189,6 @@ namespace NLI_POS.Pages.Orders
             //return new JsonResult(0);
         }
 
-        [BindProperty]
-        public Order Order { get; set; } = default!;
-
         private async Task LoadDropdownsAsync()
         {
             var customer = await _context.Customer
@@ -200,12 +200,12 @@ namespace NLI_POS.Pages.Orders
                 .ToListAsync();
 
             ViewData["CustomerId"] = new SelectList(customer, "Id", "FullName");
-            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            OfficeList = await GetUserOfficesAsync(); //Filters office by Office Assignment
             ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
             ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
         }
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
 
@@ -323,7 +323,7 @@ namespace NLI_POS.Pages.Orders
                     PaymentMethod = Order.PaymentMethod,
                     RefNo = Order.RefNo,
                     EncodedBy = User.Identity.Name,
-                    PaidAmount = Order.PaidAmount,
+                    PaidAmount = Payments.Sum(p => p.Amount),
                     ItemNo = itemNo++
                 };
 
@@ -331,6 +331,32 @@ namespace NLI_POS.Pages.Orders
                 _context.Orders.Add(order);
             }
 
+            await _context.SaveChangesAsync();
+
+
+            //Payment Methods
+            var orders = new Order
+            {
+                OrderNo = orderNo,
+                OrderDate = encodeDate.Date,
+                EncodeDate = encodeDate,
+                CustomerId = Order.CustomerId,
+                OfficeId = Order.OfficeId,
+                OrderType = orderType,
+                EncodedBy = User.Identity.Name,
+                PaidAmount = Payments.Sum(p => p.Amount),
+                Notes = Order.Notes,
+                PaymentMethod = null, // Remove if you use multiple payments
+                RefNo = null // Remove if you use multiple payments
+            };
+
+            orders.Payments = Payments;
+            //foreach (var payment in Payments)
+            //{
+                //payment.Order = orders; // optional if navigation property is configured
+                                       // OR just rely on Order.Payments collection being assigned
+            //}
+            _context.Orders.Add(orders);
             await _context.SaveChangesAsync();
 
             // ✅ Update the inventory
@@ -388,6 +414,16 @@ namespace NLI_POS.Pages.Orders
             TempData["SuccessMessage"] = "Order has been successfully submitted.";
             return RedirectToPage("./Details", new { orderNo = orderNo });
         }
+
+        public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId)
+        {
+            var stock = await _context.InventoryStocks
+                .FirstOrDefaultAsync(s => s.ProductId == productId && s.OfficeId == officeId);
+
+            return new JsonResult(stock?.StockQty ?? 0);
+        }
+
+
 
         public class ProductInput
         {

@@ -38,6 +38,20 @@ namespace NLI_POS.Data
             return await base.SaveChangesAsync(cancellationToken);
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Order>()
+                .HasMany(o => o.Payments)
+                .WithOne(p => p.Order)
+                .HasForeignKey(p => p.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ... other configurations
+        }
+
+
         public DbSet<Customer> Customer { get; set; }
         public DbSet<CustClass> CustClass { get; set; }
         public DbSet<Country> Country { get; set; }

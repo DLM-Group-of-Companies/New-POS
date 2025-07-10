@@ -32,8 +32,16 @@
                 <div class="col-md-4">
                     <label asp-for="Customer.OfficeId" class="form-label">Office <span class="text-danger">*</span></label>
                     @* <select asp-for="Customer.OfficeId" class="form-select" asp-items="ViewBag.OfficeId"> *@
-                    <select asp-for="Customer.OfficeId" class="form-select" asp-items="Model.OfficeList">
+                    <select asp-for="Customer.OfficeId" class="form-select"> @* asp-items="Model.OfficeList"> *@
                         <option value="">Select</option>
+                        @foreach (var office in Model.OfficeList) // assuming it's assigned to your ViewModel
+                        {
+                            <option value="@office.Value"
+                                    data-locale="@office.Locale"
+                                    data-currency="@office.CurrencyCode">
+                                @office.Text
+                            </option>
+                        }
                     </select>
                     <span asp-validation-for="Customer.OfficeId" class="text-danger small"></span>
                 </div>

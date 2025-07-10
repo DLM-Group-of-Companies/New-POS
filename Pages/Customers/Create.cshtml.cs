@@ -24,6 +24,8 @@ namespace NLI_POS.Pages.Customers
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
+        public List<OfficeSelectItem> OfficeList { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
             if (!User.HasPermission("Add"))
@@ -51,8 +53,6 @@ namespace NLI_POS.Pages.Customers
 
         [BindProperty]
         public Customer Customer { get; set; } = default!;
-
-        public List<SelectListItem> OfficeList { get; set; }
 
         // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()

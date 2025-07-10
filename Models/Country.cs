@@ -11,5 +11,7 @@ namespace NLI_POS.Models
         [Display(Name="Active")]
         public bool IsActive { get; set; }
         public string TimeZone { get; set; }
+        public string Locale { get; set; } // "en-PH"
+        public string CurrencyCode { get; set; } //"PHP", SGD..
     }
 }

@@ -5,7 +5,7 @@
 @{
     ViewData["Title"] = "New Order";
 }
-<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-3">
+<div class="container-fluid bg-white bg-gradient shadow p-3">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h4 class="mb-0 text-primary">
             <i class="fas fa-cart-plus me-2"></i> New Order
@@ -14,7 +14,9 @@
     </div>
     <hr />
 
-    <form method="post" onsubmit="return validateAndShowLoader(this)" id="myForm">
+    @* <form method="post" onsubmit="return validateAndShowLoader(this)" id="myForm"> *@
+    <form method="post" id="myForm">
+
         <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75 mb-2"></div>
 
         <div class="row">
@@ -26,7 +28,17 @@
                     <div class="row">
                         <div class="col-6 mb-2">
                             <label asp-for="Order.OfficeId" class="form-label"></label>
-                            <select id="OfficeId" asp-for="Order.OfficeId" class="form-select" asp-items="Model.OfficeList"></select>
+                            <select id="OfficeId" asp-for="Order.OfficeId" class="form-select">
+                                @*  asp-items="Model.OfficeList"></select> *@
+                                @foreach (var office in Model.OfficeList) // assuming it's assigned to your ViewModel
+                                {
+                                    <option value="@office.Value"
+                                            data-locale="@office.Locale"
+                                            data-currency="@office.CurrencyCode">
+                                        @office.Text
+                                    </option>
+                                }
+                            </select>
                         </div>
                         <div class="col-6 mb-2">
                             <label asp-for="Order.OrderDate" class="form-label"></label>
@@ -83,17 +95,17 @@
                         </div>
                         <div class="col-md-8 mb-2">
                             <label asp-for="Order.Amount" class="form-label"></label>
-                            <input id="Amount" asp-for="Order.Amount" class="form-control" />
+                            <input id="Amount" asp-for="Order.Amount" class="form-control fw-bold" value="@(Model.Order != null ? Model.Order.Amount?.ToString("N2") ?? "0.00" : "0.00")" />
                             <span asp-validation-for="Order.Amount" class="text-danger small"></span>
                         </div>
                     </div>
-                    <input id="Price" asp-for="Order.Price" type="hidden" data-name="Price" />
+                    <input id="Price" asp-for="Order.Price" type="hidden" data-name="Price" value="@(Model.Order != null ? Model.Order.Price?.ToString("N2") ?? "0.00" : "0.00")" />
                     <input asp-for="Order.ItemNo" type="hidden" />
                 </div>
 
                 <div class="d-flex justify-content-end">
                     <button type="button" class="btn btn-primary" onclick="addProduct()">
-                        <i class="fas fa-cart-plus"></i> Add to Cart
+                        <i class="fas fa-cart-plus me-2"></i> Add to Cart
                     </button>
                 </div>
             </div>
@@ -101,7 +113,7 @@
             <div class="col-lg-8">
                 <!-- Cart Section -->
                 <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-shopping-cart text-secondary"></i> Cart</h5>
+                    <h5 class="text-dark border-bottom pb-1 mb-2"><i class="fas fa-shopping-cart text-secondary"></i> Cart</h5>
                     <div class="table-responsive">
                         <table id="cartTable" class="table table-bordered table-sm small align-middle">
                             <thead class="table-secondary">
@@ -123,7 +135,7 @@
                                 <tr>
                                     <th>Total Amount Due</th>
                                     <td colspan="3"></td>
-                                    <td><strong>₱<span id="grandTotal">0</span></strong></td>
+                                    <td><strong><span id="grandTotal">0</span></strong></td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -135,21 +147,75 @@
                 <div class="p-3 bg-light border rounded shadow-sm mb-2">
                     <h5 class="text-secondary border-bottom pb-1 mb-2"><i class="fas fa-credit-card text-warning"></i> Payment</h5>
                     <div class="row mb-2">
-                        <div class="col-md-4">
-                            <label asp-for="Order.PaymentMethod" class="form-label"></label>
-                            <select asp-for="Order.PaymentMethod" class="form-select" asp-items="ViewBag.PaymentMethod"></select>
+                        <select id="paymentOptionsSource" class="d-none">
+                            @foreach (var method in ViewBag.PaymentMethod as SelectList)
+                            {
+                                <option value="@method.Value">@method.Text</option>
+                            }
+                        </select>
+                        <table class="table table-sm" id="paymentTable">
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Amount</th>
+                                    <th>Ref No.</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentTableBody">
+                                <tr>
+                                    <td>
+                                        <select name="Payments[0].PayMethod" class="form-select">
+                                            @foreach (var method in ViewBag.PaymentMethod as SelectList)
+                                            {
+                                                <option value="@method.Value">@method.Text</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Payments[0].Amount" class="form-control payment-amount" />
+                                        <span asp-validation-for="Payments[0].Amount" class="text-danger small"></span>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Payments[0].RefNo" class="form-control" />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger" title="Delete this payment method" onclick="removePaymentRow(this)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-warning text-white " title="Add payment method" onclick="addPaymentRow()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <div id="paymentError" class="text-danger small mb-2" style="display:none;"></div>
+                            </tfoot>
+                        </table>
+                        @*  <div id="colPaymentMethod" class="col-md-3">
+                        <label asp-for="Order.PaymentMethod" class="form-label"></label>
+                        <select asp-for="Order.PaymentMethod" class="form-select" asp-items="ViewBag.PaymentMethod"></select>
                         </div>
-                        <div class="col-md-4">
-                            <label asp-for="Order.PaidAmount" class="form-label">Paid Amount</label>
-                            <input asp-for="Order.PaidAmount" class="form-control" id="paidAmount" />
-                            <span asp-validation-for="Order.PaidAmount" class="text-danger small"></span>
-                            <div id="paymentError" class="text-danger small mb-2" style="display:none;"></div>
+                        <div id="colPaidAmount" class="col-md-3">
+                        <label asp-for="Order.PaidAmount" class="form-label">Paid Amount</label>
+                        <input asp-for="Order.PaidAmount" class="form-control" id="paidAmount" />
+                        <span asp-validation-for="Order.PaidAmount" class="text-danger small"></span>
+                        <div id="paymentError" class="text-danger small mb-2" style="display:none;"></div>
                         </div>
-                        <div class="col-md-4">
-                            <label id="PaymentRef" class="form-label">Reference No.</label>
-                            <input id="RefNo" asp-for="Order.RefNo" class="form-control" />
+                        <div id="colRefNo" class="col-md-4">
+                        <label id="PaymentRef" class="form-label">Reference No.</label>
+                        <input id="RefNo" asp-for="Order.RefNo" class="form-control" required />
                         </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-warning " onclick="addPaymentRow()">
+                        <i class="fas fa-plus"></i>
+                        </button>
+                        </div> *@
                     </div>
+
                     <div class="mb-2">
                         <label asp-for="Order.Notes" class="form-label"></label>
                         <textarea asp-for="Order.Notes" class="form-control" rows="3"></textarea>
@@ -157,7 +223,7 @@
                 </div>
                 <div class="d-flex justify-content-end pt-3">
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> Save
+                        <i class="fa-solid fa-share me-2"></i> Place Order
                     </button>
                 </div>
             </div>
@@ -198,12 +264,189 @@
     </div>
 </div>
 
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script>
+        // Cart Scripts
+        let cart = [];
+
+        function addProduct() {
+            const validationSummary = document.querySelector('.validation-summary-errors');
+            if (validationSummary) {
+                validationSummary.innerHTML = '';
+                validationSummary.style.display = 'none';
+            }
+
+            if ($('#CustomerId').val() === "") {
+                toastr.warning('Please select a customer.');
+                return;
+            }
+
+            const prodCat = $('#ProductCategory option:selected').text();
+            const selectedProductId = $('#ProductId').val();
+            const selectedProductText = $('#ProductId option:selected').text();
+            const comboId = $('#ComboId').val();
+            const comboText = $('#ComboId option:selected').text();
+            let rawAmount = $('#Amount').val();
+            let price = parseFloat(rawAmount.replace(/,/g, ''));
+            let qty = parseInt($('#Qty').val()) || 1;
+
+            // ✅ INSERT STOCK CHECK HERE
+            const officeId = $('#OfficeId').val();
+
+            $.ajax({
+                url: "?handler=GetStock",
+                type: 'GET',
+                data: {
+                    productId: selectedProductId,
+                    officeId: officeId
+                },
+                success: function (availableStock) {
+                    if (qty > availableStock) {
+                        toastr.error(`Not enough stock for ${selectedProductText}. Available: ${availableStock}, Requested: ${qty}`);
+                        return;
+                    }
+
+                    // ✅ Proceed with adding to cart
+                    const existing = cart.find(p => p.productId === parseInt(selectedProductId));
+                    if (existing) {
+                        existing.quantity += qty;
+                    } else {
+                        cart.push({
+                            productId: parseInt(selectedProductId),
+                            productCat: prodCat,
+                            productName: selectedProductText,
+                            productCombo: comboId ? parseInt(comboId) : null,
+                            comboName: comboText,
+                            price,
+                            quantity: qty
+                        });
+                    }
+
+                    syncCartWithServer();
+                    updateCartTable();
+                },
+                error: function () {
+                    toastr.error('Error checking stock.');
+                }
+            });
+        }
+
+        function updateCartTable() {
+            const tbody = $('#cartTable tbody').empty();
+            let total = 0;
+
+            if (cart.length === 0) {
+                tbody.append('<tr><td colspan="6" class="text-center text-muted">No items in cart.</td></tr>');
+            } else {
+                cart.forEach(item => {
+                    total += item.price * item.quantity;
+
+                    const formattedPrice = new Intl.NumberFormat(locale, {
+                        style: 'currency',
+                        currency: currency
+                    }).format(item.price);
+
+                    const totalItem = item.price * item.quantity;
+                    const formattedTotalItem = new Intl.NumberFormat(locale, {
+                        style: 'currency',
+                        currency: currency
+                    }).format(totalItem);
+
+                    tbody.append(`
+                                                                                                        <tr>
+                                                                                                            <td>${item.productName}</td>
+                                                                                                            <td>${item.comboName}</td>
+                                                                                                            <td>${formattedPrice}</td>
+                                                                                                            <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                                                                    <td>${formattedTotalItem}</td>
+                                                                                                            <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                                                                        </tr>`);
+                });
+            }
+
+            const formattedTotal = new Intl.NumberFormat(locale, {
+                style: 'currency',
+                currency: currency
+            }).format(total);
+
+            $('#grandTotal').text(formattedTotal);
+            $('#ProductCategory, #ProductId, #ComboId, #Price, #Qty, #Amount').val('');
+        }
+
+        function editQuantity(productId, qty) {
+            const product = cart.find(p => p.productId === productId);
+            if (product) {
+                product.quantity = parseInt(qty);
+                syncCartWithServer();
+                updateCartTable();
+            }
+        }
+
+        function removeProduct(productId) {
+            cart = cart.filter(p => p.productId !== productId);
+            syncCartWithServer();
+            updateCartTable();
+        }
+
+        function syncCartWithServer() {
+            fetch('?handler=SyncCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': gettoken()
+                },
+                body: JSON.stringify(cart)
+            });
+        }
+
+        function saveOrder() {
+            if (!cart.length) {
+                toastr.warning('Your cart is empty.');
+                return;
+            }
+
+            const form = $('form')[0];
+            const formData = new FormData(form);
+
+            fetch('?handler=SaveOrder', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': gettoken() },
+                body: formData
+            }).then(res => {
+                if (res.ok) {
+                    alert('Order saved successfully!');
+                    cart = [];
+                    updateCartTable();
+                } else {
+                    res.text().then(text => alert('Failed: ' + text));
+                }
+            }).catch(err => {
+                alert('Error: ' + err.message);
+            });
+        }
+    </script>
+
+    <script>
+        let locale = 'en-PH';
+        let currency = 'PHP';
+
+        $(function () {
+            const selectedOption = $('#OfficeId option:selected');
+            locale = selectedOption.data('locale') || 'en-PH';
+            currency = selectedOption.data('currency') || 'PHP';
+
+            console.log('Initial locale:', locale);
+            console.log('Initial currency:', currency);
+        });
+    </script>
+
+    <script>
+
         // Show loader on page load
         document.addEventListener("DOMContentLoaded", function () {
             showLoader();
@@ -331,7 +574,8 @@
 
             $('#Qty').on('input', function () {
                 const tot = $(this).val() * amount;
-                $('#Amount').val(tot);
+                let formattedTotal = tot.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                $('#Amount').val(formattedTotal);
             });
         });
 
@@ -371,126 +615,7 @@
 
     </script>
 
-    <script>
-        // Cart Scripts
-        let cart = [];
 
-        function addProduct() {
-            const validationSummary = document.querySelector('.validation-summary-errors');
-            if (validationSummary) {
-                validationSummary.innerHTML = '';
-                validationSummary.style.display = 'none';
-            }
-
-            if ($('#CustomerId').val() === "") {
-                toastr.warning('Please select a customer.');
-                return;
-            }
-
-            const prodCat = $('#ProductCategory option:selected').text();
-            const selectedProductId = $('#ProductId').val();
-            const selectedProductText = $('#ProductId option:selected').text();
-            const comboId = $('#ComboId').val();
-            const comboText = $('#ComboId option:selected').text();
-            const price = parseFloat($('#Price').val());
-            let qty = parseInt($('#Qty').val()) || 1;
-
-            const existing = cart.find(p => p.productId === parseInt(selectedProductId));
-            if (existing) {
-                existing.quantity += qty;
-            } else {
-                cart.push({
-                    productId: parseInt(selectedProductId),
-                    productCat: prodCat,
-                    productName: selectedProductText,
-                    productCombo: comboId ? parseInt(comboId) : null,
-                    comboName: comboText,
-                    price,
-                    quantity: qty
-                });
-            }
-
-            syncCartWithServer();
-            updateCartTable();
-        }
-
-        function updateCartTable() {
-            const tbody = $('#cartTable tbody').empty();
-            let total = 0;
-
-            if (cart.length === 0) {
-                tbody.append('<tr><td colspan="6" class="text-center text-muted">No items in cart.</td></tr>');
-            } else {
-                cart.forEach(item => {
-                    total += item.price * item.quantity;
-                    tbody.append(`
-                                                                <tr>
-                                                                    <td>${item.productName}</td>
-                                                                    <td>${item.comboName}</td>
-                                                                    <td>₱${item.price.toFixed(2)}</td>
-                                                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                                    <td>₱${(item.price * item.quantity).toFixed(2)}</td>
-                                                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                                </tr>`);
-                });
-            }
-
-            $('#grandTotal').text(total.toFixed(2));
-            $('#ProductCategory, #ProductId, #ComboId, #Price, #Qty, #Amount').val('');
-        }
-
-        function editQuantity(productId, qty) {
-            const product = cart.find(p => p.productId === productId);
-            if (product) {
-                product.quantity = parseInt(qty);
-                syncCartWithServer();
-                updateCartTable();
-            }
-        }
-
-        function removeProduct(productId) {
-            cart = cart.filter(p => p.productId !== productId);
-            syncCartWithServer();
-            updateCartTable();
-        }
-
-        function syncCartWithServer() {
-            fetch('?handler=SyncCart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': gettoken()
-                },
-                body: JSON.stringify(cart)
-            });
-        }
-
-        function saveOrder() {
-            if (!cart.length) {
-                toastr.warning('Your cart is empty.');
-                return;
-            }
-
-            const form = $('form')[0];
-            const formData = new FormData(form);
-
-            fetch('?handler=SaveOrder', {
-                method: 'POST',
-                headers: { 'RequestVerificationToken': gettoken() },
-                body: formData
-            }).then(res => {
-                if (res.ok) {
-                    alert('Order saved successfully!');
-                    cart = [];
-                    updateCartTable();
-                } else {
-                    res.text().then(text => alert('Failed: ' + text));
-                }
-            }).catch(err => {
-                alert('Error: ' + err.message);
-            });
-        }
-    </script>
 
     <script>
         function openCustomerSearchModal() {
@@ -510,14 +635,14 @@
 
                 data.forEach(customer => {
                     tbody.append(`
-                                                                <tr>
-                                                                    <td>${customer.custcode}</td>
-                                                                    <td>${customer.name}</td>
-                                                                    <td>${customer.email}</td>
-                                                                    <td>${customer.phone}</td>
-                                                                    <td><button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>Select</button></td>
-                                                                </tr>
-                                                            `);
+                                                    <tr>
+                                                        <td>${customer.custcode}</td>
+                                                        <td>${customer.name}</td>
+                                                        <td>${customer.email}</td>
+                                                        <td>${customer.phone}</td>
+                                                        <td><button class="btn btn-sm btn-success" onclick='selectCustomer(${JSON.stringify(customer)})'>Select</button></td>
+                                                    </tr>
+                                                `);
                 });
             });
         });
@@ -528,30 +653,6 @@
             $('#customerSearchModal').modal('hide');
         }
 
-        // Payment type switch
-        $(function () {
-            const methodSelect = $('[name="Order.PaymentMethod"]');
-            const paymentRefLabel = $('#PaymentRef');
-            const refNoInput = $('#RefNo');
-
-            function updateRefLabel() {
-                const method = methodSelect.val().toLowerCase();
-                if (method === 'cash') {
-                    // paymentRefLabel.text("Cash Amount");
-                    // refNoInput.attr("type", "number").attr("placeholder", "Enter cash amount");
-                    $('#PaymentRef').hide();
-                    $('#RefNo').hide();
-                } else {
-                    $('#PaymentRef').show();
-                    $('#RefNo').show();
-                    paymentRefLabel.text("Reference No.");
-                    refNoInput.attr("type", "text").attr("placeholder", "Enter reference number");
-                }
-            }
-
-            updateRefLabel();
-            methodSelect.on('change', updateRefLabel);
-        });
     </script>
 
     @if (!ViewData.ModelState.IsValid)
@@ -560,20 +661,117 @@
     }
 
     <script>
-        document.querySelector('form').addEventListener('submit', function (e) {
-            const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
-                            let totalText = document.getElementById('grandTotal').textContent;
-                                let grandTotal = parseFloat(totalText) || 0;
+        let paymentIndex = 1;
 
-                                            if (paidAmount < grandTotal) {
-                                                        hideLoader();
-                    e.preventDefault();
-                    document.getElementById('paymentError').style.display = 'block';
-                    document.getElementById('paymentError').textContent =
-                                `Paid amount (₱${paidAmount.toFixed(2)}) is less than the total amount due (₱${grandTotal.toFixed(2)}). Please correct the payment.`;
+        function addPaymentRow() {
+            const options = $('#paymentOptionsSource').html();
 
-                                    }
-                                });
+            const row = `
+                                        <tr>
+                                            <td>
+                                                <select name="Payments[${paymentIndex}].PayMethod" class="form-select">
+                                            ${options}
+                                        </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="Payments[${paymentIndex}].Amount" class="form-control payment-amount" />
+                                            </td>
+                                            <td>
+                                                <input type="text" name="Payments[${paymentIndex}].RefNo" class="form-control" />
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+
+                                        </tr>
+                                    `;
+
+            $('#paymentTableBody').append(row);
+            paymentIndex++;
+        }
+
+        function removePaymentRow(button) {
+            const row = $(button).closest('tr');
+            const rowCount = $('#paymentTable tbody tr').length;
+
+            if (rowCount > 1) {
+                row.remove();
+            } else {
+                toastr.warning("At least one payment method is required.");
+            }
+        }
+
+
+        // // ✅ Add default row on page load
+        // $(document).ready(function () {
+        //     addPaymentRow();
+        // });
+
+
     </script>
+    @*     <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            let totalPaid = 0;
+
+            // Sum all .payment-amount fields
+            $('.payment-amount').each(function () {
+                let val = parseFloat($(this).val().replace(/,/g, '')) || 0;
+                totalPaid += val;
+            });
+
+            // Get the grand total
+            let grandText = $('#grandTotal').text().replace(/[^\d.-]/g, '');
+            let grandTotal = parseFloat(grandText) || 0;
+
+            if (totalPaid < grandTotal) {
+                e.preventDefault(); // Stop the form from submitting
+                hideLoader();
+                // Show validation message
+                $('#paymentError').show().text(
+                    `Total paid (${totalPaid.toLocaleString(locale, { style: 'currency', currency })}) is less than order total (${grandTotal.toLocaleString(locale, { style: 'currency', currency })}).`
+                );
+
+                return false;
+            }
+        });
+    </script> *@
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            let totalPaid = 0;
+
+            // Sum all payment amounts
+            $('.payment-amount').each(function () {
+                let val = parseFloat($(this).val().replace(/,/g, '')) || 0;
+                totalPaid += val;
+            });
+
+            // Fallback: if .payment-amounts are not used, use single input (legacy)
+            if (totalPaid === 0) {
+                const paidInput = document.getElementById('paidAmount');
+                if (paidInput) {
+                    totalPaid = parseFloat(paidInput.value.replace(/,/g, '')) || 0;
+                }
+            }
+
+            // Get grand total
+            let grandText = $('#grandTotal').text().replace(/[^\d.-]/g, '');
+            let grandTotal = parseFloat(grandText) || 0;
+
+            if (totalPaid < grandTotal) {
+                e.preventDefault();
+                hideLoader?.();
+
+                $('#paymentError').show().text(
+                    `Total paid (${totalPaid.toLocaleString(locale, { style: 'currency', currency })}) is less than order total (${grandTotal.toLocaleString(locale, { style: 'currency', currency })}).`
+                );
+
+                return false;
+            }
+        });
+    </script>
+
+
 }
 
