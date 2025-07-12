@@ -1,0 +1,65 @@
+﻿@page
+@model NLI_POS.Pages.Utilities.ProdutcTypes.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>ProductType</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="ProductType.Name" class="control-label"></label>
+                <input asp-for="ProductType.Name" class="form-control" />
+                <span asp-validation-for="ProductType.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductType.Description" class="control-label"></label>
+                <input asp-for="ProductType.Description" class="form-control" />
+                <span asp-validation-for="ProductType.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="ProductType.IsActive" /> @Html.DisplayNameFor(model => model.ProductType.IsActive)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductType.EncodeDate" class="control-label"></label>
+                <input asp-for="ProductType.EncodeDate" class="form-control" />
+                <span asp-validation-for="ProductType.EncodeDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductType.EncodedBy" class="control-label"></label>
+                <input asp-for="ProductType.EncodedBy" class="form-control" />
+                <span asp-validation-for="ProductType.EncodedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductType.UpdateDate" class="control-label"></label>
+                <input asp-for="ProductType.UpdateDate" class="form-control" />
+                <span asp-validation-for="ProductType.UpdateDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductType.UpdatedBy" class="control-label"></label>
+                <input asp-for="ProductType.UpdatedBy" class="form-control" />
+                <span asp-validation-for="ProductType.UpdatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

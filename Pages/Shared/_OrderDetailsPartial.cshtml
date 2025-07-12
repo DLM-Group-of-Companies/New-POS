@@ -1,7 +1,7 @@
 ﻿@model NLI_POS.Models.ViewModels.OrderSummaryViewModel
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover shadow-sm rounded bg-white">
+    <table id="cartTable" class="table table-bordered table-hover shadow-sm rounded bg-white">
         <thead class="table-primary text-center">
             <tr>
                 <th>Item #</th>
@@ -14,7 +14,7 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="productTableBody">
             @if (Model.ProductItems != null && Model.ProductItems.Any())
             {
                 int index = 1;
@@ -36,16 +36,16 @@
             {
                 <tr><td colspan="8" class="text-center text-muted">No items found.</td></tr>
             }
-        </tbody>
-        <tfoot class="table-light fw-bold">
+
             <tr>
-                <td colspan="4" class="text-end">Total:</td>
-                <td class="text-end">@Model.ProductItems.Sum(i => i.Price).ToString("N2")</td>
-                <td class="text-end">@Model.ProductItems.Sum(i => i.Quantity).ToString("0")</td>
-                <td class="text-end">@Model.ProductItems.Sum(i => i.Amount).ToString("N2")</td>
+                <td colspan="4" class="text-end fw-bold">Total:</td>
+                <td class="text-end fw-bold">@Model.ProductItems.Sum(i => i.Price).ToString("N2")</td>
+                <td class="text-end fw-bold">@Model.ProductItems.Sum(i => i.Quantity).ToString("0")</td>
+                <td class="text-end fw-bold">@Model.ProductItems.Sum(i => i.Amount).ToString("N2")</td>
                 <td></td>
             </tr>
-
+        </tbody>
+        <tbody id="paymentTableBody" class="table-light fw-bold">
             @* Payment Summary *@
             @{
                 var paidAmount = Model.Order.TotPaidAmount;
@@ -58,7 +58,7 @@
 
             @foreach (var payment in Model.Payments)
             {
-                <tr class="table-light">
+                <tr class="table-light" data-payment="true">
                     <td colspan="4" class="text-end">Payment Method:</td>
                     <td colspan="2" class="text-end">@payment.PayMethod</td>
                     <td class="text-end">@payment.Amount.ToString("N2")</td>
@@ -74,6 +74,6 @@
                     <td></td>
                 </tr>
             @* } *@
-        </tfoot>
+        </tbody>
     </table>
 </div>

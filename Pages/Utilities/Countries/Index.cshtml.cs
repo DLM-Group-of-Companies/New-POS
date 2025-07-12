@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Countries
 {
@@ -26,11 +27,13 @@ namespace NLI_POS.Pages.Countries
             Country = await _context.Country.ToListAsync();
         }
 
-        public JsonResult OnGetGet(int id)
+        public async Task<JsonResult> OnGetGetAsync(int id)
         {
             var country = _context.Country.FirstOrDefault(c => c.Id == id);
             if (country == null)
                 return new JsonResult(NotFound());
+
+            await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Countries List");
 
             return new JsonResult(new
             {
@@ -39,6 +42,7 @@ namespace NLI_POS.Pages.Countries
                 name = country.Name,
                 isActive = country.IsActive
             });
+
         }
 
     }

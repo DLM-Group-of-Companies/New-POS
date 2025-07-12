@@ -1,0 +1,59 @@
+﻿@page
+@model NLI_POS.Pages.Utilities.CustomerClass.DetailsModel
+
+@{
+    ViewData["Title"] = "Customer Class Details";
+}
+
+<div class="container-fluid d-flex justify-content-center mt-5">
+    <div class="card shadow-lg rounded-4 p-4" style="max-width: 600px; width: 100%;">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary mb-0">
+                <i class="fas fa-users me-2"></i> @ViewData["Title"]
+            </h4>
+            <button class="btn btn-sm btn-outline-danger" title="Close" onclick="window.location = './Index';">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <hr class="mb-4" />
+
+        <!-- Details -->
+        <dl class="row mb-0">
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.CustClass.Name):</strong><br />
+                @Html.DisplayFor(m => m.CustClass.Name)
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.CustClass.Description):</strong><br />
+                @Html.DisplayFor(m => m.CustClass.Description)
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.CustClass.EncodeDate):</strong><br />
+                @Model.CustClass.EncodeDate?.ToString("MMM dd, yyyy hh:mm tt")
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.CustClass.EncodedBy):</strong><br />
+                @Html.DisplayFor(m => m.CustClass.EncodedBy)
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.CustClass.UpdateDate):</strong><br />
+                @Model.CustClass.UpdateDate?.ToString("MMM dd, yyyy hh:mm tt")
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.CustClass.UpdatedBy):</strong><br />
+                @Html.DisplayFor(m => m.CustClass.UpdatedBy)
+            </div>
+        </dl>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end mt-4">
+            <a asp-page="./Edit" asp-route-id="@Model.CustClass.Id" class="btn btn-primary me-2">
+                <i class="fas fa-edit me-1"></i> Edit
+            </a>
+            <a asp-page="./Index" class="btn btn-secondary">
+                <i class="fas fa-list me-1"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>

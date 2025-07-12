@@ -236,6 +236,39 @@ namespace NLI_POS.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("NLI_POS.Models.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Activity")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("IP")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("NLI_POS.Models.Country", b =>
                 {
                     b.Property<int>("Id")
@@ -359,8 +392,8 @@ namespace NLI_POS.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("LandlineNo")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -372,8 +405,8 @@ namespace NLI_POS.Migrations
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("MobileNo")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("Nationality")
                         .HasMaxLength(30)
@@ -681,7 +714,7 @@ namespace NLI_POS.Migrations
                     b.ToTable("OrderPayments");
                 });
 
-            modelBuilder.Entity("NLI_POS.Models.PaymentMethods", b =>
+            modelBuilder.Entity("NLI_POS.Models.PaymentMethod", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -690,8 +723,10 @@ namespace NLI_POS.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -869,11 +904,10 @@ namespace NLI_POS.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<DateTime>("EncodeDate")
+                    b.Property<DateTime?>("EncodeDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("EncodedBy")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsActive")
@@ -887,7 +921,7 @@ namespace NLI_POS.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UpdateddBy")
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -1039,6 +1073,17 @@ namespace NLI_POS.Migrations
                         .IsRequired();
 
                     b.Navigation("OfficeCountry");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.AuditLog", b =>
+                {
+                    b.HasOne("NLI_POS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Customer", b =>

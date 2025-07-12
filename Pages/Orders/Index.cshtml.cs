@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Orders
 {
@@ -46,6 +47,7 @@ namespace NLI_POS.Pages.Orders
                 })
                 .ToList();
 
+                await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Order List");
 
             return new JsonResult(new { data = orders });
         }

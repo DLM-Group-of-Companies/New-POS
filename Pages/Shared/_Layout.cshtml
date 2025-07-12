@@ -102,6 +102,26 @@
 
         }
 
+        @* Daily Sales Popup Start *@
+        <div id="todaySalesPopup" class="sales-popup shadow-lg rounded-3 p-3 bg-light border border-success">
+            <div class="d-flex justify-content-between align-items-center mb-2 cursor-move" id="salesPopupHeader">
+                <h5 class="text-success mb-0 d-flex align-items-center">
+                    <i class="fas fa-coins me-1"></i> Today's Sales
+                </h5>
+                <i class="fas fa-window-close text-danger" role="button" onclick="closeSalesPopup();" title="Close"></i>
+            </div>
+
+            <div id="todaySalesContent">
+                <div class="text-center my-2" id="salesLoader">
+                    <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Popup End *@
+
         <!-- Main Content -->
         <div class="flex-grow-1 " id="page-content" >
             <div id="preloader" style="display:none;">
@@ -116,7 +136,7 @@
     </div>
 
     <footer class="footer bg-black bg-gradient text-white text-center fixed-bottom">
-        &copy; 2025 Noble Life International
+        &copy; 2025 NobleLife International
     </footer>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

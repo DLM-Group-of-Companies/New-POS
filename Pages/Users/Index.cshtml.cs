@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Users
 {
@@ -19,11 +20,13 @@ namespace NLI_POS.Pages.Users
             _context = context;
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
             Users = _context.Users
                 .Include(u => u.OfficeCountry)
                 .ToList();
+
+            await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Users List");
         }
     }
 

@@ -14,8 +14,7 @@
     </div>
     <hr />
 
-    @* <form method="post" onsubmit="return validateAndShowLoader(this)" id="myForm"> *@
-    <form method="post" id="myForm">
+    <form method="post" id="myForm" onsubmit="return validateAndShowLoader(this)">
         @Html.AntiForgeryToken()
         <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75 mb-2"></div>
 
@@ -60,7 +59,7 @@
                         <select asp-for="Order.CustomerId" id="CustomerId" class="form-select" asp-items="ViewBag.CustomerId">
                             <option value="">-- Select Customer--</option>
                         </select>
-                        <button class="btn btn-primary" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
+                        <button class="btn btn-success" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
                     </div>
                     <div class="mb-2">
                         <span id="CustClassDisplay" class="badge bg-success"></span>
@@ -104,8 +103,8 @@
                     </div>
                     <input id="Price" type="hidden" />
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary" onclick="addProduct()">
-                            <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                        <button type="button" class="btn btn-info bg-gradient" onclick="addProduct()">
+                            <i class="fas fa-cart-plus me-2"></i> Add to Cart <i class="fas fa-angle-double-right"></i>
                         </button>
                     </div>
                 </div>
@@ -220,8 +219,8 @@
                 </div>
 
                 <div class="d-flex justify-content-end pt-3">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-share me-2"></i> Place Order
+                    <button type="submit" class="btn btn-primary btn-lg bg-gradient fw-bold">
+                        <i class="fas fa-cash-register me-2 fa-xl"></i> Place Order
                     </button>
                 </div>
             </div>
@@ -276,6 +275,7 @@
 
             if ($('#CustomerId').val() === "") {
                 toastr.warning('Please select a customer.');
+                document.getElementById('CustomerId').focus();
                 return;
             }
 
@@ -287,10 +287,16 @@
             if (prodCat === "Promo") {
                 if (comboId === "" || comboId === null) {
                     toastr.warning('Please select a combination.');
+                    document.getElementById('ComboId').focus();
                     return;
                 }
             }
 
+            if (selectedProductId == 0 || selectedProductId == null) {
+                toastr.warning('Please select a product.');
+                document.getElementById('ProductId').focus();
+                return;
+            }
             const rawPrice = $("#Price").val();
             let rawAmount = $('#Amount').val();
             let price = parseFloat(rawAmount.replace(/,/g, ''));
@@ -359,14 +365,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                                                                                                                <tr>
-                                                                                                                                    <td>${item.productName}</td>
-                                                                                                                                    <td>${item.comboName}</td>
-                                                                                                                                    <td>${formattedPrice}</td>
-                                                                                                                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                                                                                                            <td>${formattedTotalItem}</td>
-                                                                                                                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                                                                                                </tr>`);
+                                                                                                                                        <tr>
+                                                                                                                                            <td>${item.productName}</td>
+                                                                                                                                            <td>${item.comboName}</td>
+                                                                                                                                            <td>${formattedPrice}</td>
+                                                                                                                                            <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                                                                                                    <td>${formattedTotalItem}</td>
+                                                                                                                                            <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                                                                                                        </tr>`);
                 });
             }
 
@@ -508,7 +514,7 @@
                     var tot = $("#Qty").val() * amount;
                     let formattedTotal = tot.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     $('#Amount').val(formattedTotal);
-   
+
                 },
                 error: function () {
                     alert('Error retrieving price.');
@@ -611,14 +617,14 @@
 
                 data.forEach(customer => {
                     tbody.append(`
-                                                                            <tr>
-                                                                                <td>${customer.custcode}</td>
-                                                                                <td>${customer.name}</td>
-                                                                                <td>${customer.email}</td>
-                                                                                <td>${customer.phone}</td>
-                                                                                        <td><button class="btn btn-sm btn-success" title="Select" onclick='selectCustomer(${JSON.stringify(customer)})'><i class="fas fa-check"></i></button></td>
-                                                                            </tr>
-                                                                        `);
+                                                                                    <tr>
+                                                                                        <td>${customer.custcode}</td>
+                                                                                        <td>${customer.name}</td>
+                                                                                        <td>${customer.email}</td>
+                                                                                        <td>${customer.phone}</td>
+                                                                                                <td><button class="btn btn-sm btn-success" title="Select" onclick='selectCustomer(${JSON.stringify(customer)})'><i class="fas fa-check"></i></button></td>
+                                                                                    </tr>
+                                                                                `);
                 });
             });
         });
@@ -643,26 +649,26 @@
             const options = $('#paymentOptionsSource').html();
 
             const row = `
-                                                                <tr>
-                                                                    <td>
-                                                                        <select name="Payments[${paymentIndex}].PayMethod" class="form-select">
-                                                                    ${options}
-                                                                </select>
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="number" name="Payments[${paymentIndex}].Amount" class="form-control payment-amount" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text" name="Payments[${paymentIndex}].RefNo" class="form-control" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
-                                                                            <i class="fas fa-times"></i>
-                                                                        </button>
-                                                                    </td>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <select name="Payments[${paymentIndex}].PayMethod" class="form-select">
+                                                                            ${options}
+                                                                        </select>
+                                                                            </td>
+                                                                            <td>
+                                                                                <input type="number" name="Payments[${paymentIndex}].Amount" class="form-control payment-amount" />
+                                                                            </td>
+                                                                            <td>
+                                                                                <input type="text" name="Payments[${paymentIndex}].RefNo" class="form-control" />
+                                                                            </td>
+                                                                            <td>
+                                                                                <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
+                                                                                    <i class="fas fa-times"></i>
+                                                                                </button>
+                                                                            </td>
 
-                                                                </tr>
-                                                            `;
+                                                                        </tr>
+                                                                    `;
 
             $('#paymentTableBody').append(row);
             paymentIndex++;
@@ -692,6 +698,7 @@
         document.querySelector('form').addEventListener('submit', function (e) {
             //Check if cart is empty
             if (!cart || cart.length === 0) {
+                hideLoader();
                 e.preventDefault();
                 toastr.warning('Your cart is empty. Please add products before placing the order.');
                 return false;
@@ -727,6 +734,15 @@
 
                 return false;
             }
+
+        // confirm before submit
+        const confirmed = confirm("Are you sure you want to place this order?");
+        if (!confirmed) {
+            e.preventDefault();
+            hideLoader?.();
+            return false;
+        }
+
             formIsDirty = false;
         });
     </script>

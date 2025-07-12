@@ -75,6 +75,7 @@ namespace NLI_POS.Pages.Orders
                 Payments = payments
             };
 
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Viewed Order Details of {Order.OrderNo}");
             return Page();
         }
 
@@ -215,6 +216,8 @@ namespace NLI_POS.Pages.Orders
             }
 
             await _context.SaveChangesAsync();
+
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Voided Order {Order.OrderNo}");
 
             TempData["SuccessMessage"] = "Order has been successfully voided.";
             return RedirectToPage(new { orderNo = order.OrderNo });

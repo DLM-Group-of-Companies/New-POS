@@ -33,7 +33,7 @@ html, body {
 }
 
 @media screen and (max-width: 1366px) {
-/*    html {
+    /*    html {
         font-size: 12px;
     }*/
 }
@@ -241,8 +241,8 @@ input[type="number"] {
             width: 100%;
         }*/
 
-    /* Icon positioning classes for desktop */
-    /*.pos-orders {
+/* Icon positioning classes for desktop */
+/*.pos-orders {
         top: 100px;
         left: 300px;
     }
@@ -381,7 +381,35 @@ input[type="number"] {
         top: 400px;
         left: 200px;
     }
-    /* optional third row */
+
+    .pos-utility {
+        top: 400px;
+        left: 400px;
+    }
+
+    /* for modal ulitites */
+    /*start*/
+    .pos-countries {
+        top: 0;
+        left: 0;
+    }
+
+    .pos-paymentmethods {
+        top: 0;
+        left: 200px;
+    }
+
+    .pos-custclass {
+        top: 200px;
+        left: 100px;
+    }
+
+    .pos-producttypes {
+        top: 200px;
+        left: 300px;
+    }
+    /* for modal ulitites */
+    /*end*/
 }
 
 
@@ -406,4 +434,29 @@ input[type="number"] {
 .table-scroll-container {
     height: calc(100vh - 200px); /* Adjust depending on nav/footer height */
     overflow-y: auto;
+}
+
+/*//Sales Popup*/
+.sales-popup {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1080;
+    min-width: 250px;
+    max-width: 300px;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+    .sales-popup.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+/**/
+#todaySalesContent {
+    transition: opacity 0.3s ease-in-out;
 }

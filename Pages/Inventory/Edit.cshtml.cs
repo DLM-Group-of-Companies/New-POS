@@ -65,47 +65,37 @@ namespace NLI_POS.Pages.Inventory
 
         public async Task<IActionResult> OnPostAsync()
         {
-            InventoryStock.Products = null;
-            InventoryStock.Office = null;
-
-            var offc = _context.InventoryStocks
-                .AsNoTracking()
-                .Include(o => o.Office)
-                .FirstOrDefault(o => o.Id == InventoryStock.Id);
-
-            var cntry = _context.OfficeCountry
-                .AsNoTracking()
-                .Include(o => o.Country)
-                .FirstOrDefault(o => o.Id == offc.OfficeId);
-
-            var localTime = AuditHelpers.GetLocalTime(cntry.Country.TimeZone);
-
-            InventoryStock.UpdateDate = localTime;
-            InventoryStock.UpdatedBy = User?.Identity?.Name;
-
+            // Ensure only valid submission
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            // Fetch original entity from the database to preserve EncodedBy
+            // Get original record (for preserving EncodedBy, etc.)
             var original = await _context.InventoryStocks
                 .AsNoTracking()
+                .Include(i => i.Office)
                 .FirstOrDefaultAsync(s => s.Id == InventoryStock.Id);
 
             if (original == null)
                 return NotFound();
 
-            // Keep the original EncodedBy
-            InventoryStock.EncodedBy = original.EncodedBy;
+            // Use OfficeId to find country & timezone
+            var countryInfo = await _context.OfficeCountry
+                .Include(o => o.Country)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(o => o.Id == original.OfficeId);
 
-            // Attach and mark only specific properties as modified
-            _context.Attach(InventoryStock);
-            _context.Entry(InventoryStock).Property(x => x.StockQty).IsModified = true;
-            _context.Entry(InventoryStock).Property(x => x.Remarks).IsModified = true;
-            //_context.Entry(InventoryStock).Property(x => x.UpdateDate).IsModified = true;
-            //_context.Entry(InventoryStock).Property(x => x.UpdatedBy).IsModified = true;
-            // Don't touch EncodedBy!
+            var localTime = AuditHelpers.GetLocalTime(countryInfo?.Country?.TimeZone ?? "Asia/Manila");
+
+            // Manually update only allowed fields
+            original.StockQty = InventoryStock.StockQty;
+            original.Remarks = InventoryStock.Remarks;
+            original.UpdateDate = localTime;
+            original.UpdatedBy = User?.Identity?.Name;
+
+            // Mark only modified fields
+            _context.InventoryStocks.Update(original);
 
             try
             {
@@ -119,8 +109,15 @@ namespace NLI_POS.Pages.Inventory
                     throw;
             }
 
-            return RedirectToPage("./Index");
+            // Get product name for audit trail
+            var product = await _context.Products.FindAsync(original.ProductId);
+            var productName = product?.ProductName ?? "Unknown";
+
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated inventory stock: {original.StockQty} for: {productName}");
+
+            return RedirectToPage("./Index", new { officeId = original.OfficeId });
         }
+
 
 
         private bool InventoryStockExists(int id)

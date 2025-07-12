@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Inventory
 {
@@ -74,6 +75,11 @@ namespace NLI_POS.Pages.Inventory
 
             _context.InventoryStocks.Add(InventoryStock);
             await _context.SaveChangesAsync();
+
+            var product = await _context.Products.FindAsync(InventoryStock.ProductId);
+            var productName = product?.ProductName ?? "Unknown";
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added inventory product: {productName} with {InventoryStock.StockQty} stock(s)");
+
 
             return RedirectToPage("./Index", new { officeId = officeId });
         }

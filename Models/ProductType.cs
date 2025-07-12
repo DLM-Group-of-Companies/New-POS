@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NLI_POS.Models.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace NLI_POS.Models
 {
-    public class ProductType
+    public class ProductType : AuditableEntity
     {
         [Key]
         public int Id { get; set; }
@@ -13,9 +14,5 @@ namespace NLI_POS.Models
         public string Description { get; set; }
         public bool IsActive { get; set; }
 
-        public DateTime EncodeDate { get; set; }
-        public string EncodedBy { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public string? UpdateddBy { get; set; }
     }
 }

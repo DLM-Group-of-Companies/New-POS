@@ -33,16 +33,16 @@ namespace NLI_POS.Models
         [StringLength(200)]
         public string? Email { get; set; }
 
-        [StringLength(20)]
+        [StringLength(30)]
         [Display(Name = "Mobile Number")]
         public string? MobileNo { get; set; }
 
-        [StringLength(20)]
+        [StringLength(30)]
         [Display(Name = "Landline Number")]
         public string? LandlineNo { get; set; }
 
         [Required]
-        public string Gender { get; set; }
+        public string? Gender { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
@@ -72,11 +72,6 @@ namespace NLI_POS.Models
 
         [StringLength(500)]
         public string? Notes { get; set; }
-
-        //public DateTime EncodeDate { get; set; }
-        //public string EncodedBy { get; set; }
-        //public DateTime? UpdateDate { get; set; }
-        //public string? UpdateddBy { get; set; }
 
         [ValidateNever]
         [Display(Name = "Office")]

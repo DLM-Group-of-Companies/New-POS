@@ -45,6 +45,7 @@ namespace NLI_POS.Pages.Orders
                     c.Id,
                     FullName = c.CustCode + " | " + c.FirstName + " " + c.LastName
                 }), "Id", "FullName");
+
             OfficeList = await GetUserOfficesAsync(); //Filters office by Office Assignment
 
 
@@ -53,7 +54,7 @@ namespace NLI_POS.Pages.Orders
             //    .Select(p => new { p.Id, p.ProductName })
             //    .ToListAsync(), "Id", "ProductName");
 
-            ViewData["PaymentMethod"] = new SelectList(await _context.PaymentMethods.ToListAsync(), "Name", "Name");
+            ViewData["PaymentMethod"] = new SelectList(await _context.PaymentMethods.Where(p=>p.IsActive).ToListAsync(), "Name", "Name");
 
             return Page();
         }
@@ -405,6 +406,8 @@ namespace NLI_POS.Pages.Orders
             }
 
             await _context.SaveChangesAsync();
+
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Submitted Order {Order.OrderNo}");
 
             HttpContext.Session.Remove("Cart");
             TempData["SuccessMessage"] = "Order has been successfully submitted.";

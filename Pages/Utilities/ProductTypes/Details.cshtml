@@ -1,0 +1,62 @@
+﻿@page
+@model NLI_POS.Pages.Utilities.ProdutcTypes.DetailsModel
+@{
+    ViewData["Title"] = "Product Type Details";
+}
+
+<div class="container-fluid d-flex justify-content-center mt-5">
+    <div class="card shadow-lg rounded-4 p-4" style="max-width: 600px; width: 100%;">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary mb-0">
+                <i class="fas fa-tag me-2"></i> @ViewData["Title"]
+            </h4>
+            <button class="btn btn-sm btn-outline-danger" title="Close" onclick="window.location = './Index';">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <hr class="mb-4" />
+
+        <!-- Details Section -->
+        <dl class="row mb-0">
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.ProductType.Name):</strong><br />
+                @Html.DisplayFor(m => m.ProductType.Name)
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.ProductType.Description):</strong><br />
+                @Html.DisplayFor(m => m.ProductType.Description)
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.ProductType.IsActive):</strong><br />
+                @(Model.ProductType.IsActive ? "✅ Active" : "❌ Inactive")
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.ProductType.EncodeDate):</strong><br />
+                @Model.ProductType.EncodeDate?.ToString("MMM dd, yyyy hh:mm tt")
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.ProductType.EncodedBy):</strong><br />
+                @Html.DisplayFor(m => m.ProductType.EncodedBy)
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.ProductType.UpdateDate):</strong><br />
+                @Model.ProductType.UpdateDate?.ToString("MMM dd, yyyy hh:mm tt")
+            </div>
+            <div class="col-12 mb-2">
+                <strong>@Html.DisplayNameFor(m => m.ProductType.UpdatedBy):</strong><br />
+                @Html.DisplayFor(m => m.ProductType.UpdatedBy)
+            </div>
+        </dl>
+
+        <!-- Actions -->
+        <div class="d-flex justify-content-end mt-4">
+            <a asp-page="./Edit" asp-route-id="@Model.ProductType.Id" class="btn btn-primary me-2">
+                <i class="fas fa-edit me-1"></i> Edit
+            </a>
+            <a asp-page="./Index" class="btn btn-secondary">
+                <i class="fas fa-list me-1"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>

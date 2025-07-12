@@ -71,7 +71,6 @@ function printModalquarter() {
     printWindow.document.close();
 }
 
-
 function emailModal() {
     const modalBodyHtml = document.querySelector('.modal-body').innerHTML;
     const toEmail = prompt("Enter recipient email:");
@@ -99,3 +98,158 @@ function emailModal() {
         });
 }
 
+// ========== TODAY'S SALES POPUP ==========
+
+// Show popup with loader only (used before content fetch)
+function showSalesPopup() {
+    const popup = document.getElementById("todaySalesPopup");
+    const content = document.getElementById("todaySalesContent");
+
+    if (!popup || !content) {
+        console.error("Popup or content container not found.");
+        return;
+    }
+
+    // ✅ Fade-in via CSS class
+    popup.classList.add("show");
+
+    content.innerHTML = `
+        <div class="text-center my-3" id="salesLoader">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+
+    fetch("/TodaySales?handler=Partial", {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+        .then(res => res.text())
+        .then(html => {
+            content.innerHTML = html;
+            bindOfficeChangeEvent();
+            submitTodaySalesForm();
+        })
+        .catch(err => {
+            console.error("Error loading initial popup content:", err);
+            content.innerHTML = "<div class='alert alert-danger'>Failed to load popup content.</div>";
+        });
+}
+
+function closeSalesPopup() {
+    const popup = document.getElementById("todaySalesPopup");
+    if (popup) popup.classList.remove("show"); // ✅ fade-out
+}
+
+
+
+// Hide the popup
+function closeSalesPopup() {
+    const popup = document.getElementById("todaySalesPopup");
+    if (popup) popup.classList.remove("show");
+}
+
+// Submit the office filter form via AJAX
+function submitTodaySalesForm() {
+    const form = document.querySelector("#todaySalesContent #salesFilterForm");
+    const select = document.querySelector("#todaySalesContent #OfficeId");
+    const content = document.getElementById("todaySalesContent");
+
+    if (!form || !select || !content) {
+        console.error("Form, select, or content not found in submitTodaySalesForm().");
+        return;
+    }
+
+    const selectedOption = select.options[select.selectedIndex];
+    const currency = selectedOption.getAttribute("data-currency") || "₱";
+
+    content.innerHTML = `
+        <div class="text-center my-2" id="salesLoader">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+    content.style.opacity = 0.5;
+
+    const formData = new FormData(form);
+    const queryString = new URLSearchParams(formData).toString();
+
+    fetch(`/TodaySales?handler=Partial&${queryString}`, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+        .then(response => response.text())
+        .then(html => {
+            content.innerHTML = html;
+            content.style.opacity = 1;
+
+            const currencySymbolEl = document.getElementById("currencySymbol");
+            if (currencySymbolEl) {
+                currencySymbolEl.innerText = currency;
+            }
+
+            bindOfficeChangeEvent(); // Rebind again after refresh
+        })
+        .catch(error => {
+            console.error("Error loading sales data:", error);
+            content.innerHTML = "<div class='alert alert-danger'>Failed to load data.</div>";
+            content.style.opacity = 1;
+        });
+}
+
+
+// Bind onchange event to Office dropdown
+function bindOfficeChangeEvent() {
+    const select = document.querySelector("#todaySalesContent #OfficeId");
+    if (select) {
+        select.removeEventListener("change", submitTodaySalesForm);
+        select.addEventListener("change", submitTodaySalesForm);
+    } else {
+        console.warn("OfficeId not found during bind.");
+    }
+}
+
+
+// Enable dragging of popup via header
+function makeDraggable(popupId, handleId) {
+    const popup = document.getElementById(popupId);
+    const handle = document.getElementById(handleId);
+
+    if (!popup || !handle) return;
+
+    let offsetX = 0, offsetY = 0, isDragging = false;
+
+    handle.addEventListener('mousedown', function (e) {
+        isDragging = true;
+        const rect = popup.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+    });
+
+    function dragMove(e) {
+        if (!isDragging) return;
+        popup.style.position = 'fixed';
+        popup.style.left = `${e.clientX - offsetX}px`;
+        popup.style.top = `${e.clientY - offsetY}px`;
+    }
+
+    function dragEnd() {
+        isDragging = false;
+        document.removeEventListener('mousemove', dragMove);
+        document.removeEventListener('mouseup', dragEnd);
+    }
+}
+
+// ========== INIT ==========
+
+document.addEventListener("DOMContentLoaded", function () {
+    makeDraggable("todaySalesPopup", "salesPopupHeader");
+});
+
+// fades out automatically
+setTimeout(() => {
+    closeSalesPopup(); 
+}, 5000);

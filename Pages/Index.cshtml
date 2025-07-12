@@ -1,57 +1,104 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Noble Life - POS";
+    ViewData["Title"] = "NobleLife - POS";
 }
 
 
 <div class="icon-container-main ">
     <div class="icon-wrapper">
         <div class="draggable-icon pos-orders " title="Orders">
-            <a href="/Orders/Index" class="text-dark">
+            <a asp-page="/Orders/Index" class="text-dark">
                 <img src="/images/icons/orders.png" alt="Orders" class="shadow-lg hover-border" />
             </a>
-            <span class="bg-transparent text-white shadow-sm">Orders</span>
+            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Orders/Index" class="text-white text-decoration-none">Orders</a></span>
         </div>
         <div class="draggable-icon pos-customers" title="Customers">
-            <a href="/Customers/Index" class="text-dark">
+            <a asp-page="/Customers/Index" class="text-dark">
                 <img src="/images/icons/customer.png" alt="Customers" class="shadow-lg hover-border" />
             </a>
-            <span class="bg-transparent text-white shadow-sm">Customers</span>
+            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Customers/Index" class="text-white text-decoration-none">Customers</a></span>
         </div>
         <div class="draggable-icon pos-reports" title="Reports">
-            <a href="/Report/DailySales" class="text-dark">
+            <a asp-page="/Report/DailySales" class="text-dark">
                 <img src="/images/icons/reports.png" alt="Reports" class="shadow-lg hover-border" />
             </a>
-            <span class="bg-transparent text-white shadow-sm">Reports</span>
+            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Report/Index" class="text-white text-decoration-none">Reports</a></span>
         </div>
         <div class="draggable-icon pos-products" title="Products">
-            <a href="/Products/Index" class="text-dark">
+            <a asp-page="/Products/Index" class="text-dark">
                 <img src="/images/icons/products.png" alt="Products" class="shadow-lg hover-border" />
             </a>
-            <span class="bg-transparent text-white shadow-sm">Products</span>
+            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Products/Index" class="text-white text-decoration-none">Products</a></span>
         </div>
         <div class="draggable-icon pos-inventory" title="Inventory">
-            <a href="/Inventory/Index" class="text-dark">
+            <a asp-page="/Inventory/Index" class="text-dark">
                 <img src="/images/icons/inventory.png" alt="Inventory" class="shadow-lg hover-border" />
             </a>
-            <span class="bg-transparent text-white shadow-sm">Inventory</span>
+            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Inventory/Index" class="text-white text-decoration-none">Inventory</a></span>
         </div>
         <div class="draggable-icon pos-office" title="Office">
-            <a href="/Offices/Index" class="text-dark">
+            <a asp-page="/Offices/Index" class="text-dark">
                 <img src="/images/icons/office.png" alt="Office" class="shadow-lg hover-border" />
             </a>
-            <span class="bg-transparent text-white shadow-sm">Offices</span>
+            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Offices/Index" class="text-white text-decoration-none">Offices</a></span>
         </div>
         <div class="draggable-icon pos-users" title="Users">
-            <a href="/Users/Index" class="text-dark">
+            <a asp-page="/Users/Index" class="text-dark">
                 <img src="/images/icons/users.png" alt="Users" class="shadow-lg hover-border" />
             </a>
-            <span class="bg-transparent text-white shadow-sm">Users</span>
+            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Users/Index" class="text-white text-decoration-none">Users</a></span>
+        </div>
+        <div class="draggable-icon pos-utility" title="Utilities">
+            <a data-bs-toggle="modal" data-bs-target="#utilityModal" class="text-dark">
+                <img src="/images/icons/utility.png" alt="Utilities" class="shadow-lg hover-border" />
+            </a>
+            <span class="bg-transparent text-white shadow-sm"><a data-bs-toggle="modal" data-bs-target="#utilityModal" class="text-white text-decoration-none">Utilities</a></span>
         </div>
     </div>
 </div>
 
+<!-- User Access Modal -->
+<div class="modal fade" id="utilityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-tools me-2"></i>Utilities</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="utilityModalModalContainer">
+                <div class="container">
+                    <div class="icon-wrapper">
+                        <div class="draggable-icon pos-countries " title="Countries">
+                            <a asp-page="/Utilities/Countries/Index" class="text-dark">
+                                <img src="/images/icons/countries.png" alt="Countries" class="shadow-lg hover-border" />
+                            </a>
+                            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Utilities/Countries/Index" class="text-dark text-decoration-none">Countries</a></span>
+                        </div>
+                        <div class="draggable-icon pos-paymentmethods" title="Payment Methods">
+                            <a asp-page="/Utilities/PaymentMethods/Index" class="text-dark">
+                                <img src="/images/icons/paymentmethods.png" alt="Payment Methods" class="shadow-lg hover-border" />
+                            </a>
+                            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Utilities/PaymentMethods/Index" class="text-dark text-decoration-none">Payment Methods</a></span>
+                        </div>
+                        <div class="draggable-icon pos-custclass" title="Customer Classes">
+                            <a asp-page="/Utilities/CustomerClass/Index" class="text-dark">
+                                <img src="/images/icons/custclass.png" alt="Customer Classes" class="shadow-lg hover-border" />
+                            </a>
+                            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Utilities/CustomerClass/Index" class="text-dark text-decoration-none">Customer Classes</a></span>
+                        </div>
+                        <div class="draggable-icon pos-producttypes" title="Product Types">
+                            <a asp-page="/Utilities/ProductTypes/Index" class="text-dark">
+                                <img src="/images/icons/producttypes.png" alt="Products" class="shadow-lg hover-border" />
+                            </a>
+                            <span class="bg-transparent text-white shadow-sm"><a asp-page="/Utilities/ProductTypes/Index" class="text-dark text-decoration-none">Product Types</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     $(function () {

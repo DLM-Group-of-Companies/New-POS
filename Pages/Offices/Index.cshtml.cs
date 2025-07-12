@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Offices
 {
@@ -21,6 +22,11 @@ namespace NLI_POS.Pages.Offices
         {
             OfficeCountry = await _context.OfficeCountry
                 .Include(o => o.Country).ToListAsync();
+
+
+
+                await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Office List");
+
         }
     }
 }

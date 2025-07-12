@@ -34,7 +34,6 @@ namespace NLI_POS.Pages.Customers
                 return RedirectToPage("./Index");
             }
 
-            //ViewData["CustClass"] = new SelectList(_context.CustClass, "Id", "Name");
             try
             {
                 ViewData["CustClass"] = new SelectList(await _context.CustClass.ToListAsync(), "Id", "Name");
@@ -44,8 +43,6 @@ namespace NLI_POS.Pages.Customers
                 throw new Exception("Failed to load CustClass", ex);
             }
 
-
-            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
             OfficeList = await GetUserOfficesAsync();
             ViewData["Country"] = new SelectList(_context.Country, "Code", "Name");
             return Page();
@@ -63,21 +60,6 @@ namespace NLI_POS.Pages.Customers
 
             ModelState.Remove("Customer.OfficeCountries");
             ModelState.Remove("Customer.CustClasses");
-
-            //-- Generate Customer ID
-            //int lastID = 0;
-            //if (_context.Customer.Count() > 0)
-            //{
-            //     lastID = _context.Customer.Max(p => p.Id) + 1;
-            //}
-            //else
-            //{
-            //     lastID = 1;
-            //}
-            //string lastIdPadded = lastID.ToString().PadLeft(6, '0');
-            //var off = Customer.OfficeId;
-
-            //Customer.CustCode = Customer.Country + off + DateTime.UtcNow.AddHours(8).ToString("yy") + lastIdPadded;
 
             // Generate base code
             int lastID = _context.Customer.Any() ? _context.Customer.Max(p => p.Id) + 1 : 1;

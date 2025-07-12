@@ -1,0 +1,23 @@
+﻿@model NLI_POS.Pages.TodaySalesModel
+
+<div class="py-2">
+    <form id="salesFilterForm" method="get">
+        <select id="OfficeId" asp-for="Office" class="form-select">
+            @foreach (var office in Model.OfficeList)
+            {
+                <option value="@office.Value"
+                        selected="@(Model.Office.ToString() == office.Value ? "selected" : null)"
+                        data-locale="@office.Locale"
+                        data-currency="@office.CurrencyCode">
+                    @office.Text
+                </option>
+            }
+        </select>
+    </form>
+    <hr />
+    <div id="todaySalesResult" class="text-center">
+        <h4 class="text-info">
+            <span id="currencySymbol">₱</span> <span id="salesAmount">@Model.TotalSales.ToString("N2")</span>
+        </h4>
+    </div>
+</div>

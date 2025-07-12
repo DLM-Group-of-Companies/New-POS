@@ -1,0 +1,163 @@
+﻿@page
+@model NLI_POS.Pages.Report.MonthySalesModel
+
+@{
+    ViewData["Title"] = "Monthy Sales";
+}
+
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary mb-0">
+            <i class="fas fa-calendar-day me-2"></i> Montly Sales Report
+        </h3>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
+    </div>
+    <hr />
+    <div class="row g-3 mb-4">
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-2">
+                <label for="officeFilter" class="form-label">Office</label>
+                <select asp-for="Office" asp-items="Model.OfficeList" class="form-select"></select>
+            </div>
+            <div class="col-md-2">
+                <label for="dDate" class="form-label">Date</label>
+                <input type="month" id="dDate" name="Date" value="@(Model.Date?.ToString("yyyy-MM"))" class="form-control" />
+            </div>
+            <div class="col-md-2 align-self-end">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table id="ordersTable" class="table table-bordered table-hover table-sm small w-100 text-nowrap">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>Order No.</th>
+                    <th>Order Date</th>
+                    <th>Customer Code</th>
+                    <th>Customer</th>
+                    <th>Item No</th>
+                    <th>Order Type</th>
+                    <th>Product Category</th>
+                    <th>Product</th>
+                    <th>Product Combo</th>
+                    <th>Office</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Ref No</th>
+                    <th>Notes</th>
+                    <th>Encode Date</th>
+                    <th>Encoded By</th>
+                    <th>Update Date</th>
+                    <th>Updated By</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Order)
+                {
+                    foreach (var item in order.ProductItems)
+                    {
+                        <tr>
+                            <td>@order.OrderNo</td>
+                            <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
+                            <td>@order.Customers?.CustCode</td>
+                            <td>@($"{order.Customers?.FirstName} {order.Customers?.LastName}")</td>
+                            <td>@item.Id</td> <!-- Replace with correct item number if needed -->
+                            <td>@order.OrderType</td>
+                            <td>@item.ProductCat</td>
+                            <td>@item.ProductName</td>
+                            <td>@item.ProductCombo</td>
+                            <td>@order.Office?.Name</td>
+                            <td>@item.Price.ToString("N2")</td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                @{
+                                    var total = item.Price * item.Quantity;
+                                }
+                                @total.ToString("N2")
+                            </td>
+                            <td>
+                                @string.Join(", ", order.Payments.Select(p => p.PayMethod))
+                            </td>
+                            <td>
+                                @string.Join(", ", order.Payments.Select(p => p.ReferenceNo))
+                            </td>
+                            <td>@order.Notes</td>
+                            <td>@order.EncodeDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@order.EncodedBy</td>
+                            <td>@order.UpdateDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@order.UpdatedBy</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const table = $('#ordersTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        className: 'btn btn-outline-success',
+                        exportOptions: {
+                            columns: ':visible'
+                        },
+                        filename: function () {
+                            const office = $('select[name="Office"]').val() || 'AllOffices';
+                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);
+                            return `MonthlySales_${office}_${date}`;
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        className: 'btn btn-outline-danger',
+                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-outline-secondary',
+                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                    }
+                ],
+                columnDefs: [
+                    { targets: [13,14,15, 16, 17, 18, 19], visible: false }
+                ],
+                paging: true,
+                ordering: true,
+                scrollX: true,
+                responsive: false,
+                autoWidth: true,
+                searching: false
+            });
+
+            // Custom filtering function for date
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                const selectedDate = $('#minDate').val(); // Format: yyyy-mm-dd
+                const orderDateStr = data[1]; // Column index of OrderDate
+
+                if (!selectedDate) return true;
+
+                const selected = new Date(selectedDate);
+                const orderDate = new Date(orderDateStr);
+
+                // Compare by date only, ignore time
+                return selected.toDateString() === orderDate.toDateString();
+            });
+
+            // Trigger redraw when filters change
+            // $('#officeFilter, #minDate').on('change', function () {
+            //     table.draw();
+            // });
+        });
+    </script>
+
+}

@@ -65,10 +65,11 @@ namespace NLI_POS.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<ApplicationUser> AppUsers { get; set; }
         public DbSet<UserOfficeAccess> UserOfficesAccess { get; set; }
-        public DbSet<PaymentMethods> PaymentMethods { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<ProductPrice> ProductPrices { get; set; }
         public DbSet<OrderPayment> OrderPayments { get; set; }
         public DbSet<ProductItem> ProductItems { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
     }
 }

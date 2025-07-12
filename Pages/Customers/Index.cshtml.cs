@@ -79,6 +79,9 @@ namespace NLI_POS.Pages.Customers
                 .Take(length)
                 .ToListAsync();
 
+                await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Customer List");
+
+
             return new JsonResult(new
             {
                 draw = draw,
@@ -86,6 +89,7 @@ namespace NLI_POS.Pages.Customers
                 recordsFiltered = totalRecords,
                 data = data
             });
+
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int id)
@@ -106,7 +110,7 @@ namespace NLI_POS.Pages.Customers
             {
                 TempData["ErrorMessage"] = "Customer not found.";
             }
-
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Deleted {customer.CustCode}: {customer.FirstName} {customer.LastName}");
             return RedirectToPage(); // This triggers OnGetAsync again
         }
 

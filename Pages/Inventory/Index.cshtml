@@ -120,16 +120,16 @@
                     {
                         data: 'id',
                         orderable: false,
-    render: function (data, type, row) {
-        return `
-            <button class="btn btn-success btn-sm m-1 edit-btn"
-                    data-id="${data}"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editModal"
-                    title="Edit">
-                <i class="far fa-edit"></i>
-            </button>`;
-    }
+                        render: function (data, type, row) {
+                            return `
+                    <button class="btn btn-success btn-sm m-1 edit-btn"
+                            data-id="${data}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editModal"
+                            title="Edit">
+                        <i class="far fa-edit"></i>
+                    </button>`;
+                        }
                     }
                 ],
                 responsive: true,
@@ -159,8 +159,15 @@
                     {
                         data: 'id',
                         orderable: false,
-                        render: function (data) {
-                            return `<a  class="btn btn-success btn-sm m-1" title="Edit" href="/Inventory/Edit?id=${data}"><i class="far fa-edit"></i></a>`;
+                        render: function (data, type, row) {
+                            return `
+                            <button class="btn btn-success btn-sm m-1 edit-btn"
+                                    data-id="${data}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
+                                    title="Edit">
+                                <i class="far fa-edit"></i>
+                            </button>`;
                         }
                     }
                 ],
@@ -194,21 +201,21 @@
     </script>
 
     <script>
-$(document).on('click', '.edit-btn', function () {
-    const id = $(this).data('id');
-    const url = `/Inventory/Edit?id=${id}&handler=Partial`;
+        $(document).on('click', '.edit-btn', function () {
+            const id = $(this).data('id');
+            const url = `/Inventory/Edit?id=${id}&handler=Partial`;
 
-    $('#editInventoryModalLoader').show();                // show spinner
-    $('#editInventoryModalContent').hide().empty();       // clear previous content
+            $('#editInventoryModalLoader').show();                // show spinner
+            $('#editInventoryModalContent').hide().empty();       // clear previous content
 
-    $('#editModal').modal('show');                        // show modal
+            $('#editModal').modal('show');                        // show modal
 
-    // Load partial view
-    $('#editInventoryModalContent').load(url, function () {
-        $('#editInventoryModalLoader').hide();            // hide spinner
-        $('#editInventoryModalContent').fadeIn();         // show content
-    });
-});
-</script>
+            // Load partial view
+            $('#editInventoryModalContent').load(url, function () {
+                $('#editInventoryModalLoader').hide();            // hide spinner
+                $('#editInventoryModalContent').fadeIn();         // show content
+            });
+        });
+    </script>
 
 }
