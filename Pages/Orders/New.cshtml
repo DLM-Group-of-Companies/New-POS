@@ -18,7 +18,7 @@
         @Html.AntiForgeryToken()
         <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75 mb-2"></div>
 
-        <div class="row">
+        <div class="row gx-2">
             <!-- Left Panel -->
             <div class="col-lg-4">
                 <!-- Office Info -->
@@ -27,10 +27,10 @@
                         <i class="fas fa-building text-primary"></i> Office Info
                     </h5>
                     <input type="hidden" asp-for="Order.OrderNo" />
-                    <div class="row">
+                    <div class="row gx-2">
                         <div class="col-6 mb-2">
                             <label asp-for="Order.OfficeId" class="form-label"></label>
-                            <select id="OfficeId" asp-for="Order.OfficeId" class="form-select">
+                            <select id="OfficeId" asp-for="Order.OfficeId" class="form-control form-select">
                                 @foreach (var office in Model.OfficeList)
                                 {
                                     <option value="@office.Value"
@@ -56,7 +56,7 @@
                     </h5>
                     <label asp-for="Order.CustomerId" class="form-label"></label>
                     <div class="input-group mb-2">
-                        <select asp-for="Order.CustomerId" id="CustomerId" class="form-select" asp-items="ViewBag.CustomerId">
+                        <select asp-for="Order.CustomerId" id="CustomerId" class="form-control form-select" asp-items="ViewBag.CustomerId">
                             <option value="">-- Select Customer--</option>
                         </select>
                         <button class="btn btn-success" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
@@ -73,23 +73,23 @@
                     <h5 class="text-secondary border-bottom pb-1 mb-2">
                         <i class="fas fa-box text-info"></i> Product Selection
                     </h5>
-                    <div class="row">
-                        <div class="col-4 mb-2">
+                    <div class="row gx-2">
+                        <div class="col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
                             <label class="form-label">Category</label>
-                            <select id="ProductCategory" class="form-select">
+                            <select id="ProductCategory" class="form-control form-select">
                                 <option value="Regular">Regular</option>
-                                <option value="Promo">Promo</option>
+                                <option value="Package">Package</option>
                                 <option value="Freebie">Freebie</option>
                             </select>
                         </div>
-                        <div class="col-8 mb-2">
+                        <div class="col-lg-8 col-md-12 col-sm-12 col-12 mb-2">
                             <label class="form-label">Product</label>
-                            <select id="ProductId" class="form-select" asp-items="ViewBag.ProductId"></select>
+                            <select id="ProductId" class="form-control form-select" asp-items="ViewBag.ProductId"></select>
                         </div>
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Combo (if applicable)</label>
-                        <select id="ComboId" class="form-select" asp-items="ViewBag.ProductCombos"></select>
+                        <select id="ComboId" class="form-control form-select" asp-items="ViewBag.ProductCombos"></select>
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-2">
@@ -153,7 +153,10 @@
                                 <tr>
                                     <td></td>
                                     <td colspan="3" class="text-end fw-bold text-uppercase">Total Amount Due</td>
-                                    <td class="text-end"><strong><span id="grandTotal">0</span></strong></td>
+                                    <td class="text-end">
+                                        <strong><span id="grandTotal">0</span></strong>
+                                        <input type="hidden" asp-for="Order.TotAmount" name="Order.TotAmount" id="GrandTotalInput" value="0" />
+                                    </td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -184,7 +187,7 @@
                         <tbody id="paymentTableBody">
                             <tr>
                                 <td>
-                                    <select name="Payments[0].PayMethod" class="form-select">
+                                    <select name="Payments[0].PayMethod" class="form-control form-select">
                                         @foreach (var method in ViewBag.PaymentMethod as SelectList)
                                         {
                                             <option value="@method.Value">@method.Text</option>
@@ -249,7 +252,7 @@
                         </thead>
                         <tbody id="customerSearchResults"></tbody>
                     </table>
-                    <a asp-page="/Customers/Create" class="btn btn-primary float-end"><i class="fas fa-user-plus"></i> New Customer</a>
+                    <a asp-page="/Customers/Create" class="btn btn-primary"><i class="fas fa-user-plus"></i> New Customer</a>
                 </div>
             </div>
         </div>
@@ -284,7 +287,7 @@
             const selectedProductText = $('#ProductId option:selected').text();
             const comboId = $('#ComboId').val();
             const comboText = $('#ComboId option:selected').text();
-            if (prodCat === "Promo") {
+            if (prodCat === "Package") {
                 if (comboId === "" || comboId === null) {
                     toastr.warning('Please select a combination.');
                     document.getElementById('ComboId').focus();
@@ -365,14 +368,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                                                                                                                        <tr>
-                                                                                                                                            <td>${item.productName}</td>
-                                                                                                                                            <td>${item.comboName}</td>
-                                                                                                                                            <td>${formattedPrice}</td>
-                                                                                                                                            <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                                                                                                                    <td>${formattedTotalItem}</td>
-                                                                                                                                            <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                                                                                                        </tr>`);
+                                <tr>
+                                    <td>${item.productName}</td>
+                                    <td>${item.comboName}</td>
+                                    <td>${formattedPrice}</td>
+                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                            <td>${formattedTotalItem}</td>
+                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                </tr>`);
                 });
             }
 
@@ -382,6 +385,10 @@
             }).format(total);
 
             $('#grandTotal').text(formattedTotal);
+            // Get the plain number value (not formatted) to store in hidden input
+$('#GrandTotalInput').val(total.toFixed(2));
+
+
             $('#ProductCategory, #ProductId, #ComboId, #Price, #Qty, #Amount').val('');
         }
 
@@ -476,7 +483,11 @@
             const category = $('#ProductCategory').val();
             const custclasstxt = $('#CustClassDisplay').text();
 
-            if (!category || !custclasstxt) return;
+            if (!category || !custclasstxt) {
+                loadTracker.productList = true;
+                checkAllLoaded(); // ✅ Add this
+                return;
+            }
 
             $("#ProductId").empty();
             $.getJSON(`?handler=ProductList&ProdCat=${category}&custclass=${custclasstxt}`, function (data) {
@@ -518,6 +529,10 @@
                 },
                 error: function () {
                     alert('Error retrieving price.');
+                },
+                complete: function () {
+                    // Always hide the loader, whether success or failure
+                    hideLoader();
                 }
             });
         }
@@ -544,7 +559,6 @@
             });
 
             $('#ProductCategory').on('change', function () {
-                showLoader();
                 loadTracker.productList = false;
                 loadProductList();
             });
@@ -617,14 +631,14 @@
 
                 data.forEach(customer => {
                     tbody.append(`
-                                                                                    <tr>
-                                                                                        <td>${customer.custcode}</td>
-                                                                                        <td>${customer.name}</td>
-                                                                                        <td>${customer.email}</td>
-                                                                                        <td>${customer.phone}</td>
-                                                                                                <td><button class="btn btn-sm btn-success" title="Select" onclick='selectCustomer(${JSON.stringify(customer)})'><i class="fas fa-check"></i></button></td>
-                                                                                    </tr>
-                                                                                `);
+                                                                                            <tr>
+                                                                                                <td>${customer.custcode}</td>
+                                                                                                <td>${customer.name}</td>
+                                                                                                <td>${customer.email}</td>
+                                                                                                <td>${customer.phone}</td>
+                                                                                                        <td><button class="btn btn-sm btn-success" title="Select" onclick='selectCustomer(${JSON.stringify(customer)})'><i class="fas fa-check"></i></button></td>
+                                                                                            </tr>
+                                                                                        `);
                 });
             });
         });
@@ -649,26 +663,26 @@
             const options = $('#paymentOptionsSource').html();
 
             const row = `
-                                                                        <tr>
-                                                                            <td>
-                                                                                <select name="Payments[${paymentIndex}].PayMethod" class="form-select">
-                                                                            ${options}
-                                                                        </select>
-                                                                            </td>
-                                                                            <td>
-                                                                                <input type="number" name="Payments[${paymentIndex}].Amount" class="form-control payment-amount" />
-                                                                            </td>
-                                                                            <td>
-                                                                                <input type="text" name="Payments[${paymentIndex}].RefNo" class="form-control" />
-                                                                            </td>
-                                                                            <td>
-                                                                                <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
-                                                                                    <i class="fas fa-times"></i>
-                                                                                </button>
-                                                                            </td>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        <select name="Payments[${paymentIndex}].PayMethod" class="form-control form-select">
+                                                                                    ${options}
+                                                                                </select>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <input type="number" name="Payments[${paymentIndex}].Amount" class="form-control payment-amount" />
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <input type="text" name="Payments[${paymentIndex}].RefNo" class="form-control" />
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
+                                                                                            <i class="fas fa-times"></i>
+                                                                                        </button>
+                                                                                    </td>
 
-                                                                        </tr>
-                                                                    `;
+                                                                                </tr>
+                                                                            `;
 
             $('#paymentTableBody').append(row);
             paymentIndex++;
@@ -735,13 +749,13 @@
                 return false;
             }
 
-        // confirm before submit
-        const confirmed = confirm("Are you sure you want to place this order?");
-        if (!confirmed) {
-            e.preventDefault();
-            hideLoader?.();
-            return false;
-        }
+            // confirm before submit
+            const confirmed = confirm("Are you sure you want to place this order?");
+            if (!confirmed) {
+                e.preventDefault();
+                hideLoader?.();
+                return false;
+            }
 
             formIsDirty = false;
         });
@@ -765,6 +779,5 @@
             }
         });
     </script>
-
 }
 

@@ -25,6 +25,7 @@ namespace NLI_POS.Services
             public string Text { get; set; }
             public string Locale { get; set; }
             public string CurrencyCode { get; set; }
+            public string TimeZone { get; set; }
         }
 
 
@@ -66,7 +67,7 @@ namespace NLI_POS.Services
 
         public async Task<List<OfficeSelectItem>> GetUserOfficesAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.FindByNameAsync(User.Identity?.Name);
 
             if (await _userManager.IsInRoleAsync(user, "Admin"))
             {
@@ -77,7 +78,8 @@ namespace NLI_POS.Services
                         Value = o.Id.ToString(),
                         Text = o.Name,
                         Locale = o.Country.Locale,
-                        CurrencyCode = o.Country.CurrencyCode
+                        CurrencyCode = o.Country.CurrencyCode,
+                        TimeZone = o.Country.TimeZone
                     })
                     .ToListAsync();
             }
@@ -91,7 +93,8 @@ namespace NLI_POS.Services
                         Value = x.OfficeId.ToString(),
                         Text = x.OfficeCountry.Name,
                         Locale = x.OfficeCountry.Country.Locale,
-                        CurrencyCode = x.OfficeCountry.Country.CurrencyCode
+                        CurrencyCode = x.OfficeCountry.Country.CurrencyCode,
+                        TimeZone = x.OfficeCountry.Country.TimeZone
                     })
                     .ToListAsync();
             }

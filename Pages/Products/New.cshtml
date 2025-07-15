@@ -39,7 +39,7 @@
 
                     <div class="col-md-4">
                         <label asp-for="Products.ProductType" class="form-label"></label>
-                        <select asp-for="Products.ProductType" class="form-select" asp-items="ViewBag.ProductType">
+                        <select asp-for="Products.ProductType" class="form-control form-select" asp-items="ViewBag.ProductType">
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="Products.ProductType" class="text-danger small"></span>
@@ -47,10 +47,10 @@
 
                     <div class="col-md-4">
                         <label asp-for="Products.ProductCategory" class="form-label"></label>
-                        <select asp-for="Products.ProductCategory" id="ProductCategory" class="form-select">
+                        <select asp-for="Products.ProductCategory" id="ProductCategory" class="form-control form-select">
                             <option value="">Select</option>
                             <option value="Regular">Regular</option>
-                            <option value="Promo">Promo</option>
+                            <option value="Package">Package</option>
                             <option value="Freebie">Freebie</option>
                         </select>
                         <span asp-validation-for="Products.ProductCategory" class="text-danger small"></span>
@@ -70,7 +70,7 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label asp-for="ProductPrice.CountryId" class="form-label"></label>
-                        <select asp-for="ProductPrice.CountryId" class="form-select"
+                        <select asp-for="ProductPrice.CountryId" class="form-control form-select"
                                 asp-items="@(new SelectList(Model.Countries, "Id", "Name"))">
                             <option value="">Select Country</option>
                         </select>

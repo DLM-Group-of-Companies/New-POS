@@ -72,9 +72,23 @@ namespace NLI_POS.Pages.Products
             return new JsonResult(new { success = true, received = data });
         }
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            // Check if ProductCode already exists (case-insensitive)
+            bool isDuplicate = await _context.Products
+                .AnyAsync(p => p.ProductCode == Products.ProductCode);
+
+            if (isDuplicate)
+            {
+                ModelState.AddModelError("Products.ProductCode", "Product code already exists.");
+
+                ViewData["ProductType"] = new SelectList(_context.ProductTypes, "Name", "Name");
+                ViewData["Product"] = new SelectList(_context.Products.OrderBy(p => p.ProductName), "Id", "ProductName");
+                Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
+                //ProductCombos = _context.ProductCombos.Where(p => p.ProductId == Id).ToList();
+                return Page();
+            }
+
             int arrayCount = ProductCombos.Count;
             for(int i = 0; i < arrayCount; i++)
             {
@@ -105,13 +119,13 @@ namespace NLI_POS.Pages.Products
 
             // Set the foreign key
             ProductPrice.ProductId = Products.Id;
-            ProductPrice.EncodeDate = DateTime.UtcNow.AddHours(8);
+            ProductPrice.EncodeDate = DateTime.UtcNow;
             ProductPrice.EncodedBy = User?.Identity?.Name ?? "SYSTEM";
 
             _context.ProductPrices.Add(ProductPrice);
             await _context.SaveChangesAsync();
 
-            if (Products.ProductCategory == "Promo")
+            if (Products.ProductCategory == "Package")
             {
                 return RedirectToPage("./Edit", new { id = Products.Id });
             }

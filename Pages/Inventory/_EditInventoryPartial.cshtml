@@ -7,14 +7,14 @@
 
         <div class="mb-3">
              <label asp-for="InventoryStock.OfficeId" class="form-label"></label>
-@*             <select asp-for="InventoryStock.OfficeId" class="form-select" asp-items="ViewBag.OfficeId"></select>
+@*             <select asp-for="InventoryStock.OfficeId" class="form-control form-select" asp-items="ViewBag.OfficeId"></select>
             <span asp-validation-for="InventoryStock.OfficeId" class="text-danger"></span>  *@
         <input asp-for="InventoryStock.Office.Name" class="form-control" readonly />
         </div>
 
         <div class="mb-3">
             <label asp-for="InventoryStock.ProductId" class="form-label"></label>
-@*             <select asp-for="InventoryStock.ProductId" class="form-select" asp-items="ViewBag.ProductId"></select>
+@*             <select asp-for="InventoryStock.ProductId" class="form-control form-select" asp-items="ViewBag.ProductId"></select>
             <span asp-validation-for="InventoryStock.ProductId" class="text-danger"></span> *@
         <input asp-for="InventoryStock.Products.ProductName" class="form-control" readonly />
         </div>

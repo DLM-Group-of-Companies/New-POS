@@ -1,4 +1,5 @@
-﻿using NLI_POS.Models.Base;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using NLI_POS.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -35,11 +36,7 @@ namespace NLI_POS.Models
         [Display(Name = "Country")]
         public int CountryId { get; set; }
 
-        //public DateTime EncodeDate { get; set; }
-        //public string EncodedBy { get; set; }
-        //public DateTime? UpdateDate { get; set; }
-        //public string? UpdateddBy { get; set; }
-
+        [ValidateNever]
         public virtual Country Country { get; set; }
     }
 }

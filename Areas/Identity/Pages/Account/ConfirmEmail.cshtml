@@ -3,6 +3,15 @@
 @{
     ViewData["Title"] = "Confirm email";
 }
+<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-4 w-25">
 
-<h1>@ViewData["Title"]</h1>
+<div class="text-center pb-5">
+        <i class="far fa-check-circle fa-10x text-success fa-beat"></i>
+</div>
 <partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="text-center">
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">
+            <i class="fas fa-sign-in-alt me-2"></i> Login
+        </a>
+    </div>
+</div>

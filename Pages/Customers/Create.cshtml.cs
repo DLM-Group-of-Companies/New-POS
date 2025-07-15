@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 using NLI_POS.Services;
+using System.Globalization;
 
 namespace NLI_POS.Pages.Customers
 {
@@ -51,7 +47,14 @@ namespace NLI_POS.Pages.Customers
         [BindProperty]
         public Customer Customer { get; set; } = default!;
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
+        public static string ToProperCase(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return input;
+
+            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input.ToLower());
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
             ViewData["CustClass"] = new SelectList(_context.CustClass, "Id", "Name");
@@ -99,6 +102,10 @@ namespace NLI_POS.Pages.Customers
             {
                 return Page();
             }
+
+            Customer.FirstName = ToProperCase(Customer.FirstName);
+            if (Customer.MiddleName!=null ) Customer.MiddleName = ToProperCase(Customer.MiddleName);
+            Customer.LastName = ToProperCase(Customer.LastName);
 
             _context.Customer.Add(Customer);
             await _context.SaveChangesAsync();

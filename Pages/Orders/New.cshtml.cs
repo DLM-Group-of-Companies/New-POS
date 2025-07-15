@@ -34,6 +34,8 @@ namespace NLI_POS.Pages.Orders
         [BindProperty]
         public List<OrderDetails> OrderDetails { get; set; } = new();
 
+        [BindProperty]
+        public string GrandTotal { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -222,8 +224,8 @@ namespace NLI_POS.Pages.Orders
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
 
-                // Check if product is a promo bundle
-                if (product != null && product.ProductCategory == "Promo")
+                // Check if product is a package bundle
+                if (product != null && product.ProductCategory == "Package")
                 {
                     var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == item.ProductCombo);
 
@@ -235,7 +237,7 @@ namespace NLI_POS.Pages.Orders
                         for (int i = 0; i < productIds.Count; i++)
                         {
                             int componentProductId = productIds[i];
-                            int requiredQty = qtyList[i] * item.Quantity; // Multiply by how many promos were ordered
+                            int requiredQty = qtyList[i] * item.Quantity; // Multiply by how many packages were ordered
 
                             var inventory = await _context.InventoryStocks
                                 .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == Order.OfficeId);
@@ -245,7 +247,7 @@ namespace NLI_POS.Pages.Orders
                                 var componentProduct = await _context.Products.FindAsync(componentProductId);
                                 string componentName = componentProduct?.ProductName ?? $"Product ID {componentProductId}";
 
-                                ModelState.AddModelError("", $"Not enough stock for promo component: {componentName}. Available: {inventory?.StockQty ?? 0}, Required: {requiredQty}");
+                                ModelState.AddModelError("", $"Not enough stock for package component: {componentName}. Available: {inventory?.StockQty ?? 0}, Required: {requiredQty}");
                                 await LoadDropdownsAsync();
                                 return Page();
                             }
@@ -293,7 +295,7 @@ namespace NLI_POS.Pages.Orders
             //} while (!isUnique);
 
 
-            DateTime encodeDate = DateTime.UtcNow.AddHours(8);
+            DateTime encodeDate = DateTime.UtcNow;
 
             var oType = await _context.Customer
                 .Include(c => c.CustClasses)
@@ -305,12 +307,13 @@ namespace NLI_POS.Pages.Orders
             var order = new Order
             {
                 OrderNo = orderNo,
-                OrderDate = encodeDate.Date,
+                OrderDate = encodeDate,
                 EncodeDate = encodeDate,
                 CustomerId = Order.CustomerId,
                 OfficeId = Order.OfficeId,
                 OrderType = orderType,
                 EncodedBy = User.Identity.Name,
+                TotAmount = Order.TotAmount,
                 TotPaidAmount = Payments.Sum(p => p.Amount),
                 Notes = Order.Notes
             };
@@ -361,9 +364,9 @@ namespace NLI_POS.Pages.Orders
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
 
-                if (product != null && product.ProductCategory == "Promo")
+                if (product != null && product.ProductCategory == "Package")
                 {
-                    // Promo 
+                    // Package 
                     var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == item.ProductCombo);
                     if (combo != null)
                     {
@@ -407,7 +410,7 @@ namespace NLI_POS.Pages.Orders
 
             await _context.SaveChangesAsync();
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Submitted Order {Order.OrderNo}");
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Submitted Order {orderNo}");
 
             HttpContext.Session.Remove("Cart");
             TempData["SuccessMessage"] = "Order has been successfully submitted.";
@@ -425,7 +428,7 @@ namespace NLI_POS.Pages.Orders
         //Verify Stocks
         public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId)
         {
-            // Get the product to determine if it's Promo or Regular
+            // Get the product to determine if it's Package or Regular
             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
             if (product == null)
@@ -433,9 +436,9 @@ namespace NLI_POS.Pages.Orders
                 return new JsonResult(0);
             }
 
-            if (product.ProductCategory == "Promo")
+            if (product.ProductCategory == "Package")
             {
-                // It's a promo item — find the corresponding combo
+                // It's a Package item — find the corresponding combo
                 var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == productId);
 
                 if (combo == null)

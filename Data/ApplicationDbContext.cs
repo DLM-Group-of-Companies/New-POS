@@ -49,6 +49,9 @@ namespace NLI_POS.Data
                 .HasForeignKey(p => p.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Product>()
+    .HasIndex(p => p.ProductCode)
+    .IsUnique();
             // ... other configurations
         }
 
@@ -71,5 +74,6 @@ namespace NLI_POS.Data
         public DbSet<ProductItem> ProductItems { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<SysParam> SysParams { get; set; }
     }
 }

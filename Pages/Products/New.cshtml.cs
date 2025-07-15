@@ -103,13 +103,13 @@ namespace NLI_POS.Pages.Products
 
             //Save Prices per Country
             ProductPrice.ProductId = Products.Id;
-            ProductPrice.EncodeDate = DateTime.UtcNow.AddHours(8);
+            ProductPrice.EncodeDate = DateTime.UtcNow;
             ProductPrice.EncodedBy = User.Identity?.Name ?? "System";
 
             _context.ProductPrices.Add(ProductPrice);
             await _context.SaveChangesAsync();
 
-            if (Products.ProductCategory == "Promo")
+            if (Products.ProductCategory == "Package")
             {
                 return RedirectToPage("./Edit", new { id = Products.Id });
             }

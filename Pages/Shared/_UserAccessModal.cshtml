@@ -1,7 +1,7 @@
 ﻿@using NLI_POS.Models.ViewModels
 @model UserAccessViewModel
 
-<form id="userAccessForm" method="post" >
+<form id="userAccessForm" method="post"  >
     @Html.AntiForgeryToken()
     <input type="hidden" name="userId" value="@Model.UserId" />
 

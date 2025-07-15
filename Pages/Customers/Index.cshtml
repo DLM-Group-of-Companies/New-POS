@@ -5,7 +5,7 @@
 @{
     ViewData["Title"] = "Customers";
 }
-<div class="container-fluid bg-white bg-gradient  shadow p-2">
+<div class="container-fluid bg-white bg-gradient shadow p-4 pb-1">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0 text-primary">
             <i class="fas fa-users"></i> Customers
@@ -109,13 +109,13 @@
                 ]
             });
 
-            // Optional: Preloader logic (only if you have #preloader in your HTML)
-            $('#customerTable').on('preXhr.dt', function () {
-                showLoader();
-            });
-            $('#customerTable').on('xhr.dt', function () {
-                hideLoader();
-            });
+            // // Optional: Preloader logic (only if you have #preloader in your HTML)
+            // $('#customerTable').on('preXhr.dt', function () {
+            //     showLoader();
+            // });
+            // $('#customerTable').on('xhr.dt', function () {
+            //     hideLoader();
+            // });
 
             // Delete modal logic
             const deleteModal = document.getElementById('deleteCustomerModal');

@@ -2,7 +2,7 @@
 
 <div class="py-2">
     <form id="salesFilterForm" method="get">
-        <select id="OfficeId" asp-for="Office" class="form-select">
+        <select id="OfficeId" asp-for="Office" class="form-control form-select">
             @foreach (var office in Model.OfficeList)
             {
                 <option value="@office.Value"

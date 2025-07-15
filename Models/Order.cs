@@ -32,8 +32,9 @@ namespace NLI_POS.Models
         [Display(Name = "Order Type")]
         public string OrderType { get; set; }
 
-
-        public decimal TotPaidAmount { get; set; }
+        public decimal TotAmount { get; set; } //Total Amount of Transaction
+        public decimal TotPaidAmount { get; set; } //Total payment of Customer. Maybe higher than TotAmount
+        
 
         [StringLength(500)]
         public string? Notes { get; set; }

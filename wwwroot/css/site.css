@@ -8,7 +8,7 @@ html, body {
     width: 100%;
     overflow-x: hidden; /* prevents horizontal scroll */
 
-    background-image: url('/images/main.jpg');
+    background-image: url('/images/backgrounds/main.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -225,59 +225,6 @@ input[type="number"] {
     cursor: move;
 }
 
-/*@media (min-width: 768px) {
-    .icon-container-main {
-        position: relative;
-        height: 100vh;
-        padding: 0;
-    }
-
-    .draggable-icon {
-        position: absolute !important;
-        width: 100px;
-    }
-
-        .draggable-icon img {
-            width: 100%;
-        }*/
-
-/* Icon positioning classes for desktop */
-/*.pos-orders {
-        top: 100px;
-        left: 300px;
-    }
-
-    .pos-customers {
-        top: 100px;
-        left: 500px;
-    }
-
-    .pos-reports {
-        top: 100px;
-        left: 700px;
-    }
-
-    .pos-products {
-        top: 300px;
-        left: 200px;
-    }
-
-    .pos-inventory {
-        top: 300px;
-        left: 400px;
-    }
-
-    .pos-office {
-        top: 300px;
-        left: 600px;
-    }
-
-    .pos-users {
-        top: 300px;
-        left: 800px;
-    }
-}*/
-
 .icon-container-main {
     display: flex;
     height: calc(100vh - 60px); /* reserve space for footer */
@@ -459,4 +406,52 @@ input[type="number"] {
 /**/
 #todaySalesContent {
     transition: opacity 0.3s ease-in-out;
+}
+
+/* right click submenu hover */
+.submenu-container:hover .submenu {
+    display: block !important;
+}
+
+.submenu {
+    min-width: 150px;
+    z-index: 10000;
+}
+
+#customContextMenu a.dropdown-item {
+    white-space: nowrap;
+}
+
+.submenu a.dropdown-item {
+    padding-left: 1.5rem;
+}
+
+/* Align Context  menu */
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+}
+
+    .menu-item i {
+        width: 20px; /* fixed icon width for alignment */
+        text-align: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+
+    .menu-item span {
+        flex-grow: 1;
+    }
+
+    /*Fix datatable progress bar behind headers*/
+.dataTables_processing {
+    z-index: 1050 !important; /* Higher than sticky headers (Bootstrap uses 1030–1040) */
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    /* background-color: rgba(255, 255, 255, 0.8); Optional: add background to see it clearly */
+    padding: 1rem;
 }

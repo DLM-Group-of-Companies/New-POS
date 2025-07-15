@@ -107,7 +107,7 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Username.Trim().ToUpper(), Email = Input.Email.Trim(), FullName = Input.FullName.Trim(), OfficeId = Input.OfficeId };
+                var user = new ApplicationUser { UserName = Input.Username.Trim().ToUpper(), Email = Input.Email.ToLower().Trim(), FullName = Input.FullName.Trim(), OfficeId = Input.OfficeId };
 
                 var isUserNameAlreadyExists = _userManager.Users.Any(x => x.UserName == user.UserName);
                 if (isUserNameAlreadyExists)

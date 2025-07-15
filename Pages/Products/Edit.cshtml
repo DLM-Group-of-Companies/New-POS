@@ -75,7 +75,7 @@
                             <select asp-for="Products.ProductCategory" id="ProductCategory" class="form-control">
                                 <option value="">Select</option>
                                 <option value="Regular">Regular</option>
-                                <option value="Promo">Promo</option>
+                                <option value="Package">Package</option>
                                 <option value="Freebie">Freebie</option>
                             </select>
                             <span asp-validation-for="Products.ProductCategory" class="text-danger small"></span>
@@ -100,7 +100,7 @@
                     <div class="col-md-3">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-globe-asia fa-lg text-secondary" title="Country"></i>
-                            <select asp-for="ProductPrice.CountryId" class="form-select"
+                            <select asp-for="ProductPrice.CountryId" class="form-control form-select"
                                     asp-items="@(new SelectList(Model.Countries, "Id", "Name"))">
                                 <option value="">Select Country</option>
                             </select>
@@ -366,7 +366,7 @@
         $(document).ready(function () {
 
             var fieldValue = $('#ProductCategory').val();
-            if (fieldValue == 'Promo')
+            if (fieldValue == 'Package')
             //.....................^.......
             {
                 $("#comboColumn").slideDown(500);
@@ -378,7 +378,7 @@
             }
 
             $('#ProductCategory').on('change', function () {
-                if (this.value == 'Promo')
+                if (this.value == 'Package')
                 //.....................^.......
                 {
                     $("#comboColumn").slideDown(500);

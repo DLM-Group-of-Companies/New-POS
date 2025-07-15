@@ -44,38 +44,6 @@ namespace NLI_POS.Pages.Customers
             return Page();
         }
 
-        //public async Task<IActionResult> OnPostAsync()
-        //{
-        //    ModelState.Remove("Customer.OfficeCountries");
-        //    ModelState.Remove("Customer.CustClasses");
-
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return Page();
-        //    }
-
-        //    _context.Attach(Customer).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!CustomerExists(Customer.Id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    await AuditHelpers.LogAsync(HttpContext, _context, User, $"Edited Customer ${Customer.CustCode}");
-        //    return RedirectToPage("./Index");
-        //}
-
         public async Task<IActionResult> OnPostAsync()
         {
             ModelState.Remove("Customer.OfficeCountries");

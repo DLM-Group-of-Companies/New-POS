@@ -81,7 +81,7 @@
     <div class="modal-dialog ">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">User Office Access</h5>
+                <h5 class="modal-title text-primary"><i class="fas fa-house-user me-2"></i>User Office Access</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="userAccessModalBody">
@@ -215,7 +215,7 @@
 
                 const form = e.target;
                 const formData = new FormData(form);
-
+                showLoader();
                 fetch('/UsersOfficeAccess/Create', {
                     method: 'POST',
                     body: formData
@@ -237,6 +237,8 @@
                             //alert(currentUserId);
                             reloadUserAccess(currentUserId);
 
+                            hideLoader();
+
                             // ✅ Optionally show alert
                             toastr.options.closeButton = false;
                             toastr.options.timeOut = 1800;
@@ -254,7 +256,7 @@
         function deleteRecord(button) {
             const accId = button.dataset.accessId;
             //alert(accId);
-
+            showLoader();
             // Send AJAX request to check if the record exists
             $.ajax({
                 url: '/UsersOfficeAccess/Delete/', // Adjust the URL to match your route
@@ -264,6 +266,7 @@
                 data: { __RequestVerificationToken: gettoken(), id: accId },
                 success: function (successDelete) {
                     if (successDelete) {
+                        hideLoader();
                         toastr.options.closeButton = false;
                         toastr.options.timeOut = 1800;
                         toastr.options.fadeOut = 1000;
@@ -276,6 +279,7 @@
                 },
                 error: function (xhr, status, error) {
                     //toastr.waring('@TempData["Message"]');
+                    hideLoader();
                     alert('An error occurred while deleting the record.');
                     alert('err:' + xhr.responseText);
                 }

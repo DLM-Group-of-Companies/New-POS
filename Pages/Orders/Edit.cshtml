@@ -25,7 +25,7 @@
                     <div class="row">
                         <div class="col-6 mb-2">
                             <label asp-for="Order.OfficeId" class="form-label"></label>
-@*                             <select id="OfficeId" asp-for="Order.OfficeId" class="form-select">
+@*                             <select id="OfficeId" asp-for="Order.OfficeId" class="form-control form-select">
                                 @foreach (var office in Model.OfficeList)
                                 {
                                     <option value="@office.Value"
@@ -51,7 +51,7 @@
                     </h5>
                     <label asp-for="Order.CustomerId" class="form-label"></label>
                     <div class="input-group mb-2">
-                        <select asp-for="Order.CustomerId" id="CustomerId" class="form-select" asp-items="ViewBag.CustomerId">
+                        <select asp-for="Order.CustomerId" id="CustomerId" class="form-control form-select" asp-items="ViewBag.CustomerId">
                             <option value="">-- Select Customer--</option>
                         </select>
                         <button class="btn btn-primary" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
@@ -71,20 +71,20 @@
                     <div class="row">
                         <div class="col-4 mb-2">
                             <label class="form-label">Category</label>
-                            <select id="ProductCategory" class="form-select">
+                            <select id="ProductCategory" class="form-control form-select">
                                 <option value="Regular">Regular</option>
-                                <option value="Promo">Promo</option>
+                                <option value="Package">Package</option>
                                 <option value="Freebie">Freebie</option>
                             </select>
                         </div>
                         <div class="col-8 mb-2">
                             <label class="form-label">Product</label>
-                            <select id="ProductId" class="form-select" asp-items="ViewBag.ProductId"></select>
+                            <select id="ProductId" class="form-control form-select" asp-items="ViewBag.ProductId"></select>
                         </div>
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Combo (if applicable)</label>
-                        <select id="ComboId" class="form-select" asp-items="ViewBag.ProductCombos"></select>
+                        <select id="ComboId" class="form-control form-select" asp-items="ViewBag.ProductCombos"></select>
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-2">
@@ -179,7 +179,7 @@
                         <tbody id="paymentTableBody">
                             <tr>
                                 <td>
-                                    <select name="Payments[0].PayMethod" class="form-select">
+                                    <select name="Payments[0].PayMethod" class="form-control form-select">
                                         @foreach (var method in ViewBag.PaymentMethod as SelectList)
                                         {
                                             <option value="@method.Value">@method.Text</option>

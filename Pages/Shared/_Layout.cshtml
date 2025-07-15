@@ -3,6 +3,10 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@inject ApplicationDbContext _context
+@{
+    var bgUrl = _context.SysParams.FirstOrDefault(x => x.Id == 1)?.Background.Replace("\\", "/");
+}
 
 @{
     var path = Context.Request.Path.ToString().ToLower();
@@ -18,9 +22,8 @@
 
 
     <title>@ViewData["Title"] - NobleLife POS</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    @*     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
+    @* Default *@
+    <link id="bootstrap-theme" rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     @* <script src="~/lib/jquery/dist/jquery.min.js"></script> *@
     <script src="https://kit.fontawesome.com/cc42349d53.js" crossorigin="anonymous"></script>
@@ -66,11 +69,10 @@
 <body class="@((User.Identity?.IsAuthenticated ?? false) ? "with-sidebar" : "no-sidebar")">
 
     @* <div class="d-flex"> *@
-        <div>
+    <div>
         @* @if (!isLoginPage) *@
         @if (User.Identity.IsAuthenticated)
         {
-            
             <!-- ✅ Sidebar for desktop (md+) only -->
             <div class="sidebar-desktop d-none d-md-block bg-dark text-white sidebar-scrollable">
                 @await Html.PartialAsync("_SidebarPartial")
@@ -99,7 +101,6 @@
                     @await Html.PartialAsync("_SidebarPartial")
                 </div>
             </div>
-
         }
 
         @* Daily Sales Popup Start *@
@@ -119,14 +120,91 @@
                 </div>
             </div>
         </div>
-
         @* Popup End *@
 
-        <!-- Main Content -->
-        <div class="flex-grow-1 " id="page-content" >
+        <!-- Change Background Modal -->
+        <div class="modal fade" id="changebgModal" tabindex="-1" aria-labelledby="changebgModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered ">
+                <div class="modal-content">
+                    <!-- Optional: Modal header -->
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="changebgModalLabel">Change Background</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-4" id="changeBackgroundContent">
+                        <div class="text-center">Loading backgrounds...</div>
+                    </div>
+
+                    <script>
+                        const modal = document.getElementById('changebgModal');
+                        modal.addEventListener('show.bs.modal', function () {
+                            fetch('/Utilities/ChangeBackground/_ChangeBackgroundPartial')
+                                .then(response => response.text())
+                                .then(html => {
+                                    document.getElementById('changeBackgroundContent').innerHTML = html;
+                                });
+                        });
+                    </script>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Right Click menu -->
+        <div class="flex-grow-1 " id="page-content">
             <div id="preloader" style="display:none;">
                 <div class="loader"></div>
             </div>
+
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <div id="customContextMenu" class="position-absolute bg-white border rounded shadow p-2 d-none" style="z-index: 9999; min-width: 220px;">
+                    <small>
+                        <a href="#" class="dropdown-item menu-item pb-2 d-flex align-items-center" onclick="location.reload();">
+                            <i class="fas fa-sync"></i>
+                            <span>Refresh</span>
+                        </a>
+
+                        <a href="#" class="dropdown-item menu-item pb-2 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#changebgModal">
+                            <i class="fas fa-brush"></i>
+                            <span>Change Background</span>
+                        </a>
+
+                        <!-- Themes Menu -->
+                        <div class="submenu-container position-relative">
+                            <a href="#" class="dropdown-item menu-item pb-2">
+                                <i class="fas fa-palette me-2"></i> Themes
+                                <i class="fas fa-chevron-right float-end small mt-1"></i>
+                            </a>
+                            <div class="submenu bg-white border shadow rounded d-none position-absolute start-100 top-0 mt-0 ms-1">
+                                <a href="#" class="dropdown-item pb-2 d-flex justify-content-between align-items-center" onclick="setTheme('default')">
+                                    <span><i class="far fa-hand-point-right me-2"></i> Default</span>
+                                    <i class="fas fa-check text-success d-none pe-3" id="check-default"></i>
+                                </a>
+                                <a href="#" class="dropdown-item pb-2 d-flex justify-content-between align-items-center" onclick="setTheme('pulse')">
+                                    <span><i class="far fa-hand-point-right me-2"></i> Pulse</span>
+                                    <i class="fas fa-check text-success d-none pe-3" id="check-pulse"></i>
+                                </a>
+                                <a href="#" class="dropdown-item pb-2 d-flex justify-content-between align-items-center" onclick="setTheme('flatly')">
+                                    <span><i class="far fa-hand-point-right me-2"></i> Flatly</span>
+                                    <i class="fas fa-check text-success d-none pe-3" id="check-flatly"></i>
+                                </a>
+                                <a href="#" class="dropdown-item pb-2 d-flex justify-content-between align-items-center" onclick="setTheme('lumen')">
+                                    <span><i class="far fa-hand-point-right me-2"></i> Lumen</span>
+                                    <i class="fas fa-check text-success d-none pe-3" id="check-lumen"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <a href="~/Identity/Account/Logout?returnUrl=@Url.Page("/Index", new { area = "" })" class="dropdown-item menu-item pb-2 text-danger d-flex align-items-center">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </small>
+                </div>
+            }
+
 
             <main role="main" class="main-content">
                 @RenderBody()
@@ -144,15 +222,15 @@
 
     <script>
         $(function () {
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <text>toastr.success("@TempData["SuccessMessage"]");</text>
-            }
-            else if (TempData["ErrorMessage"] != null)
-            {
-                <text>toastr.error("@TempData["ErrorMessage"]");</text>
-            }
-        });
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>toastr.success("@TempData["SuccessMessage"]");</text>
+        }
+        else if (TempData["ErrorMessage"] != null)
+        {
+            <text>toastr.error("@TempData["ErrorMessage"]");</text>
+        }
+                                        });
 
         function validateAndShowLoader(form) {
             if (!form) return false;
@@ -186,7 +264,16 @@
         updateClock(); // initialize immediately
 
     </script>
-
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const bgUrl = "@bgUrl";
+            if (bgUrl) {
+                document.body.style.backgroundImage = `url('${bgUrl}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+            }
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("Notyf")

@@ -14,13 +14,24 @@
     <hr />
     <div class="row g-3 mb-4">
         <form method="get" class="row g-3 mb-4">
+            <input type="hidden" id="timezoneInput" name="timeZone" />
             <div class="col-md-2">
                 <label for="officeFilter" class="form-label">Office</label>
-                <select asp-for="Office" asp-items="Model.OfficeList" class="form-select"></select>
+                <select id="officeFilter" name="officeId" class="form-control form-select ms-2" style="width: auto;" title="Filter by Office">
+                    @foreach (var office in Model.OfficeList)
+                    {
+                        Console.WriteLine($"Office: {office.Text}, TZ: {office.TimeZone}");
+                        <option value="@office.Value"
+                                data-timezone="@office.TimeZone"
+                                data-currency="@office.CurrencyCode">
+                            @office.Text
+                        </option>
+                    }
+                </select>
             </div>
             <div class="col-md-2">
                 <label for="dDate" class="form-label">Date</label>
-                <input type="date" id="dDate" name="Date" value="@(Model.Date?.ToString("yyyy-MM-dd"))" class="form-control" />
+                <input type="date" id="dDate" name="dDate" value="@(Model.Date?.ToString("yyyy-MM-dd"))" class="form-control" />
             </div>
             <div class="col-md-2 align-self-end">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i> Filter</button>
@@ -61,7 +72,15 @@
                     {
                         <tr>
                             <td>@order.OrderNo</td>
-                            <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                            <td>
+                                    @{
+                                        var tz = TimeZoneInfo.FindSystemTimeZoneById(Request.Query["timeZone"]);
+                                        var localDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, tz);
+                                    }
+                                    @localDate.ToString("yyyy-MM-dd")
+                            </td>
+
                             <td>@order.Customers?.CustCode</td>
                             <td>@($"{order.Customers?.FirstName} {order.Customers?.LastName}")</td>
                             <td>@item.Id</td> <!-- Replace with correct item number if needed -->
@@ -110,8 +129,8 @@
                             columns: ':visible'
                         },
                         filename: function () {
-                            const office = $('select[name="Office"]').val() || 'AllOffices';
-                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);
+                            const office = $('select[name="officeFilter"]').val() || 'AllOffices';
+                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);                            
                             return `DailySales_${office}_${date}`;
                         }
                     },
@@ -156,6 +175,16 @@
             //     table.draw();
             // });
         });
+
+        $(document).ready(function () {
+            $('#officeFilter').on('change', function () {
+                const tz = $('#officeFilter option:selected').data('timezone');
+                $('#timezoneInput').val(tz);
+            });
+
+            $('#officeFilter').trigger('change'); // set on page load
+        });
+
     </script>
 
 }

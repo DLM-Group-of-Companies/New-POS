@@ -32,7 +32,7 @@ namespace NLI_POS.Pages
 
         public async Task<IActionResult> OnGetPartialAsync(int? Office)
         {
-            Date = DateTime.UtcNow.AddHours(8);
+            Date = DateTime.UtcNow;
             OfficeList = await GetUserOfficesAsync();
 
             // Default to the first assigned office if none is selected
@@ -46,7 +46,7 @@ namespace NLI_POS.Pages
             TotalSales = await _context.Orders
                 .Include(o => o.Office)
                 .Where(o => o.Office.Id == Office && o.OrderDate.Date == Date.Value.Date && !o.IsVoided)
-                .SumAsync(o => (decimal?)o.TotPaidAmount) ?? 0;
+                .SumAsync(o => (decimal?)o.TotAmount) ?? 0;
 
             this.Office = Office.Value; // update model's Office value
 

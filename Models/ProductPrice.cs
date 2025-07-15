@@ -20,7 +20,7 @@ namespace NLI_POS.Models
         public int CountryId { get; set; }
 
         [Display(Name = "Unit Price")]
-        public decimal UnitCost { get; set; }=decimal.Zero;
+        public decimal UnitCost { get; set; } = decimal.Zero;
         [Display(Name = "Regular")]
         public decimal RegPrice { get; set; } = decimal.Zero;
         [Display(Name = "Standard Dist")]

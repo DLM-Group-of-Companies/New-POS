@@ -251,5 +251,137 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // fades out automatically
 setTimeout(() => {
-    closeSalesPopup(); 
+    closeSalesPopup();
 }, 5000);
+
+// Change the background
+//document.addEventListener('click', function (e) {
+//    if (e.target.classList.contains('bg-thumb')) {
+//        const imgUrl = e.target.src;
+//        document.body.style.backgroundImage = `url('${imgUrl}')`;
+//        document.body.style.backgroundSize = 'cover';
+//        document.body.style.backgroundPosition = 'center';
+//    }
+//});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modalEl = document.getElementById('changebgModal');
+    modalEl.addEventListener('shown.bs.modal', function () {
+        initializeBackgroundSelector();
+    });
+});
+
+
+function initializeBackgroundSelector() {
+    const thumbs = document.querySelectorAll('.bg-thumb');
+    const hiddenInput = document.getElementById('selectedBackground');
+    const saveButton = document.getElementById('saveBgBtn');
+
+    if (!thumbs.length || !hiddenInput || !saveButton) return;
+
+    thumbs.forEach(thumb => {
+        thumb.addEventListener('click', function () {
+            const imgUrl = this.src;
+            document.body.style.backgroundImage = `url('${imgUrl}')`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+
+            hiddenInput.value = imgUrl;
+        });
+    });
+
+    saveButton.addEventListener('click', function () {
+        const selected = hiddenInput.value;
+        if (!selected) {
+            alert("Please select a background first.");
+            return;
+        }
+
+        fetch('/Utilities/ChangeBackground/_ChangeBackgroundPartial?handler=SaveBackground', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: JSON.stringify({ selectedBackground: selected })
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("Background saved!");
+                    const modalEl = document.getElementById("changebgModal");
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+                } else {
+                    alert("Failed to save background.");
+                }
+            });
+    });
+}
+
+//Right click
+document.addEventListener('DOMContentLoaded', function () {
+    const contextMenu = document.getElementById('customContextMenu');
+
+    document.body.addEventListener('contextmenu', function (e) {
+        //return; //temporary disable
+        e.preventDefault();
+
+        contextMenu.style.left = `${e.pageX}px`;
+        contextMenu.style.top = `${e.pageY}px`;
+        contextMenu.classList.remove('d-none');
+    });
+
+    document.body.addEventListener('click', function () {
+        contextMenu.classList.add('d-none');
+    });
+});
+
+//Change theme
+const themeMap = {
+    default: "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
+    pulse: "https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/pulse/bootstrap.min.css",
+    flatly: "https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/flatly/bootstrap.min.css",
+    lumen: "https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css"
+};
+
+function setTheme(name) {
+    const link = document.getElementById('bootstrap-theme');
+    if (!link || !themeMap[name]) return;
+
+    link.href = themeMap[name];
+    localStorage.setItem("theme", name);
+    updateThemeCheck(name);
+}
+
+function updateThemeCheck(selected) {
+    // Hide all checks first
+    Object.keys(themeMap).forEach(t => {
+        const checkIcon = document.getElementById(`check-${t}`);
+        if (checkIcon) checkIcon.classList.add('d-none');
+    });
+
+    // Show selected
+    const selectedIcon = document.getElementById(`check-${selected}`);
+    if (selectedIcon) selectedIcon.classList.remove('d-none');
+}
+
+// Load theme on startup
+document.addEventListener("DOMContentLoaded", function () {
+    const savedTheme = localStorage.getItem("theme") || "default";
+    setTheme(savedTheme);
+});
+
+
+//Fixed the remaining backdrop of 2 modals
+$('#addAccessModal').on('hidden.bs.modal', function () {
+    // Check if the parent modal is still visible
+    if ($('#officeAccessModal').hasClass('show')) {
+        // Restore the modal-open class to prevent body scrolling
+        $('body').addClass('modal-open');
+
+        // Manually add a backdrop if it was removed
+        if ($('.modal-backdrop').length === 0) {
+            $('<div class="modal-backdrop fade show"></div>').appendTo(document.body);
+        }
+    }
+});

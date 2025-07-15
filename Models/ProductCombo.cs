@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NLI_POS.Models
 {
-    //Product List for Combo or Promo
+    //Product List for Combo or Package
     public class ProductCombo
     {
         [Key]

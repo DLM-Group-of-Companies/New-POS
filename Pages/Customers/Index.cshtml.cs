@@ -104,13 +104,14 @@ namespace NLI_POS.Pages.Customers
             {
                 _context.Customer.Remove(customer);
                 await _context.SaveChangesAsync();
+                await AuditHelpers.LogAsync(HttpContext, _context, User, $"Deleted {customer.CustCode}: {customer.FirstName} {customer.LastName}");
                 TempData["SuccessMessage"] = "Customer deleted successfully.";
             }
             else
             {
                 TempData["ErrorMessage"] = "Customer not found.";
             }
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Deleted {customer.CustCode}: {customer.FirstName} {customer.LastName}");
+            
             return RedirectToPage(); // This triggers OnGetAsync again
         }
 

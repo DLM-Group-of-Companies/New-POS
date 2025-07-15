@@ -21,7 +21,7 @@ namespace NLI_POS.Pages.ProductCombos
 
         public IActionResult OnGet()
         {
-        ViewData["ProductId"] = new SelectList(_context.Products.Where(p=>p.ProductCategory=="Promo"), "Id", "ProductName");
+        ViewData["ProductId"] = new SelectList(_context.Products.Where(p=>p.ProductCategory=="Package"), "Id", "ProductName");
             return Page();
         }
 

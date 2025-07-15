@@ -1,19 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
+using NLI_POS.Services;
 using NLI_POS.Models.ViewModels;
+using static NLI_POS.Services.BasePageModel;
 
 namespace NLI_POS.Pages.Report
 {
-    public class DailySalesModel : PageModel
+    public class DailySalesModel : BasePageModel
     {
         private readonly NLI_POS.Data.ApplicationDbContext _context;
+        protected readonly UserManager<ApplicationUser> _userManager;
 
-        public DailySalesModel(NLI_POS.Data.ApplicationDbContext context)
+        public DailySalesModel(NLI_POS.Data.ApplicationDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [BindProperty(SupportsGet = true)]
@@ -23,49 +28,59 @@ namespace NLI_POS.Pages.Report
         public DateTime? Date { get; set; }
 
         public List<Order> Order { get; set; }
-        public List<OfficeCountry> Offices { get; set; }
-        public SelectList OfficeList { get; set; }
+
+        public List<OfficeSelectItem> OfficeList { get; set; }
         public OrderSummaryViewModel OrderSummary { get; set; }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync(int? officeId, string timeZone, DateTime? dDate)
         {
-            Offices = _context.OfficeCountry.Where(o => o.isActive).ToList();
+            OfficeList = await GetUserOfficesAsync();
+            
+            //if (dDate == null)
+            //{
+            //    var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+            //    DateTime localStart = DateTime.UtcNow;
+            //    dDate = localStart;
+            //    DateTime localEnd = localStart.AddDays(1);
 
-            // Set default Office if none selected
-            if (string.IsNullOrEmpty(Office))
+            //    DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, tz);
+            //    DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd, tz);
+            //}
+
+            Order = new List<Order>();
+
+            if (!officeId.HasValue || string.IsNullOrEmpty(timeZone) || !dDate.HasValue)
             {
-                Office = Offices.FirstOrDefault()?.Name;
+                return Page(); // Don't query unless all filters are supplied
             }
-
-            // Set default Date to today if none selected
-            if (!Date.HasValue)
-            {
-                Date = DateTime.Today;
-            }
-
-            OfficeList = new SelectList(Offices.DistinctBy(o => o.Name), "Name", "Name", Office);
 
             var query = _context.Orders
                 .Include(o => o.Customers)
                 .Include(o => o.Office)
-                .Include(o => o.ProductItems)  // ✅ This includes the items with product info already flattened
+                .Include(o => o.ProductItems)
                 .Include(o => o.Payments)
+                .Where(o => o.OfficeId == officeId)
                 .AsQueryable();
 
-
-            if (!string.IsNullOrEmpty(Office))
+            try
             {
-                query = query.Where(o => o.Office.Name == Office);
+                var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+                DateTime localStart = dDate.Value.Date;
+                DateTime localEnd = localStart.AddDays(1);
+
+                DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, tz);
+                DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd, tz);
+
+                query = query.Where(o => o.OrderDate >= utcStart && o.OrderDate < utcEnd);
+            }
+            catch (Exception ex)
+            {
+                // Log error (optional)
             }
 
-            if (Date.HasValue)
-            {
-                query = query.Where(o => o.OrderDate.Date == Date.Value.Date);
-            }
-
-            Order = query.ToList();
+            Order = await query.ToListAsync();
+            return Page();
         }
-
 
     }
 }

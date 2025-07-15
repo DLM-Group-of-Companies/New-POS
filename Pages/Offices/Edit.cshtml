@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Edit Office Details";
 }
-<div class="container-fluid bg-white bg-gradient shadow w-50 px-4 py-4">
+<div class="container-fluid bg-white bg-gradient shadow px-4 py-4" style="max-width: 600px; width: 100%;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="text-primary mb-0">
             <i class="fa-solid fa-building me-2"></i> @ViewData["Title"]
@@ -16,13 +16,20 @@
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
         <input type="hidden" asp-for="OfficeCountry.Id" />
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
+        <div class="row g-2">
+            <div class="col-md-9 mb-3">
                 <label asp-for="OfficeCountry.Name" class="form-label"></label>
                 <input asp-for="OfficeCountry.Name" class="form-control" />
                 <span asp-validation-for="OfficeCountry.Name" class="text-danger"></span>
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3">
+                <label asp-for="OfficeCountry.OffCode" class="form-label">Office Code</label>
+                <input asp-for="OfficeCountry.OffCode" class="form-control" />
+                <span asp-validation-for="OfficeCountry.OffCode" class="text-danger"></span>
+            </div>
+            </div>
+        <div class="row g-2">
+            <div class="col-md-12 mb-3">
                 <label asp-for="OfficeCountry.CountryId" class="form-label"></label>
                 <select asp-for="OfficeCountry.CountryId" class="form-control form-select" asp-items="ViewBag.CountryId"></select>
                 <span asp-validation-for="OfficeCountry.CountryId" class="text-danger"></span>
@@ -35,7 +42,7 @@
             <span asp-validation-for="OfficeCountry.Address" class="text-danger"></span>
         </div>
 
-        <div class="row">
+        <div class="row g-2">
             <div class="col-md-6 mb-3">
                 <label asp-for="OfficeCountry.Email" class="form-label"></label>
                 <input asp-for="OfficeCountry.Email" class="form-control" />

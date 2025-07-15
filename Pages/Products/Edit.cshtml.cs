@@ -243,7 +243,7 @@ namespace NLI_POS.Pages.Products
             // Attach and mark the product as modified only if changed
             if (isProductModified)
             {
-                Products.UpdateDate = DateTime.UtcNow.AddHours(8);
+                Products.UpdateDate = DateTime.UtcNow;
                 Products.UpdatedBy = User.Identity?.Name;
                 _context.Attach(Products).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
@@ -251,7 +251,7 @@ namespace NLI_POS.Pages.Products
 
             // Always save or update the ProductPrice (as requested)
             ProductPrice.ProductId = Products.Id;
-            ProductPrice.EncodeDate = DateTime.UtcNow.AddHours(8);
+            ProductPrice.EncodeDate = DateTime.UtcNow;
             ProductPrice.EncodedBy = User.Identity?.Name ?? "System";
 
             // Check if price exists

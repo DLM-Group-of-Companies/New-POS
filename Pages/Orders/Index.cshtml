@@ -16,105 +16,133 @@
     <p>
         <a class="btn btn-primary btn-gradient" asp-page="New"><i class="fas fa-cart-plus"></i> New Order</a>
     </p>
+    <div class="mb-3">
+        <select id="officeFilter" class="form-control form-select ms-2" style="width: auto;" title="Filter by Office">
+            @foreach (var office in Model.OfficeList)
+            {
+                <option value="@office.Value"
+                        data-timezone="@office.TimeZone"
+                        data-currency="@office.CurrencyCode">
+                    @office.Text
+                </option>
+            }
+        </select>
 
-    @* <div class="table-scroll-container"> *@
-        <table id="ordersTable" class="table table-striped table-sm text-nowrap">
-            <thead class="table-primary">
-                <tr>
-                    <th>Order No.</th>
-                    <th>Order Date</th>
-                    <th>Customer</th>
-                    <th>Office</th>
-                    <th>Total Amount</th>
-                    <th>Status</th>
-                    <th class="no-export">Actions</th>
-                </tr>
-            </thead>
-        </table>
     </div>
-@* </div> *@
+
+    <table id="ordersTable" class="table table-striped table-sm text-nowrap">
+        <thead class="table-primary">
+            <tr>
+                <th>Order No.</th>
+                <th>Order Date</th>
+                <th>Customer</th>
+                <th>Office</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th class="no-export">Actions</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
 
 @section Scripts {
-    <script>
+
+        <script>
         $(document).ready(function () {
 
-            // Globally override default DataTables button classes
-            $.extend(true, $.fn.dataTable.Buttons.defaults, {
-                dom: {
-                    button: {
-                        className: 'btn btn-sm btn-outline-primary' // or any Bootstrap class
+        let selectedLocale = $('#officeFilter option:selected').data('locale');
+
+        // ✅ Show loader before DataTable initializes
+        showLoader();
+
+        // Initialize the DataTable
+        var table = $('#ordersTable').DataTable({
+            ajax: {
+                url: '@Url.Page("Index", "Orders")',
+                data: function (d) {
+                    d.officeId = $('#officeFilter').val();
+                    d.timeZone = $('#officeFilter option:selected').data('timezone');
+                },
+                dataSrc: function (json) {
+                    // ✅ Hide loader once data is received
+                    hideLoader();
+                    return json.data;
+                },
+                error: function () {
+                    // ✅ Hide loader on error too
+                    hideLoader();
+                }
+            },
+            columns: [
+                { data: 'orderNo' },
+                {
+                    data: 'orderDate',
+                    render: function (data) {
+                        const timeZone = $('#officeFilter option:selected').data('timezone') || 'UTC';
+                        try {
+                            const utcDate = new Date(data + 'Z');
+                            return utcDate.toLocaleDateString('en-CA', {
+                                timeZone: timeZone
+                            });
+                        } catch (e) {
+                            console.warn('Time zone conversion failed:', e);
+                            return new Date(data).toLocaleDateString(); // Fallback
+                        }
+                    }
+                },
+                { data: 'customerName' },
+                { data: 'office' },
+                {
+                    data: 'totAmount',
+                    className: 'text-end',
+                    render: function (data) {
+                        return parseFloat(data).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    }
+                },
+                {
+                    data: 'isVoided',
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge bg-danger"><i class="fas fa-ban me-1"></i> Voided</span>'
+                            : '<span class="badge bg-success"><i class="fas fa-check me-1"></i> Approved</span>';
+                    }
+                },
+                {
+                    data: 'orderNo',
+                    render: function (data) {
+                        return `<a class="btn btn-primary btn-sm" href="/Orders/Details?orderNo=${data}" title="Details"><i class="fas fa-info-circle"></i></a>`;
                     }
                 }
-            });
-
-            const exportCommon = {
-                exportOptions: {
-                    columns: ':not(.no-export)' // Exclude Actions column
-                },
-                title: 'Orders Report',
-                pageSize: 'A4'
-            };
-
-            $('#ordersTable').DataTable({
-                ajax: {
-                    url: '@Url.Page("Index", "Orders")', // Points to OnGetOrders
-                    dataSrc: 'data'
-                },
-                columns: [
-                    { data: 'orderNo' },
-                    {
-                        data: 'orderDate',
-                        render: function (data, type, row) {
-                            return new Date(data).toLocaleDateString('en-CA'); // outputs YYYY-MM-DD
-                        }
-                    },
-                    { data: 'customerName' },
-                    { data: 'office' },
-                    {
-                        data: 'totAmount',
-                        className: 'text-end',
-                        render: function (data, type, row) {
-                            return parseFloat(data).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                        }
-                    },
-                    {
-                        data: 'isVoided',
-                        render: function (data, type, row) {
-                            return data ? '<span class="text-danger fw-bold">Voided</span>' : '<span class="text-success">Approved</span>';
-                        }
-                    },
-                    {
-                        data: 'orderNo',
-                        render: function (data) {
-                            return `
-                                      <a class="btn btn-primary btn-sm" href="/Orders/Details?orderNo=${data}" title="Details"><i class="fas fa-info-circle"></i></a>
-                                            `;
-                        }
-                    }
-                ],
-                columnDefs: [
-                    { targets: 5, orderable: false } // Disable sorting Actions column
-                ],
-                responsive: true,
-                dom: 'Bfrtip',
-                buttons: [
-                    $.extend(true, {}, exportCommon, { extend: 'copy', className: 'btn  btn-outline-primary' }),
-                    $.extend(true, {}, exportCommon, { extend: 'csv', className: 'btn  btn-outline-success' }),
-                    $.extend(true, {}, exportCommon, { extend: 'excel', className: 'btn  btn-outline-success' }),
-                    $.extend(true, {}, exportCommon, { extend: 'pdfHtml5', orientation: 'portrait', className: 'btn  btn-outline-danger' }),
-                    $.extend(true, {}, exportCommon, { extend: 'print', className: 'btn  btn-outline-secondary' })
-                ]
-            });
+            ],
+            columnDefs: [
+                { targets: 6, orderable: false }
+            ],
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'copy', className: 'btn btn-outline-primary' },
+                { extend: 'csv', className: 'btn btn-outline-success' },
+                { extend: 'excel', className: 'btn btn-outline-success' },
+                { extend: 'pdfHtml5', orientation: 'portrait', className: 'btn btn-outline-danger' },
+                { extend: 'print', className: 'btn btn-outline-secondary' }
+            ]
         });
 
-        // Show loader on AJAX request
-        $('#ordersTable').on('preXhr.dt', function () {
-            $('#preloader').show();
-        });
+        // Wrap search & filter
+        const $filterWrapper = $('<div class="d-flex align-items-center gap-2"></div>');
+    $filterWrapper.append($('#ordersTable_filter label'));
+    $filterWrapper.prepend($('#officeFilter'));
+    $('#ordersTable_filter').html($filterWrapper);
 
-        // Hide loader when data is loaded
-        $('#ordersTable').on('xhr.dt', function () {
-            $('#preloader').hide();
-        });
-    </script>
+    // Reload table on filter change
+    $('#officeFilter').on('change', function () {
+        showLoader();
+        table.ajax.reload();
+    });
+});
+</script>
 }

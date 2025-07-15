@@ -266,7 +266,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Country", b =>
@@ -302,7 +302,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Country");
+                    b.ToTable("Country", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.CustClass", b =>
@@ -334,7 +334,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustClass");
+                    b.ToTable("CustClass", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Customer", b =>
@@ -437,7 +437,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("OfficeId");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customer", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.InventoryStock", b =>
@@ -479,7 +479,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("InventoryStocks");
+                    b.ToTable("InventoryStocks", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.InventoryStockAuditTrail", b =>
@@ -520,7 +520,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("InventoryStockAuditTrails");
+                    b.ToTable("InventoryStockAuditTrails", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OfficeCountry", b =>
@@ -579,7 +579,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("OfficeCountry");
+                    b.ToTable("OfficeCountry", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Order", b =>
@@ -623,6 +623,9 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<decimal>("TotAmount")
+                        .HasColumnType("decimal(65,30)");
+
                     b.Property<decimal>("TotPaidAmount")
                         .HasColumnType("decimal(65,30)");
 
@@ -647,7 +650,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("OfficeId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OrderDetails", b =>
@@ -683,7 +686,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OrderPayment", b =>
@@ -711,7 +714,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderPayments");
+                    b.ToTable("OrderPayments", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.PaymentMethod", b =>
@@ -734,7 +737,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Product", b =>
@@ -799,7 +802,10 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.HasIndex("ProductCode")
+                        .IsUnique();
+
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.ProductCombo", b =>
@@ -829,7 +835,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductCombos");
+                    b.ToTable("ProductCombos", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.ProductPrice", b =>
@@ -888,7 +894,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductPrices");
+                    b.ToTable("ProductPrices", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.ProductType", b =>
@@ -926,7 +932,28 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductTypes");
+                    b.ToTable("ProductTypes", (string)null);
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.SysParam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Background")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Theme")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SysParams", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.UserOfficeAccess", b =>
@@ -962,7 +989,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserOfficesAccess");
+                    b.ToTable("UserOfficesAccess", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Pages.Orders.NewModel+ProductItem", b =>
@@ -1010,7 +1037,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("ProductItems");
+                    b.ToTable("ProductItems", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1146,7 +1173,7 @@ namespace NLI_POS.Migrations
             modelBuilder.Entity("NLI_POS.Models.OfficeCountry", b =>
                 {
                     b.HasOne("NLI_POS.Models.Country", "Country")
-                        .WithMany()
+                        .WithMany("OfficeCountries")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1257,6 +1284,11 @@ namespace NLI_POS.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.Country", b =>
+                {
+                    b.Navigation("OfficeCountries");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Order", b =>

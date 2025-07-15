@@ -102,9 +102,9 @@ namespace NLI_POS.Pages.Orders
 
         //    // Restock items
         //    // ✅ Reverse the inventory
-        //    if (order.Products != null && order.Products.ProductCategory == "Promo")
+        //    if (order.Products != null && order.Products.ProductCategory == "Package")
         //    {
-        //        // Promo: unpack the combo
+        //        // Package: unpack the combo
         //        var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == order.ComboId);
         //        if (combo != null)
         //        {
@@ -162,7 +162,7 @@ namespace NLI_POS.Pages.Orders
 
             // Flag as void
             order.IsVoided = true;
-            order.VoidedDate = DateTime.UtcNow.AddHours(8);
+            order.VoidedDate = DateTime.UtcNow;
             order.VoidedBy = User.Identity?.Name ?? "System";
             _context.Orders.Update(order);
 
@@ -176,9 +176,9 @@ namespace NLI_POS.Pages.Orders
                 var product = await _context.Products.FindAsync(item.ProductId);
                 if (product == null) continue;
 
-                if (product.ProductCategory == "Promo")
+                if (product.ProductCategory == "Package")
                 {
-                    // Promo: restock components
+                    // Package: restock components
                     var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == item.ProductCombo);
                     if (combo != null)
                     {
