@@ -52,7 +52,7 @@ namespace NLI_POS.Pages.Orders
                 .Select(o => new
                 {
                     o.OrderNo,
-                    OrderDate = o.OrderDate,
+                    OrderDate = DateTime.SpecifyKind(o.OrderDate, DateTimeKind.Utc),
                     CustomerName = o.Customers.FirstName + " " + o.Customers.LastName,
                     Office = o.Office.Name,
                     o.IsVoided,

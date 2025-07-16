@@ -385,3 +385,32 @@ $('#addAccessModal').on('hidden.bs.modal', function () {
         }
     }
 });
+
+function startClock(clockElementId) {
+    function updateClock() {
+        const now = new Date();
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        const localTime = now.toLocaleString(undefined, {
+            timeZone: timeZone,
+            year: 'numeric',
+            month: 'long',    // e.g., July
+            day: '2-digit',
+            weekday: 'long',  // e.g., Tuesday
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true      // change to false for 24-hour format
+        });
+
+        const clockElement = document.getElementById(clockElementId);
+        if (clockElement) {
+            /* clockElement.textContent = ` ${localTime} (${timeZone})`;*/
+            clockElement.textContent = ` ${localTime}`;
+        }
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+

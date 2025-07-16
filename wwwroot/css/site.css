@@ -155,6 +155,54 @@ input[type="number"] {
     border: none;
 }
 
+/* ipad */
+/* Hide sidebar on tablets and below */
+@media (max-width: 991.98px) {
+    .sidebar-desktop {
+        display: none !important;
+        z-index: -1 !important;
+    }
+
+    #page-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* Show sidebar only on large screens and up */
+@media (min-width: 992px) {
+    .sidebar-desktop {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100vh;
+        z-index: 1030;
+    }
+
+    .with-sidebar #page-content {
+        margin-left: 250px;
+    }
+
+    .actions-column {
+        min-width: 120px !important;
+        white-space: nowrap;
+    }
+    /* Prevent buttons from squeezing on tablets */
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+}
+
+
+
+
+
 /* ---------------------------------------
    PRELOADER
 ---------------------------------------- */

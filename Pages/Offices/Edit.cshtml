@@ -17,6 +17,13 @@
         <input type="hidden" asp-for="OfficeCountry.Id" />
 
         <div class="row g-2">
+            <div class="col-md-12 mb-3">
+                <label asp-for="OfficeCountry.CountryId" class="form-label"></label>
+                <select asp-for="OfficeCountry.CountryId" class="form-control form-select" asp-items="ViewBag.CountryId"></select>
+                <span asp-validation-for="OfficeCountry.CountryId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row g-2">
             <div class="col-md-9 mb-3">
                 <label asp-for="OfficeCountry.Name" class="form-label"></label>
                 <input asp-for="OfficeCountry.Name" class="form-control" />
@@ -27,18 +34,11 @@
                 <input asp-for="OfficeCountry.OffCode" class="form-control" />
                 <span asp-validation-for="OfficeCountry.OffCode" class="text-danger"></span>
             </div>
-            </div>
-        <div class="row g-2">
-            <div class="col-md-12 mb-3">
-                <label asp-for="OfficeCountry.CountryId" class="form-label"></label>
-                <select asp-for="OfficeCountry.CountryId" class="form-control form-select" asp-items="ViewBag.CountryId"></select>
-                <span asp-validation-for="OfficeCountry.CountryId" class="text-danger"></span>
-            </div>
         </div>
 
         <div class="mb-3">
             <label asp-for="OfficeCountry.Address" class="form-label"></label>
-            <textarea asp-for="OfficeCountry.Address" class="form-control" rows="3"></textarea>
+            <textarea asp-for="OfficeCountry.Address" class="form-control" rows="2"></textarea>
             <span asp-validation-for="OfficeCountry.Address" class="text-danger"></span>
         </div>
 
@@ -57,7 +57,7 @@
 
         <div class="mb-3">
             <label asp-for="OfficeCountry.Remarks" class="form-label"></label>
-            <textarea asp-for="OfficeCountry.Remarks" class="form-control" rows="3"></textarea>
+            <textarea asp-for="OfficeCountry.Remarks" class="form-control" rows="2"></textarea>
             <span asp-validation-for="OfficeCountry.Remarks" class="text-danger"></span>
         </div>
 

@@ -30,12 +30,19 @@ namespace NLI_POS.Pages
 
         public decimal TotalSales { get; set; }
 
+        //Using UTC
         public async Task<IActionResult> OnGetPartialAsync(int? Office)
         {
+            var localOffset = TimeSpan.FromHours(8); // Philippines (UTC+8)
+            var nowLocal = DateTime.UtcNow + localOffset;
+
+            // Local "today" range in UTC
+            var localTodayStartUtc = nowLocal.Date - localOffset;
+            var localTodayEndUtc = nowLocal.Date.AddDays(1).AddTicks(-1) - localOffset;
+
             Date = DateTime.UtcNow;
             OfficeList = await GetUserOfficesAsync();
 
-            // Default to the first assigned office if none is selected
             if (!Office.HasValue || Office.Value == 0)
             {
                 Office = OfficeList.FirstOrDefault()?.Value is string id && int.TryParse(id, out var officeId)
@@ -45,15 +52,15 @@ namespace NLI_POS.Pages
 
             TotalSales = await _context.Orders
                 .Include(o => o.Office)
-                .Where(o => o.Office.Id == Office && o.OrderDate.Date == Date.Value.Date && !o.IsVoided)
+                .Where(o =>
+                    o.Office.Id == Office &&
+                    o.OrderDate >= localTodayStartUtc &&
+                    o.OrderDate <= localTodayEndUtc &&
+                    !o.IsVoided)
                 .SumAsync(o => (decimal?)o.TotAmount) ?? 0;
 
-            this.Office = Office.Value; // update model's Office value
-
+            this.Office = Office.Value;
             return Partial("_TodaySalesPartial", this);
         }
-
-
-
     }
 }

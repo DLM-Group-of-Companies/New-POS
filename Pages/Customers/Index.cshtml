@@ -26,7 +26,7 @@
                 <th>Email</th>
                 <th>City</th>
                 <th>Class</th>
-                <th>Actions</th>
+                <th class="actions-column text-center">Actions</th>
             </tr>
         </thead>
     </table>
@@ -96,26 +96,18 @@
                         render: function (data, type, row) {
                             let name = `${row.custCode}: ${row.firstName} ${row.lastName}`;
                             return `
-                                <a href="/Customers/Edit?id=${data}" class="btn btn-success btn-sm" title="Edit"><i class="fas fa-user-edit"></i></a>
-                        <a href="/Customers/Details?id=${data}" class="btn btn-primary btn-sm" title="Details"><i class="fas fa-user-tag"></i></a>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal" data-id="${data}" data-name="${name}" title="Delete">
-                            <i class="fas fa-user-times"></i>
-                        </button>
-                        `;
+                                   <a href="/Customers/Edit?id=${data}" class="btn btn-success btn-sm btn-icon" title="Edit"><i class="fas fa-user-edit"></i></a>
+                                   <a href="/Customers/Details?id=${data}" class="btn btn-primary btn-sm btn-icon" title="Details"><i class="fas fa-user-tag"></i></a>
+                                   <button type="button" class="btn btn-danger btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal" data-id="${data}" data-name="${name}" title="Delete">
+                                        <i class="fas fa-user-times"></i>
+                                    </button>
+                                `;
                         },
                         orderable: false,
                         searchable: false
                     }
                 ]
             });
-
-            // // Optional: Preloader logic (only if you have #preloader in your HTML)
-            // $('#customerTable').on('preXhr.dt', function () {
-            //     showLoader();
-            // });
-            // $('#customerTable').on('xhr.dt', function () {
-            //     hideLoader();
-            // });
 
             // Delete modal logic
             const deleteModal = document.getElementById('deleteCustomerModal');

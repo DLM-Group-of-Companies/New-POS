@@ -62,9 +62,13 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
-    @*     <!-- Bootstrap Icons -->
+    @* <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"> *@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <body class="@((User.Identity?.IsAuthenticated ?? false) ? "with-sidebar" : "no-sidebar")">
 
@@ -74,12 +78,14 @@
         @if (User.Identity.IsAuthenticated)
         {
             <!-- ✅ Sidebar for desktop (md+) only -->
-            <div class="sidebar-desktop d-none d-md-block bg-dark text-white sidebar-scrollable">
+            @* <div class="sidebar-desktop d-none d-md-block bg-dark text-white sidebar-scrollable"> *@
+            <div class="sidebar-desktop d-none d-lg-block bg-dark text-white sidebar-scrollable">
                 @await Html.PartialAsync("_SidebarPartial")
             </div>
 
             <!-- ✅ Mobile top navbar with logo and menu toggle -->
-            <nav class="navbar navbar-dark bg-dark bg-gradient d-md-none w-100">
+            @* <nav class="navbar navbar-dark bg-dark bg-gradient d-md-none w-100"> *@
+            <nav class="navbar navbar-dark bg-dark bg-gradient d-lg-none w-100">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="/">
                         <img src="~/images/noblelife-white.png" alt="Logo" height="30" />
@@ -92,7 +98,8 @@
             </nav>
 
             <!-- ✅ Offcanvas for mobile only -->
-            <div class="offcanvas offcanvas-start bg-dark bg-gradient text-white d-md-none" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            @* <div class="offcanvas offcanvas-start bg-dark bg-gradient text-white d-md-none" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel"> *@
+            <div class="offcanvas offcanvas-start bg-dark bg-gradient text-white d-lg-none" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -254,16 +261,24 @@
             if (preloader) preloader.style.display = "none";
         }
 
-        function updateClock() {
-            const now = new Date();
-            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            document.getElementById('liveClock').textContent = now.toLocaleTimeString([], options);
-        }
+        // function updateClock() {
+        //     const now = new Date();
+        //     const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        //     document.getElementById('liveClock').textContent = now.toLocaleTimeString([], options);
+        // }
 
-        setInterval(updateClock, 1000);
-        updateClock(); // initialize immediately
+        // setInterval(updateClock, 1000);
+        // updateClock(); // initialize immediately
 
     </script>
+ 
+
+        <script>
+            // Call this after the page loads
+            startClock("clock");
+        </script>
+
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const bgUrl = "@bgUrl";

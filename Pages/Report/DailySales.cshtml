@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Daily Sales";
 }
-<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-4">
+<div class="container-fluid bg-white bg-gradient  shadow p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="text-primary mb-0">
             <i class="fas fa-calendar-day me-2"></i> Daily Sales Report
@@ -13,30 +13,57 @@
     </div>
     <hr />
     <div class="row g-3 mb-4">
-        <form method="get" class="row g-3 mb-4">
-            <input type="hidden" id="timezoneInput" name="timeZone" />
-            <div class="col-md-2">
-                <label for="officeFilter" class="form-label">Office</label>
-                <select id="officeFilter" name="officeId" class="form-control form-select ms-2" style="width: auto;" title="Filter by Office">
-                    @foreach (var office in Model.OfficeList)
-                    {
-                        Console.WriteLine($"Office: {office.Text}, TZ: {office.TimeZone}");
-                        <option value="@office.Value"
-                                data-timezone="@office.TimeZone"
-                                data-currency="@office.CurrencyCode">
-                            @office.Text
-                        </option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="dDate" class="form-label">Date</label>
-                <input type="date" id="dDate" name="dDate" value="@(Model.Date?.ToString("yyyy-MM-dd"))" class="form-control" />
-            </div>
-            <div class="col-md-2 align-self-end">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i> Filter</button>
-            </div>
-        </form>
+        <form method="get" class="row g-2 align-items-end mb-4">
+    <div class="col-md-3">
+        <label for="officeFilter" class="form-label">Office</label>
+        <select id="officeFilter" name="officeId" class="form-select" required>
+            <option value="">Select Office</option>
+            @foreach (var office in Model.OfficeList)
+            {
+                <option value="@office.Value"
+                        data-timezone="@office.TimeZone"
+                        data-currency="@office.CurrencyCode"
+                                selected="@(office.Value == Model.Office ? "selected" : null)">
+                    @office.Text
+                </option>
+            }
+        </select>
+                <input type="hidden" id="timeZoneInput" name="timeZone" />
+
+    </div>
+    <div class="col-md-2">
+        <label for="dateFilter" class="form-label">Date</label>
+@{
+    var timeZoneId = Request.Query["timeZone"].ToString();
+
+    TimeZoneInfo timeZone;
+    DateTime localDate;
+
+    try
+    {
+        timeZone = !string.IsNullOrWhiteSpace(timeZoneId)
+            ? TimeZoneInfo.FindSystemTimeZoneById(timeZoneId)
+            : TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila"); // Fallback
+
+        localDate = Model.Date.HasValue
+            ? TimeZoneInfo.ConvertTimeFromUtc(Model.Date.Value, timeZone)
+            : TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+    }
+    catch
+    {
+        // Fallback in case of invalid time zone
+        localDate = DateTime.UtcNow.AddHours(8);
+    }
+}
+<input type="date" id="dateFilter" name="dDate" class="form-control"
+       value="@localDate.ToString("yyyy-MM-dd")" required />
+
+    </div>
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i> Filter</button>
+    </div>
+</form>
+
     </div>
 
     <div class="table-responsive">
@@ -67,27 +94,27 @@
             </thead>
             <tbody>
                 @foreach (var order in Model.Order)
-                {
+                {int itemNo = 1;
                     foreach (var item in order.ProductItems)
-                    {
+                    {                         
                         <tr>
                             <td>@order.OrderNo</td>
-                            <td>
+                            
                             <td>
                                     @{
                                         var tz = TimeZoneInfo.FindSystemTimeZoneById(Request.Query["timeZone"]);
-                                        var localDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, tz);
+                                        var vlocalDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, tz);
                                     }
-                                    @localDate.ToString("yyyy-MM-dd")
+                                    @vlocalDate.ToString("yyyy-MM-dd")
                             </td>
 
                             <td>@order.Customers?.CustCode</td>
                             <td>@($"{order.Customers?.FirstName} {order.Customers?.LastName}")</td>
-                            <td>@item.Id</td> <!-- Replace with correct item number if needed -->
+                            <td>@itemNo</td> 
                             <td>@order.OrderType</td>
                             <td>@item.ProductCat</td>
                             <td>@item.ProductName</td>
-                            <td>@item.ProductCombo</td>
+                            <td>@item.ComboName</td>
                             <td>@order.Office?.Name</td>
                             <td>@item.Price.ToString("N2")</td>
                             <td>@item.Quantity</td>
@@ -108,6 +135,7 @@
                             <td>@order.UpdateDate?.ToString("yyyy-MM-dd")</td>
                             <td>@order.UpdatedBy</td>
                         </tr>
+                        itemNo++;
                     }
                 }
             </tbody>
@@ -155,36 +183,29 @@
                 autoWidth: true,
                 searching: false
             });
-
-            // Custom filtering function for date
-            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                const selectedDate = $('#minDate').val(); // Format: yyyy-mm-dd
-                const orderDateStr = data[1]; // Column index of OrderDate
-
-                if (!selectedDate) return true;
-
-                const selected = new Date(selectedDate);
-                const orderDate = new Date(orderDateStr);
-
-                // Compare by date only, ignore time
-                return selected.toDateString() === orderDate.toDateString();
-            });
-
-            // Trigger redraw when filters change
-            // $('#officeFilter, #minDate').on('change', function () {
-            //     table.draw();
-            // });
-        });
-
-        $(document).ready(function () {
-            $('#officeFilter').on('change', function () {
-                const tz = $('#officeFilter option:selected').data('timezone');
-                $('#timezoneInput').val(tz);
-            });
-
-            $('#officeFilter').trigger('change'); // set on page load
-        });
+});
+            
 
     </script>
+<script>
+    function syncTimeZoneBeforeSubmit() {
+        const select = document.getElementById('officeFilter');
+        const tz = select.options[select.selectedIndex].getAttribute('data-timezone');
+        
+        document.getElementById('timeZoneInput').value = tz;
+    }
+
+    // Attach to form
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form[method="get"]');
+        if (form) {
+            form.addEventListener('submit', syncTimeZoneBeforeSubmit);
+        }
+
+        // Set default value on page load
+        syncTimeZoneBeforeSubmit();
+    });
+</script>
+
 
 }

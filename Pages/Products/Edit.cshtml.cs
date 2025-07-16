@@ -68,7 +68,7 @@ namespace NLI_POS.Pages.Products
 
         public List<SelectListItem> GetProductList()
         {
-            List<SelectListItem> SectionList = (from d in _context.Products
+            List<SelectListItem> SectionList = (from d in _context.Products.Where(p => p.IsActive).OrderByDescending(p => p.ProductCategory)
                                                 select new SelectListItem
                                                 {
                                                     Text = d.ProductName,

@@ -41,7 +41,8 @@ namespace NLI_POS.Pages.Orders
         {
             SelectedProducts = HttpContext.Session.GetObject<List<ProductItem>>("Cart") ?? new List<ProductItem>();
 
-            ViewData["CustomerId"] = new SelectList(_context.Customer
+            ViewData["CustomerId"] = new SelectList(_context.Customer.OrderByDescending(c=>c.Id)
+                .Take(30)
                 .Select(c => new
                 {
                     c.Id,

@@ -10,7 +10,8 @@
 
 <hr />
 <h4 class="text-center text-white">POINT OF SALE</h4>
-<p class="text-center text-info small "><span class="small">Today is @DateTime.UtcNow.AddHours(8).ToString("MMM dd, yyyy") <span id="liveClock"></span></span></p>
+
+<p class="text-center text-info small "><span class="small"><span id="clock"></span></span></p>
 
 <hr />
 
@@ -100,7 +101,7 @@
                         </div>
 
                         <a class="nav-link text-white" asp-page="/Utilities/AuditLogs/Index"><i class="fas fa-user-clock me-2"></i> Audit Logs</a>
-                        <a class="nav-link text-white" asp-page="/Utilities/Backup"><i class="fas fa-sync me-2"></i> Backup</a>
+                        <a class="nav-link text-white" asp-page="/Utilities/Export"><i class="fas fa-sync me-2"></i> Backup</a>
 
                     </div>
                 </div>

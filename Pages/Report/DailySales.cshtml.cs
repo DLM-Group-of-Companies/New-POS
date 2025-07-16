@@ -32,26 +32,25 @@ namespace NLI_POS.Pages.Report
         public List<OfficeSelectItem> OfficeList { get; set; }
         public OrderSummaryViewModel OrderSummary { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string timeZone { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? officeId, string timeZone, DateTime? dDate)
         {
             OfficeList = await GetUserOfficesAsync();
-            
-            //if (dDate == null)
-            //{
-            //    var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
-            //    DateTime localStart = DateTime.UtcNow;
-            //    dDate = localStart;
-            //    DateTime localEnd = localStart.AddDays(1);
-
-            //    DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, tz);
-            //    DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd, tz);
-            //}
-
             Order = new List<Order>();
 
-            if (!officeId.HasValue || string.IsNullOrEmpty(timeZone) || !dDate.HasValue)
+            if (!officeId.HasValue || !dDate.HasValue)
             {
-                return Page(); // Don't query unless all filters are supplied
+                return Page(); // skip querying if filters not set
+            }
+
+            // fallback to first office's timezone if none provided
+            timeZone ??= OfficeList.FirstOrDefault(o => o.Value == officeId?.ToString())?.TimeZone;
+
+            if (string.IsNullOrEmpty(timeZone))
+            {
+                return Page(); // prevent querying with invalid timezone
             }
 
             var query = _context.Orders
@@ -71,16 +70,24 @@ namespace NLI_POS.Pages.Report
                 DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, tz);
                 DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd, tz);
 
+                // Enforce UTC kind (important if you save timestamps as UTC)
+                utcStart = DateTime.SpecifyKind(utcStart, DateTimeKind.Utc);
+                utcEnd = DateTime.SpecifyKind(utcEnd, DateTimeKind.Utc);
+
                 query = query.Where(o => o.OrderDate >= utcStart && o.OrderDate < utcEnd);
             }
             catch (Exception ex)
             {
-                // Log error (optional)
+                // optionally log ex
             }
 
             Order = await query.ToListAsync();
+            Office = officeId.ToString();
+            Date = dDate;
+
             return Page();
         }
+
 
     }
 }

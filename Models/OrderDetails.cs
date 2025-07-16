@@ -12,13 +12,11 @@ namespace NLI_POS.Models
         [Display(Name = "Product Category")]
         [StringLength(20)]
         public string? ProductCategory { get; set; }
-
-        [ForeignKey("Products")]
+        
         [Display(Name = "Product")]
         public int? ProductId { get; set; }
 
-        [Display(Name = "Product Combination")]
-        [ForeignKey("ProductCombos")]
+        [Display(Name = "Product Combination")]        
         public int? ComboId { get; set; }
 
         public int Quantity { get; set; }
@@ -26,8 +24,11 @@ namespace NLI_POS.Models
         public decimal TotalPrice => Quantity * Price;
 
         [ValidateNever]
+        [ForeignKey("ProductId")]
         public virtual Product Products { get; set; }
+
         [ValidateNever]
+        [ForeignKey("ComboId")]
         public virtual ProductCombo ProductCombos { get; set; }
     }
 }

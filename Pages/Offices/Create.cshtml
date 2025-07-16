@@ -1,79 +1,99 @@
 ﻿@page
 @model NLI_POS.Pages.Offices.CreateModel
-
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "New Office";
 }
 
-<div class="container-fluid p-2 rounded bg-light">
-    <span class="float-end" title="Close"><i class="fas fa-times-circle fa-xl" onclick="window.location = '/Patients';"></i> </span>
-    <div class=" align-items-center justify-content-center ">
-        <h4>Office</h4>
-        <hr />
-        <div class="row">
-            <div class="col-md-4">
-               <form method="post" onsubmit="return validateAndShowLoader(this)">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group">
-                        <label asp-for="OfficeCountry.CountryId" class="control-label"></label>
-                        <select asp-for="OfficeCountry.CountryId" class="form-control" asp-items="ViewBag.CountryId">
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 bg-white bg-gradient rounded-3 shadow  p-md-3" style="max-width: 900px;">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-primary mb-0">
+                    <i class="fa-solid fa-building me-2"></i> @ViewData["Title"]
+                </h4>
+                <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = './Index';"></i>
+            </div>
+            <hr/>
+            <!-- Form -->
+            <form method="post" onsubmit="return validateAndShowLoader(this)">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div class="row g-3">
+                    <!-- Country -->
+                    <div class="col-12">
+                        <label asp-for="OfficeCountry.CountryId" class="form-label">Country</label>
+                        <select asp-for="OfficeCountry.CountryId" class="form-select" asp-items="ViewBag.CountryId">
                             <option value="">Select</option>
                         </select>
-                        <span asp-validation-for="OfficeCountry.CountryId" class="text-danger"></span>
+                        <span asp-validation-for="OfficeCountry.CountryId" class="text-danger small"></span>
                     </div>
-                    <div class="form-group">
-                        <span class="text-danger">*</span>
-                        <label asp-for="OfficeCountry.Name" class="control-label"></label>
+
+                    <!-- Name -->
+                    <div class="col-lg-8 col-12">
+                        <label asp-for="OfficeCountry.Name" class="form-label"><span class="text-danger">*</span> Name</label>
                         <input asp-for="OfficeCountry.Name" class="form-control" />
-                        <span asp-validation-for="OfficeCountry.Name" class="text-danger"></span>
+                        <span asp-validation-for="OfficeCountry.Name" class="text-danger small"></span>
                     </div>
-                    <div class="form-group">
-                        <span class="text-danger">*</span>
-                        <label asp-for="OfficeCountry.OffCode" class="control-label"></label>
+
+                    <!-- Office Code -->
+                    <div class="col-lg-4 col-12">
+                        <label asp-for="OfficeCountry.OffCode" class="form-label"><span class="text-danger">*</span> Office Code</label>
                         <input asp-for="OfficeCountry.OffCode" class="form-control" />
-                        <span asp-validation-for="OfficeCountry.OffCode" class="text-danger"></span>
+                        <span asp-validation-for="OfficeCountry.OffCode" class="text-danger small"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="OfficeCountry.Address" class="control-label"></label>
-                        <textarea asp-for="OfficeCountry.Address" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="OfficeCountry.Address" class="text-danger"></span>
+
+                    <!-- Address -->
+                    <div class="col-12">
+                        <label asp-for="OfficeCountry.Address" class="form-label">Address</label>
+                        <textarea asp-for="OfficeCountry.Address" class="form-control" rows="2"></textarea>
+                        <span asp-validation-for="OfficeCountry.Address" class="text-danger small"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="OfficeCountry.Email" class="control-label"></label>
+
+                    <!-- Email -->
+                    <div class="col-6">
+                        <label asp-for="OfficeCountry.Email" class="form-label">Email</label>
                         <input asp-for="OfficeCountry.Email" class="form-control" />
-                        <span asp-validation-for="OfficeCountry.Email" class="text-danger"></span>
+                        <span asp-validation-for="OfficeCountry.Email" class="text-danger small"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="OfficeCountry.ContactNo" class="control-label"></label>
+
+                    <!-- Contact Number -->
+                    <div class="col-6">
+                        <label asp-for="OfficeCountry.ContactNo" class="form-label">Contact No</label>
                         <input asp-for="OfficeCountry.ContactNo" class="form-control" />
-                        <span asp-validation-for="OfficeCountry.ContactNo" class="text-danger"></span>
+                        <span asp-validation-for="OfficeCountry.ContactNo" class="text-danger small"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="OfficeCountry.Remarks" class="control-label"></label>
+
+                    <!-- Remarks -->
+                    <div class="col-12">
+                        <label asp-for="OfficeCountry.Remarks" class="form-label">Remarks</label>
                         <input asp-for="OfficeCountry.Remarks" class="form-control" />
-                        <span asp-validation-for="OfficeCountry.Remarks" class="text-danger"></span>
-                    </div>
-                    <div class="form-group form-check form-switch">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" asp-for="OfficeCountry.isActive" /> @Html.DisplayNameFor(model => model.OfficeCountry.isActive)
-                        </label>
+                        <span asp-validation-for="OfficeCountry.Remarks" class="text-danger small"></span>
                     </div>
 
+                    <!-- Is Active -->
+                    <div class="col-12 d-flex align-items-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="OfficeCountry.isActive" />
+                            <label class="form-check-label" for="OfficeCountry_isActive">
+                                @Html.DisplayNameFor(model => model.OfficeCountry.isActive)
+                            </label>
+                        </div>
+                    </div>
 
+                    <!-- Hidden Fields -->
                     <input asp-for="OfficeCountry.EncodeDate" type="hidden" value="@DateTime.UtcNow.AddHours(8)" />
                     <input asp-for="OfficeCountry.EncodedBy" type="hidden" value="@User?.Identity.Name" />
 
-
-                    <div class="form-group">
-                        <input type="submit" value="Create" class="btn btn-primary" />
+                    <!-- Submit -->
+                    <div class="col-6 mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save
+                        </button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
-</div>
-<div>
-    <a asp-page="Index">Back to List</a>
 </div>
 
 @section Scripts {

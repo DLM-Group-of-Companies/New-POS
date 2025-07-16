@@ -14,7 +14,7 @@
     </div>
     <hr />
 
-    <form method="post" id="myForm" onsubmit="return validateAndShowLoader(this)">
+    <form method="post" id="myForm" >
         @Html.AntiForgeryToken()
         <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75 mb-2"></div>
 
@@ -56,9 +56,15 @@
                     </h5>
                     <label asp-for="Order.CustomerId" class="form-label"></label>
                     <div class="input-group mb-2">
-                        <select asp-for="Order.CustomerId" id="CustomerId" class="form-control form-select" asp-items="ViewBag.CustomerId">
-                            <option value="">-- Select Customer--</option>
-                        </select>
+                        @*                         <select asp-for="Order.CustomerId" id="CustomerId" class="form-control form-select" asp-items="ViewBag.CustomerId">
+                        <option value="">-- Select Customer--</option>
+                        </select> *@
+
+                        <!-- Visible input (for searching by name) -->
+                        <input type="text" id="CustomerSearchInput" class="form-control" placeholder="Search customer..." autocomplete="off" />
+
+                        <!-- Hidden input (for actual submission of CustomerId) -->
+                        <input type="hidden" name="Order.CustomerId" id="CustomerId" />
                         <button class="btn btn-success" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
                     </div>
                     <div class="mb-2">
@@ -239,7 +245,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" id="customerSearchInput" class="form-control mb-2" placeholder="Enter name, customer ID, email, mobile..." />
+                    <input type="text" id="CustomerSearchInputModal" class="form-control mb-2" placeholder="Enter name, customer ID, email, mobile..." />
                     <table class="table table-sm table-hover table-bordered small">
                         <thead>
                             <tr>
@@ -368,14 +374,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                <tr>
-                                    <td>${item.productName}</td>
-                                    <td>${item.comboName}</td>
-                                    <td>${formattedPrice}</td>
-                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                            <td>${formattedTotalItem}</td>
-                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                </tr>`);
+                                                <tr>
+                                                    <td>${item.productName}</td>
+                                                    <td>${item.comboName}</td>
+                                                    <td>${formattedPrice}</td>
+                                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                            <td>${formattedTotalItem}</td>
+                                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                </tr>`);
                 });
             }
 
@@ -386,7 +392,7 @@
 
             $('#grandTotal').text(formattedTotal);
             // Get the plain number value (not formatted) to store in hidden input
-$('#GrandTotalInput').val(total.toFixed(2));
+            $('#GrandTotalInput').val(total.toFixed(2));
 
 
             $('#ProductCategory, #ProductId, #ComboId, #Price, #Qty, #Amount').val('');
@@ -541,6 +547,7 @@ $('#GrandTotalInput').val(total.toFixed(2));
 
         $(function () {
             $('#CustomerId').on('change', function () {
+
                 showLoader();
                 const customerId = $(this).val();
 
@@ -551,6 +558,7 @@ $('#GrandTotalInput').val(total.toFixed(2));
 
                 loadTracker.customerClass = false;
                 loadTracker.productList = false;
+
                 if (customerId) {
                     loadCustomerClass(customerId).done(() => {
                         setTimeout(loadProductList, 100);
@@ -618,7 +626,8 @@ $('#GrandTotalInput').val(total.toFixed(2));
             $('#customerSearchModal').modal('show');
         }
 
-        $('#customerSearchInput').on('input', function () {
+
+        $('#CustomerSearchInputModal').on('input', function () {
             const keyword = $(this).val();
             if (keyword.length < 2) return;
 
@@ -631,20 +640,27 @@ $('#GrandTotalInput').val(total.toFixed(2));
 
                 data.forEach(customer => {
                     tbody.append(`
-                                                                                            <tr>
-                                                                                                <td>${customer.custcode}</td>
-                                                                                                <td>${customer.name}</td>
-                                                                                                <td>${customer.email}</td>
-                                                                                                <td>${customer.phone}</td>
-                                                                                                        <td><button class="btn btn-sm btn-success" title="Select" onclick='selectCustomer(${JSON.stringify(customer)})'><i class="fas fa-check"></i></button></td>
-                                                                                            </tr>
-                                                                                        `);
+                                <tr>
+                                    <td>${customer.custcode}</td>
+                                    <td>${customer.name}</td>
+                                    <td>${customer.email}</td>
+                                    <td>${customer.phone}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" title="Select"
+                                                onclick='selectCustomer(${JSON.stringify(customer)})'>
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
                 });
             });
         });
 
+
         function selectCustomer(customer) {
-            $('#Order_CustomerId').val(customer.id);
+            //$('#Order_CustomerId').val(customer.id);
+            $('#CustomerSearchInput').val(customer.name);
             $('#CustomerId').val(customer.id).change();
             $('#customerSearchModal').modal('hide');
         }
@@ -663,26 +679,26 @@ $('#GrandTotalInput').val(total.toFixed(2));
             const options = $('#paymentOptionsSource').html();
 
             const row = `
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        <select name="Payments[${paymentIndex}].PayMethod" class="form-control form-select">
-                                                                                    ${options}
-                                                                                </select>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <input type="number" name="Payments[${paymentIndex}].Amount" class="form-control payment-amount" />
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <input type="text" name="Payments[${paymentIndex}].RefNo" class="form-control" />
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
-                                                                                            <i class="fas fa-times"></i>
-                                                                                        </button>
-                                                                                    </td>
+                                                                                                <tr>
+                                                                                                    <td>
+                                                                                                        <select name="Payments[${paymentIndex}].PayMethod" class="form-control form-select">
+                                                                                                    ${options}
+                                                                                                </select>
+                                                                                                    </td>
+                                                                                                    <td>
+                                                                                                        <input type="number" name="Payments[${paymentIndex}].Amount" class="form-control payment-amount" />
+                                                                                                    </td>
+                                                                                                    <td>
+                                                                                                        <input type="text" name="Payments[${paymentIndex}].RefNo" class="form-control" />
+                                                                                                    </td>
+                                                                                                    <td>
+                                                                                                        <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
+                                                                                                            <i class="fas fa-times"></i>
+                                                                                                        </button>
+                                                                                                    </td>
 
-                                                                                </tr>
-                                                                            `;
+                                                                                                </tr>
+                                                                                            `;
 
             $('#paymentTableBody').append(row);
             paymentIndex++;
@@ -708,7 +724,7 @@ $('#GrandTotalInput').val(total.toFixed(2));
 
     </script>
 
-    <script>
+    @* <script>
         document.querySelector('form').addEventListener('submit', function (e) {
             //Check if cart is empty
             if (!cart || cart.length === 0) {
@@ -758,6 +774,67 @@ $('#GrandTotalInput').val(total.toFixed(2));
             }
 
             formIsDirty = false;
+        });
+    </script> *@
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault(); // Always prevent default until we're sure
+
+            // Check if cart is empty
+            if (!cart || cart.length === 0) {
+                hideLoader();
+                toastr.warning('Your cart is empty. Please add products before placing the order.');
+                return false;
+            }
+
+            let totalPaid = 0;
+
+            // Sum all payment amounts
+            $('.payment-amount').each(function () {
+                let val = parseFloat($(this).val().replace(/,/g, '')) || 0;
+                totalPaid += val;
+            });
+
+            // Fallback: if .payment-amounts are not used, use single input (legacy)
+            if (totalPaid === 0) {
+                const paidInput = document.getElementById('paidAmount');
+                if (paidInput) {
+                    totalPaid = parseFloat(paidInput.value.replace(/,/g, '')) || 0;
+                }
+            }
+
+            // Get grand total
+            let grandText = $('#grandTotal').text().replace(/[^\d.-]/g, '');
+            let grandTotal = parseFloat(grandText) || 0;
+
+            if (totalPaid < grandTotal) {
+                hideLoader?.();
+                $('#paymentError').show().text(
+                    `Total paid (${totalPaid.toLocaleString(locale, { style: 'currency', currency })}) is less than order total (${grandTotal.toLocaleString(locale, { style: 'currency', currency })}).`
+                );
+                return false;
+            }
+
+            // Use SweetAlert for confirmation
+            Swal.fire({
+                title: 'Confirm Order',
+                text: "Are you sure you want to place this order?",
+                icon: 'question',
+                confirmButtonColor: '#0d6efd',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, place it',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showLoader();
+                    formIsDirty = false;
+                    e.target.submit(); // Manually submit the form
+                } else {
+                    hideLoader?.();
+                }
+            });
         });
     </script>
 
