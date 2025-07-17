@@ -50,6 +50,8 @@ namespace NLI_POS.Models
         public virtual Customer Customers { get; set; }
         [ValidateNever]
         public virtual OfficeCountry Office { get; set; }
+        [ValidateNever]
+        public virtual ICollection<OrderDetails> OrderDetails { get; set; }
 
         public virtual ICollection<OrderPayment> Payments { get; set; }
     }

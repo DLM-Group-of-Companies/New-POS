@@ -52,32 +52,35 @@ namespace NLI_POS.Pages.Utilities
 
             foreach (var table in tables)
             {
-                using var tableCmd = new MySqlCommand($"SELECT * FROM `{table}`", conn)
+                using var cmd = new MySqlCommand($"SELECT * FROM `{table}`", conn)
                 {
-                    CommandTimeout = 120 // seconds
-                }; 
-                using var adapter = new MySqlDataAdapter(tableCmd);
-                adapter.SelectCommand.CommandTimeout = 120;
-                var dt = new DataTable();
-                adapter.Fill(dt);
+                    CommandTimeout = 120
+                };
 
-                var csv = new StringBuilder();
-
-                // Header
-                var columnNames = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName);
-                csv.AppendLine(string.Join(",", columnNames));
-
-                // Rows
-                foreach (DataRow row in dt.Rows)
-                {
-                    var fields = row.ItemArray.Select(f => $"\"{f?.ToString()?.Replace("\"", "\"\"")}\"");
-                    csv.AppendLine(string.Join(",", fields));
-                }
+                using var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
                 var filePath = Path.Combine(exportFolder, $"{table}.csv");
-                await System.IO.File.WriteAllTextAsync(filePath, csv.ToString());
+                await using var writer = new StreamWriter(filePath, false, Encoding.UTF8);
+
+                // Write column headers
+                var headers = Enumerable.Range(0, reader.FieldCount).Select(i => reader.GetName(i));
+                await writer.WriteLineAsync(string.Join(",", headers));
+
+                // Write rows
+                while (await reader.ReadAsync())
+                {
+                    var fields = new List<string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        var value = reader.IsDBNull(i) ? "" : reader.GetValue(i).ToString()?.Replace("\"", "\"\"");
+                        fields.Add($"\"{value}\"");
+                    }
+
+                    await writer.WriteLineAsync(string.Join(",", fields));
+                }
             }
         }
+
     }
 
 }

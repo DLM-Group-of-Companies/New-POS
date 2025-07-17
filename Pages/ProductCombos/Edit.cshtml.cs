@@ -40,8 +40,26 @@ namespace NLI_POS.Pages.ProductCombos
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
+        public async Task<JsonResult> OnPostToggleStatusAsync(int id, bool isActive)
+        {
+            var combo = await _context.ProductCombos.FindAsync(id);
+            if (combo == null)
+            {
+                return new JsonResult(new { success = false, error = "Record not found." });
+            }
+
+            combo.IsActive = isActive;
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(new { success = true });
+        }
+
+        public async Task<IActionResult> OnGetRefreshCombosAsync(int? productId)
+        {
+            var combos = await _context.ProductCombos.Include(p => p.Products).Where(p=>p.ProductId == productId).ToListAsync();
+            return Partial("_ProductComboPartial", combos);
+        }
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)

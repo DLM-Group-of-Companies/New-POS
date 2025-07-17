@@ -70,7 +70,8 @@
                     </td>
 
                     <td class="align-middle">
-                        <a asp-page="./Edit" class="btn btn-success btn-sm "  title="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a>
+                        @* <a asp-page="./Edit" asp-route-pageNumber="@Model.PageNumber" class="btn btn-success btn-sm " title="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a> *@
+                        <a href="javascript:;" class="btn btn-success btn-sm edit-product" data-id="@item.Id" title="Edit"><i class="far fa-edit"></i></a>
                         <a asp-page="./Details" class="btn btn-primary btn-sm "  title="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a>
                         @if (User.IsInRole("Admin"))
                         {
@@ -97,46 +98,6 @@
 </div>
 
 <script>
-//     $(document).ready(function () {
-//     var table = $('#productsTable').DataTable({
-//         dom: 'Bfrtip',
-//         buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-//         ajax: {
-//             url: '@Url.Page("Index", "Products")',
-//             data: function (d) {
-//                 d.countryId = $('#countryFilter').val();
-//             },
-//             dataSrc: 'data'
-//         },
-//         columns: [
-//             { data: 'code' },
-//             { data: 'name' },
-//             { data: 'type' },
-//             { data: 'category' },
-//             { data: 'productClass', visible: false },
-//         {
-//             data: 'active',
-//             render: function (data, type, row) {
-//                 if (type === 'display') {
-//                     return data
-//                         ? '<i class="fas fa-check text-success"></i>'  // ✅ check icon
-//                         : '<i class="fas fa-times text-danger"></i>';  // ❌ cross icon
-//                 }
-//                 return data;
-//             },
-//             className: 'text-center'
-//         }
-//         ],
-//         responsive: true,
-//             serverSide: false, // or true if doing server-side paging
-//     order: [[4, 'desc']], // 👈 index of your ProductClass column, 0-based
-//     });
-
-//     $('#countryFilter').change(function () {
-//         table.ajax.reload();
-//     });
-// });
-
 
     $(document).ready(function () {
         $('#ProductTable').DataTable({
@@ -177,6 +138,32 @@
         });
     });
 
+    $(document).ready(function () {
+    var page = getUrlParameter('pageNumber') || 1;
+    var table = $('#ProductTable').DataTable();
+
+    table.page(parseInt(page) - 1).draw(false);
+});
+
+function getUrlParameter(name) {
+    const url = window.location.search;
+    const params = new URLSearchParams(url);
+    return params.get(name);
+}
+</script>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#ProductTable').DataTable();
+
+        $('#ProductTable').on('click', '.edit-product', function () {
+            const id = $(this).data('id');
+            const pageIndex = table.page(); // 0-based
+
+            // Navigate to Edit page with pageNumber
+            window.location.href = `/Products/Edit?id=${id}&pageNumber=${pageIndex + 1}`;
+        });
+    });
 </script>
 
 

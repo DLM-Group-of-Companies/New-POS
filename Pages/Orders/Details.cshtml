@@ -63,12 +63,17 @@
             </button>
             </form> *@
                 <!-- Void Button -->
-                <button type="button"
+@*                 <button type="button"
                         class="btn btn-danger"
                         data-bs-toggle="modal"
                         data-bs-target="#voidOrderModal"
                         data-orderno="@Model.Order.OrderNo"
                         data-customer="@Model.Order.Customers.FirstName @Model.Order.Customers.LastName">
+                    <i class="fas fa-ban me-2"></i> Void Order
+                </button> *@
+                <button type="button"
+                        class="btn btn-danger"
+                        onclick="confirmVoid('@Model.Order.OrderNo')">
                     <i class="fas fa-ban me-2"></i> Void Order
                 </button>
                 <a class="btn btn-success bg-gradient ms-2" data-bs-toggle="modal" data-bs-target="#printReceipt">
@@ -84,13 +89,19 @@
 
 </div>
 
+<form id="voidForm" method="post" asp-page-handler="Void">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="OrderNo" id="voidOrderNoInput" value="" />
+</form>
+
+
 <!-- Modal Receipt -->
 <div class="modal fade" id="printReceipt" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="printReceiptLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div id="printableOrderDetails" class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="printReceiptLabel">Receipt</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title text-primary" id="printReceiptLabel"><i class="fas fa-receipt me-2 "></i> Receipt</h5>
+                <button type="button" class="btn-close text-danger"  data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row pb-3">
@@ -98,9 +109,20 @@
                         <img src="~/images/nli-logo.png" width="200px" /><br />
                         <h5>We care for you <i>naturally</i>!</h5><br />
                         <h4>Purchase Order Receipt</h4>
-                        <span > ORDER NO: @Model.Order.OrderNo</span><br />
-                        <span> DATE: @Model.Order.OrderDate.ToString("MMMM dd, yyyy")</span><br />
-                        <span> CUSTOMER: @Model.Order.Customers.FirstName @Model.Order.Customers.LastName </span><br />
+                        <div class="row">
+                            <div class="col-2"> ORDER NO:</div><div class="col-10 justify-content-start"> @Model.Order.OrderNo</div><br />
+                            <div class="col-2">
+                                DATE:
+                            </div>
+                            <div class="col-10 justify-content-start">
+                                @Model.Order.OrderDate.ToString("MMMM dd, yyyy")
+                            </div><br />
+                            <div class="col-2">
+                                CUSTOMER:
+                            </div><div class="col-10 justify-content-start">
+                                @Model.Order.Customers.FirstName @Model.Order.Customers.LastName
+                            </div><br />
+                        </div>
                     </div>
                     <div class="col-3 small justify-content-end">
                         <span class="small"> Address: @Model.Order.Office.Address </span><br />
@@ -133,14 +155,14 @@
 </div>
 
 <!-- Void Confirmation Modal -->
-<div class="modal fade" id="voidOrderModal" tabindex="-1" aria-labelledby="voidOrderLabel" aria-hidden="true">
+@* <div class="modal fade" id="voidOrderModal" tabindex="-1" aria-labelledby="voidOrderLabel" aria-hidden="true">
     <div class="modal-dialog">
         <form method="post" asp-page-handler="Void" onsubmit="return validateAndShowLoader(this)">
             @Html.AntiForgeryToken()
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="voidOrderLabel">Confirm Void</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close"  data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
@@ -165,7 +187,28 @@
             </div>
         </form>
     </div>
-</div>
+</div> *@
+
+
+<script>
+    function confirmVoid(orderNo) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to void Order No: ${orderNo}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, void it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('voidOrderNoInput').value = orderNo;
+                document.getElementById('voidForm').submit();
+            }
+        });
+    }
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -198,121 +241,106 @@
         }
     });
 
-           function buildEmailHtml(orderNo, date, customerName, items, payments, change) {
-            let html = `
-        <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div style="flex-shrink: 0; margin-right: 20px;">
-                <img src="https://pos.ournoblelife.com/images/nli-logo.png" style="width: 200px;" />
-            <p style="margin: 5px 0 0; font-style: italic;">We care for you <strong>naturally</strong>!</p>
+    function buildEmailHtml(orderNo, date, customerName, items, payments, change) {
+        let html = `
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex-shrink: 0; margin-right: 20px;">
+                    <img src="https://pos.ournoblelife.com/images/nli-logo.png" style="width: 200px;" />
+                <p style="margin: 5px 0 0; font-style: italic;">We care for you <strong>naturally</strong>!</p>
+            </div>
+            <div style="font-size: 12px; text-align: right; line-height: 1.5;">
+                <p style="margin: 0;">Bay 9 St. Anthony Bldg.</p>
+                <p style="margin: 0;">891 Aurora Blvd. Cubao, Quezon City 1109</p>
+                <p style="margin: 0;">Email: <a href="mailto:wecare@ournoblelife.com">wecare@ournoblelife.com</a></p>
+                <p style="margin: 0;">+63 917 828 0696</p>
+            </div>
         </div>
-        <div style="font-size: 12px; text-align: right; line-height: 1.5;">
-            <p style="margin: 0;">Bay 9 St. Anthony Bldg.</p>
-            <p style="margin: 0;">891 Aurora Blvd. Cubao, Quezon City 1109</p>
-            <p style="margin: 0;">Email: <a href="mailto:wecare@ournoblelife.com">wecare@ournoblelife.com</a></p>
-            <p style="margin: 0;">+63 917 828 0696</p>
-        </div>
-    </div>
 
 
-            <h2 style="margin-top: 20px;">Purchase Order Receipt</h2>
-            <p><strong>Order No:</strong> ${orderNo}<br>
-            <strong>Date:</strong> ${date}<br>
-            <strong>Customer:</strong> ${customerName}</p>
+                <h2 style="margin-top: 20px;">Purchase Order Receipt</h2>
+                <p><strong>Order No:</strong> ${orderNo}<br>
+                <strong>Date:</strong> ${date}<br>
+                <strong>Customer:</strong> ${customerName}</p>
 
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                <thead style="background-color: #f2f2f2;">
-                    <tr>
-                        <th style="border: 1px solid #ccc; padding: 8px;">#</th>
-                        <th style="border: 1px solid #ccc; padding: 8px;">Category</th>
-                        <th style="border: 1px solid #ccc; padding: 8px;">Item</th>
-                        <th style="border: 1px solid #ccc; padding: 8px;">Combo</th>
-                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Price</th>
-                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Qty</th>
-                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead style="background-color: #f2f2f2;">
+                        <tr>
+                            <th style="border: 1px solid #ccc; padding: 8px;">#</th>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Category</th>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Item</th>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Combo</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Price</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Qty</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
 
-            items.forEach((item, i) => {
-                html += `
-                    <tr>
-                        <td style="border: 1px solid #ccc; padding: 8px;">${i + 1}</td>
-                        <td style="border: 1px solid #ccc; padding: 8px;">${item.category}</td>
-                        <td style="border: 1px solid #ccc; padding: 8px;">${item.name}</td>
-                        <td style="border: 1px solid #ccc; padding: 8px;">${item.combo}</td>
-                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.price}</td>
-                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.qty}</td>
-                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.amount}</td>
-                    </tr>`;
-            });
-
-            html += `</tbody></table>`;
-
-            // Payments section
-            html += `<h3 style="margin-top: 30px;">Payment Summary</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background-color: #f2f2f2;">
-                    <tr>
-                        <th style="border: 1px solid #ccc; padding: 8px;">Payment Method</th>
-                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-            payments.forEach(p => {
-                html += `
-                    <tr>
-                        <td style="border: 1px solid #ccc; padding: 8px;">${p.method}</td>
-                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${p.amount}</td>
-                    </tr>`;
-            });
-
+        items.forEach((item, i) => {
             html += `
-                    <tr>
-                        <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">Change</td>
-                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right; font-weight: bold;">${change}</td>
-                    </tr>
-                </tbody>
-            </table>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">${i + 1}</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">${item.category}</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">${item.name}</td>
+                            <td style="border: 1px solid #ccc; padding: 8px;">${item.combo}</td>
+                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.price}</td>
+                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.qty}</td>
+                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.amount}</td>
+                        </tr>`;
+        });
 
-            <p style="font-size: 12px; margin-top: 30px; font-style: italic; color: #666;">
-                NOTE: This is a computer-generated receipt. No signature is required.
-            </p>
+        html += `</tbody></table>`;
 
-            <p style="text-align: right; font-weight: bold;">Cashier: System Admin</p>
-        </div>`;
+        // Payments section
+        html += `<h3 style="margin-top: 30px;">Payment Summary</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background-color: #f2f2f2;">
+                        <tr>
+                            <th style="border: 1px solid #ccc; padding: 8px;">Payment Method</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
 
-            return html;
-        }
+        payments.forEach(p => {
+            html += `
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">${p.method}</td>
+                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${p.amount}</td>
+                        </tr>`;
+        });
+
+        html += `
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">Change</td>
+                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right; font-weight: bold;">${change}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p style="font-size: 12px; margin-top: 30px; font-style: italic; color: #666;">
+                    NOTE: This is a computer-generated receipt. No signature is required.
+                </p>
+
+                <p style="text-align: right; font-weight: bold;">Cashier: System Admin</p>
+            </div>`;
+
+        return html;
+    }
 
 
-               function sendEmail(button) {
-                const orderNo = button.getAttribute('data-orderno');
-                const customerName = button.getAttribute('data-customer');
-                const date = new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+    function sendEmail(button) {
+        const orderNo = button.getAttribute('data-orderno');
+        const customerName = button.getAttribute('data-customer');
+        const date = new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
 
-                // Extract product rows
-                const items = [];
-                document.querySelectorAll('#cartTable tbody tr').forEach(row => {
-                    const cols = row.querySelectorAll('td');
-                    if (cols.length >= 7) {
-                        items.push({
-                            category: cols[1].textContent.trim(),
-                            name: cols[2].textContent.trim(),
-                            combo: cols[3].textContent.trim(),
-                            price: cols[4].textContent.trim(),
-                            qty: cols[5].textContent.trim(),
-                            amount: cols[6].textContent.trim()
-                        });
-                    }
-                });
-
-@*                         const productItems  = [];
-                    document.querySelectorAll('#productTableBody tr').forEach(row => {
+        // Extract product rows
+        const items = [];
+        document.querySelectorAll('#cartTable tbody tr').forEach(row => {
             const cols = row.querySelectorAll('td');
             if (cols.length >= 7) {
-                    productItems .push({
+                items.push({
                     category: cols[1].textContent.trim(),
                     name: cols[2].textContent.trim(),
                     combo: cols[3].textContent.trim(),
@@ -321,57 +349,72 @@
                     amount: cols[6].textContent.trim()
                 });
             }
-        }); *@
+        });
 
-
-    // Extract payment rows (text-based)
-    const payments = [];
-    document.querySelectorAll('#paymentTableBody tr[data-payment]').forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const method = cells[5]?.textContent.trim() || '';
-        const amount = cells[6]?.textContent.trim() || '';
-        if (method && amount) {
-            payments.push({ method, amount });
-        }
-    });
-
-
-
-                // Get grand total and total paid to calculate change
-                const grandText = document.getElementById("grandTotal")?.textContent?.replace(/[^\d.-]/g, '') || "0";
-                const grandTotal = parseFloat(grandText);
-
-                let paidTotal = 0;
-                payments.forEach(p => {
-                    const amt = parseFloat(p.amount.replace(/,/g, '')) || 0;
-                    paidTotal += amt;
-                });
-
-                const change = (paidTotal - grandTotal).toFixed(2);
-
-                // Build email body
-                const html = buildEmailHtml(orderNo, date, customerName, items, payments, change);
-                const email = prompt("Enter recipient email:");
-                if (!email) return;
-
-                // Send to backend
-                fetch('?handler=EmailModal', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    body: JSON.stringify({ email, html })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            toastr.success("Email sent!");
-                        } else {
-                            toastr.error("Failed to send: " + data.error);
-                        }
-                    });
+    @*                         const productItems  = [];
+            document.querySelectorAll('#productTableBody tr').forEach(row => {
+            const cols = row.querySelectorAll('td');
+            if (cols.length >= 7) {
+            productItems .push({
+            category: cols[1].textContent.trim(),
+            name: cols[2].textContent.trim(),
+            combo: cols[3].textContent.trim(),
+            price: cols[4].textContent.trim(),
+            qty: cols[5].textContent.trim(),
+            amount: cols[6].textContent.trim()
+            });
             }
+            }); *@
+
+
+        // Extract payment rows (text-based)
+        const payments = [];
+        document.querySelectorAll('#paymentTableBody tr[data-payment]').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const method = cells[5]?.textContent.trim() || '';
+            const amount = cells[6]?.textContent.trim() || '';
+            if (method && amount) {
+                payments.push({ method, amount });
+            }
+        });
+
+
+
+        // Get grand total and total paid to calculate change
+        const grandText = document.getElementById("grandTotal")?.textContent?.replace(/[^\d.-]/g, '') || "0";
+        const grandTotal = parseFloat(grandText);
+
+        let paidTotal = 0;
+        payments.forEach(p => {
+            const amt = parseFloat(p.amount.replace(/,/g, '')) || 0;
+            paidTotal += amt;
+        });
+
+        const change = (paidTotal - grandTotal).toFixed(2);
+
+        // Build email body
+        const html = buildEmailHtml(orderNo, date, customerName, items, payments, change);
+        const email = prompt("Enter recipient email:");
+        if (!email) return;
+
+        // Send to backend
+        fetch('?handler=EmailModal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            body: JSON.stringify({ email, html })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    toastr.success("Email sent!");
+                } else {
+                    toastr.error("Failed to send: " + data.error);
+                }
+            });
+    }
 
 
 </script>

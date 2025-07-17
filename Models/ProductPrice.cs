@@ -36,11 +36,6 @@ namespace NLI_POS.Models
         [Display(Name = "Naturopath")]
         public decimal NaturoPrice { get; set; } = decimal.Zero;
 
-        //public DateTime? EncodeDate { get; set; } 
-        //public string? EncodedBy { get; set; } 
-        //public DateTime? UpdateDate { get; set; }
-        //public string? UpdateddBy { get; set; }
-
         [ValidateNever]
         public virtual Product? Product { get; set; }
         [ValidateNever]

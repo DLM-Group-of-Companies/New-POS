@@ -15,6 +15,8 @@ namespace NLI_POS.Models
         public string ProductsDesc { get; set; }
         public string QuantityList { get; set; }
 
+        public bool IsActive { get; set; } = true;
+
         public virtual Product Products { get; set; }
     }
 }

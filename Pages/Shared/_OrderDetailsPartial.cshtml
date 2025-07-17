@@ -24,7 +24,9 @@
                         <td>@(index++)</td>
                         <td>@item.ProductCat</td>
                         <td>@item.ProductName</td>
-                        <td>@item.ComboName</td>
+                        <td>
+                            @(@item.ComboName == "No Combination Available" ? "--" : @item.ComboName)
+                        </td>
                         <td class="text-end">@item.Price.ToString("N2")</td>
                         <td class="text-end">@item.Quantity.ToString("0")</td>
                         <td class="text-end">@item.Amount.ToString("N2")</td>

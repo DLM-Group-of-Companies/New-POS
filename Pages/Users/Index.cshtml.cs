@@ -26,7 +26,7 @@ namespace NLI_POS.Pages.Users
                 .Include(u => u.OfficeCountry)
                 .ToList();
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Users List");
+            //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Users List");
         }
     }
 

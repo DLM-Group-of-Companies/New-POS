@@ -4,8 +4,8 @@
 <p>
     @* <a asp-page="Create">Create New</a> *@
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#myListModal">
-        Add Combination
+    <button type="button" class="btn btn-primary btn-gradient bg-opacity-50 text-white" data-bs-toggle="modal" data-bs-target="#myListModal">
+        <i class="fas fa-plus me-2"></i> Add Combination
     </button>
 </p>
 <table id="ComboTable" class="table">
@@ -33,105 +33,137 @@
                 </td>
 
                 <td>
-                    <a asp-page="./Edit" class=" btn btn-success btn-sm  m-1" asp-route-id="@item.Id"><i class="far fa-edit"></i></a> 
-                    @* <a asp-page="./Details" asp-route-id="@item.Id">Details</a> | *@
-                    <a href="javascript:;" class="delete btn btn-danger btn-sm  m-1" title="Delete"><i class="fas fa-trash-alt"></i> </a>
+                    @* <a asp-page="./Edit" class=" btn btn-success btn-sm  m-1" asp-route-id="@item.Id"><i class="far fa-edit"></i></a> *@
+                    @* <a href="javascript:;" class="delete btn btn-danger btn-sm  m-1" title="Delete"><i class="fas fa-toggle-on"></i> </a> *@
+                    <a href="javascript:;"
+                       class="toggle-status btn @(item.IsActive ? "btn-success" : "btn-secondary") btn-sm m-1"
+                       data-id="@item.Id"
+                       data-productid="@item.ProductId"
+                       data-status="@item.IsActive"
+                       title="Toggle Active">
+                        <i class="fas @(item.IsActive ? "fa-toggle-on" : "fa-toggle-off")"></i>
+                    </a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
+<script>
+    $(function () {
+        $("#ComboTable").on("click", ".toggle-status", function () {
+            const button = $(this);
+            const id = button.data("id");
+            const isActive = button.data("status") === true || button.data("status") === "True";
+
+            const newStatus = !isActive;
+            const newLabel = newStatus ? 'Activate' : 'Deactivate';
+
+            Swal.fire({
+                title: `Are you sure you want to <b>${newLabel}</b> this combo?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: `Yes, ${newLabel}`,
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                preConfirm: () => {
+                    return $.ajax({
+                        type: 'POST',
+                        url: '@Url.Page("/ProductCombos/Edit", "ToggleStatus")',
+                        data: { id: id, isActive: newStatus },
+                        headers: {
+                            "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                        }
+                    }).then(response => {
+                        if (response.success) {
+                            // Update button icon and data-status
+                            button.find("i").removeClass("fa-toggle-on fa-toggle-off")
+                                .addClass(newStatus ? "fa-toggle-on" : "fa-toggle-off");
+                            button.data("status", newStatus);
+
+                            const productId = button.data("productid");
+                            Swal.fire('Success', `Record has been ${newStatus ? 'activated' : 'deactivated'}.`, 'success').then(() => {
+                                $.get('@Url.Page("/ProductCombos/Edit", "RefreshCombos")', { productId: productId }, function (html) {
+                                    $('#productComboContainer').html(html);
+                                });
+                            });
+
+
+
+                        } else {
+                            throw new Error(response.error || "Failed to update status.");
+                        }
+                    }).catch(error => {
+                        Swal.fire('Error', error.message, 'error');
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
 <script type="text/javascript">
     var vID;
     var selRow;
+    var vName;
+
     $(function () {
         $("#ComboTable .delete").click(function () {
-            vID = $(this).closest("tr").find("td").eq(0).html();
-            selRow = $(this).closest("tr");
-            // alert(vID.trim())
-            $.ajax({
-                cache: false,
-                type: "GET",
-                url: '@Url.Page("/ProductCombos/Delete")',
-                data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
-                // contentType: "application/json; charset=utf-8",
-                // dataType: "html",
-                success: function (response) {
-                    // alert('response:' + response);
-                    $("#partialModal").find(".modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
-                    $("#partialModal").find(".modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-trash-alt"></i> Delete</button>');
+            const row = $(this).closest("tr");
+            vID = row.find("td").eq(0).html().trim();
+            vName = row.find("td").eq(1).html().trim(); // get the name
+            selRow = row;
 
-                    $("#partialModal").find(".modal-body").html(response);
-                    $("#partialModal").modal('show');
-                },
-                failure: function (response) {
-                    alert('failure:' + response.responseText);
-                },
-                error: function (response) {
-                    $("#partialModal").find(".modal-body").html(response);
-                    // alert('error:' + response.responseText);
-                    alert('Error encountered. This record may already have been deleted.');
+            Swal.fire({
+                title: 'Are you sure?',
+                html: `You are about to delete: <strong>${vName}</strong>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                preConfirm: () => {
+                    return deleteRecord(); // calls the delete function
                 }
             });
         });
     });
 
-    function deleteRecord1() {
-        var id = vID;
-        //alert(id);
-        $.ajax({
-            type: "POST",
-            url: '@Url.Page("/ProductCombos/Delete")',
-            data: id,
-            success: function (response) {
-                if (response.success) {
-                    alert("Record deleted successfully!");
-                    // Optionally, refresh the page or update the UI
-                    window.location.reload();
-                } else {
-                    alert("Error deleting record: " + response.error);
-                }
-            },
-            error: function (xhr, status, error) {
-                alert("Error: " + status);
-            }
-        });
-    };
-
     function deleteRecord() {
-        // var vPatID = $(this).closest("tr").find("td").eq(0).html();
-        //alert(vID);
-
-        // Send AJAX request to check if the record exists
-        $.ajax({
-            //url: '/ProductCombos/Delete/', // Adjust the URL to match your route
-            url: '@Url.Page("/ProductCombos/Delete")',
+        return $.ajax({
             type: 'POST',
+            url: '@Url.Page("/ProductCombos/Delete")',
             cache: false,
             beforeSend: function () {
-                showLoader(); // ✅ Show preloader before sending request
+                showLoader();
             },
-            // data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
-            data: { id: vID.trim() },
-            headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() }, //add the verification token to the header.
+            data: {
+                id: vID
+            },
+            headers: {
+                "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+            },
             success: function (successDelete) {
                 if (successDelete) {
-                    toastr.options.closeButton = false;
-                    toastr.options.timeOut = 800;
-                    toastr.options.fadeOut = 1000;
-                    toastr.options.onHidden = function () { selRow.remove(); }
-                    toastr.success('Successfully deleted!');
-                    $("#partialModal").modal('hide');
+                    selRow.remove();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: `"${vName}" has been deleted.`,
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire('Failed', `Unable to delete "${vName}".`, 'error');
                 }
             },
             error: function (xhr, status, error) {
-                //toastr.waring('@TempData["Message"]');
-                alert('An error occurred while deleting the record.');
-                alert('err:' + xhr.responseText);
+                Swal.fire('Error', `An error occurred while deleting "${vName}".`, 'error');
+                console.error(xhr.responseText);
             },
             complete: function () {
-                hideLoader(); // ✅ Always hide loader after request
+                hideLoader();
             }
         });
     }
@@ -141,5 +173,5 @@
         token = $(token).val();
         return token;
     }
-
 </script>
+

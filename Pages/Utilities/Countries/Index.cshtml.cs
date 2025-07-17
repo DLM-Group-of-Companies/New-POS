@@ -33,7 +33,7 @@ namespace NLI_POS.Pages.Countries
             if (country == null)
                 return new JsonResult(NotFound());
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Countries List");
+            //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Countries List");
 
             return new JsonResult(new
             {

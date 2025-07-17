@@ -4,121 +4,173 @@
 @{
     ViewData["Title"] = "Sales By Date Range";
 }
-<div class="container-fluid bg-white bg-gradient rounded-3 shadow p-4">
+<div class="container-fluid bg-white bg-gradient  shadow p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="text-primary mb-0">
-            <i class="fas fa-calendar-week me-2"></i> Sales By Date Range Report
+            <i class="fas fa-calendar-week me-2"></i> @ViewData["Title"]
         </h3>
-        <button class="btn btn-outline-danger" onclick="window.location = '../Index';">
-            <i class="fas fa-times"></i> Close
-        </button>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
+    </div>
+    <hr />
+    <div class="row g-3 mb-4">
+        <form method="get" class="row g-2 align-items-end mb-4" onsubmit="return validateAndShowLoader(this)">
+            <div class="col-md-3">
+                <label for="officeFilter" class="form-label">Office</label>
+                <select id="officeFilter" name="officeId" class="form-select" required>
+                    <option value="">Select Office</option>
+                    @foreach (var office in Model.OfficeList)
+                    {
+                        <option value="@office.Value"
+                                data-timezone="@office.TimeZone"
+                                data-currency="@office.CurrencyCode"
+                                selected="@(office.Value == Model.Office ? "selected" : null)">
+                            @office.Text
+                        </option>
+                    }
+                </select>
+                <input type="hidden" id="timeZoneInput" name="timeZone" />
+            </div>
+            @{
+                var timeZoneId = Request.Query["timeZone"].ToString();
+                TimeZoneInfo timeZone;
+
+                try
+                {
+                    timeZone = !string.IsNullOrWhiteSpace(timeZoneId)
+                    ? TimeZoneInfo.FindSystemTimeZoneById(timeZoneId)
+                    : TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
+                }
+                catch
+                {
+                    timeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila"); // guaranteed fallback
+                }
+
+                var defaultDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
+                var fromDate = Model.DateFrom.HasValue
+                ? TimeZoneInfo.ConvertTimeFromUtc(Model.DateFrom.Value, timeZone)
+                : defaultDate;
+
+                var toDate = Model.DateTo.HasValue
+                ? TimeZoneInfo.ConvertTimeFromUtc(Model.DateTo.Value, timeZone)
+                : defaultDate;
+            }
+            <div class="col-md-2">
+                <label for="dateFilterFrom" class="form-label">Date From</label>
+                <input type="date" id="dateFilterFrom" name="dDateFrom" class="form-control"
+                       value="@fromDate.ToString("yyyy-MM-dd")" required />
+            </div>
+
+            <div class="col-md-2">
+                <label for="dateFilterTo" class="form-label">Date To</label>
+                <input type="date" id="dateFilterTo" name="dDateTo" class="form-control"
+                       value="@toDate.ToString("yyyy-MM-dd")" required />
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i> Filter</button>
+            </div>
+        </form>
+
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-2">
-            <label for="officeFilter" class="form-label">Filter by Office</label>
-            <select id="officeFilter" class="form-control form-select">
-                @* <option value="">All Offices</option> *@
-                @foreach (var office in Model.Offices.DistinctBy(o => o.Name))
-                {
-                    <option value="@office.Name">@office.Name</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label for="minDate" class="form-label">Start Date</label>
-            <input type="date" id="minDate" class="form-control" />
-        </div>
-        <div class="col-md-2">
-            <label for="maxDate" class="form-label">End Date</label>
-            <input type="date" id="maxDate" class="form-control" />
-        </div>
-    </div>
-    <h2 class="text-center">This page is under construction.</h2>
-   @*  <div class="table-responsive">
-        <table id="ordersTable" class="table table-bordered table-hover table-sm nowrap small w-100">
+    <div class="table-responsive">
+        <table id="ordersTable" class="table table-bordered table-hover table-sm small w-100 text-nowrap">
             <thead class="table-light text-center">
                 <tr>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderNo)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderDate)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.CustCode)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.FirstName)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Customers.LastName)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].ItemNo)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].OrderType)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].ProductCategory)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Price)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Products)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].ProductCombos)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Office)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Qty)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Amount)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].PaymentMethod)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].RefNo)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].Notes)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].EncodeDate)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].EncodedBy)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].UpdateDate)</th>
-                    <th>@Html.DisplayNameFor(m => m.Order[0].UpdatedBy)</th>
+                    <th>Order No.</th>
+                    <th>Order Date</th>
+                    <th>Customer Code</th>
+                    <th>Customer</th>
+                    <th>Item No</th>
+                    <th>Order Type</th>
+                    <th>Product Category</th>
+                    <th>Product</th>
+                    <th>Product Combo</th>
+                    <th>Office</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Ref No</th>
+                    <th>Notes</th>
+                    <th>Encode Date</th>
+                    <th>Encoded By</th>
+                    <th>Update Date</th>
+                    <th>Updated By</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.Order)
+                @foreach (var order in Model.Order)
                 {
-                    <tr>
-                        <td>@Html.DisplayFor(m => item.OrderNo)</td>
-                        <td>@Html.DisplayFor(m => item.OrderDate)</td>
-                        <td>@Html.DisplayFor(m => item.Customers.CustCode)</td>
-                        <td>@Html.DisplayFor(m => item.Customers.FirstName)</td>
-                        <td>@Html.DisplayFor(m => item.Customers.LastName)</td>
-                        <td>@Html.DisplayFor(m => item.ItemNo)</td>
-                        <td>@Html.DisplayFor(m => item.OrderType)</td>
-                        <td>@Html.DisplayFor(m => item.ProductCategory)</td>
-                        <td>@Html.DisplayFor(m => item.Price)</td>
-                        <td>@Html.DisplayFor(m => item.Products.ProductName)</td>
-                        <td>@Html.DisplayFor(m => item.ProductCombos.ProductsDesc)</td>
-                        <td>@Html.DisplayFor(m => item.Office.Name)</td>
-                        <td>@Html.DisplayFor(m => item.Qty)</td>
-                        <td>@Html.DisplayFor(m => item.Amount)</td>
-                        <td>@Html.DisplayFor(m => item.PaymentMethod)</td>
-                        <td>@Html.DisplayFor(m => item.RefNo)</td>
-                        <td>@Html.DisplayFor(m => item.Notes)</td>
-                        <td>@Html.DisplayFor(m => item.EncodeDate)</td>
-                        <td>@Html.DisplayFor(m => item.EncodedBy)</td>
-                        <td>@Html.DisplayFor(m => item.UpdateDate)</td>
-                        <td>@Html.DisplayFor(m => item.UpdatedBy)</td>
-                    </tr>
+                    int itemNo = 1;
+                    foreach (var item in order.ProductItems)
+                    {
+                        <tr>
+                            <td>@order.OrderNo</td>
+
+                            <td>
+                                @{
+                                    var tz = TimeZoneInfo.FindSystemTimeZoneById(Request.Query["timeZone"]);
+                                    var vlocalDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, tz);
+                                }
+                                @vlocalDate.ToString("yyyy-MM-dd")
+                            </td>
+
+                            <td>@order.Customers?.CustCode</td>
+                            <td>@($"{order.Customers?.FirstName} {order.Customers?.LastName}")</td>
+                            <td>@itemNo</td>
+                            <td>@order.OrderType</td>
+                            <td>@item.ProductCat</td>
+                            <td>@item.ProductName</td>
+                            <td>@(@item.ComboName == "No Combination Available" ? "--" : @item.ComboName)</td>
+                            <td>@order.Office?.Name</td>
+                            <td>@item.Price.ToString("N2")</td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                @{
+                                    var total = item.Price * item.Quantity;
+                                }
+                                @total.ToString("N2")
+                            </td>
+                            <td>
+                                @string.Join(", ", order.Payments.Select(p => p.PayMethod))
+                            </td>
+                            <td>
+                                @string.Join(", ", order.Payments.Select(p => p.ReferenceNo))
+                            </td>
+                            <td>@order.Notes</td>
+                            <td>@order.EncodeDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@order.EncodedBy</td>
+                            <td>@order.UpdateDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@order.UpdatedBy</td>
+                        </tr>
+                        itemNo++;
+                    }
                 }
             </tbody>
+
         </table>
-    </div> *@
+    </div>
 </div>
 
 @section Scripts {
     <script>
-        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-            const officeIndex = 11;
-            const dateIndex = 1;
-            const selectedOffice = $('#officeFilter').val();
-            const min = $('#minDate').val();
-            const max = $('#maxDate').val();
-            const office = data[officeIndex];
-            const date = new Date(data[dateIndex]);
-
-            if (selectedOffice && office !== selectedOffice) return false;
-            if (min && new Date(min) > date) return false;
-            if (max && new Date(max) < date) return false;
-            return true;
-        });
-
         $(document).ready(function () {
             const table = $('#ordersTable').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
                     {
-                        extend: 'excel',
+                        extend: 'excelHtml5',
                         className: 'btn btn-outline-success',
-                        exportOptions: { columns: ':visible' }
+                        exportOptions: {
+                            columns: ':visible'
+                        },
+                        filename: function () {
+                            const office = $('select[name="officeFilter"]').val() || 'AllOffices';
+                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);
+                            return `DailySales_${office}_${date}`;
+                        }
                     },
                     {
                         extend: 'pdfHtml5',
@@ -132,18 +184,38 @@
                     }
                 ],
                 columnDefs: [
-                    { targets: [16, 17, 18, 19, 20], visible: false }
+                    { targets: [9,13, 14, 15, 16, 17, 18, 19], visible: false }
                 ],
                 paging: true,
                 ordering: true,
                 scrollX: true,
                 responsive: false,
-                autoWidth: true
-            });
-
-            $('#officeFilter, #minDate, #maxDate').on('change', function () {
-                table.draw();
+                autoWidth: true,
+                searching: false
             });
         });
+
+
     </script>
+    <script>
+        function syncTimeZoneBeforeSubmit() {
+            const select = document.getElementById('officeFilter');
+            const tz = select.options[select.selectedIndex].getAttribute('data-timezone');
+
+            document.getElementById('timeZoneInput').value = tz;
+        }
+
+        // Attach to form
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form[method="get"]');
+            if (form) {
+                form.addEventListener('submit', syncTimeZoneBeforeSubmit);
+            }
+
+            // Set default value on page load
+            syncTimeZoneBeforeSubmit();
+        });
+    </script>
+
+
 }

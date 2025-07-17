@@ -22,6 +22,11 @@ html, body {
         box-sizing: border-box;
     }
 
+main {
+    overflow-y: auto;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
 .main-content {
     padding-bottom: 40px; /* 👈 Same or slightly more than footer height */
 }

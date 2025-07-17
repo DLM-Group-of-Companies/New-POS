@@ -25,7 +25,7 @@ namespace NLI_POS.Pages.Offices
 
 
 
-                await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Office List");
+                //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Office List");
 
         }
     }

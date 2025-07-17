@@ -87,15 +87,31 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string pEmail, string? pNewEmail)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (pEmail == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
 
-            await LoadAsync(user);
+                await LoadAsync(user);
+            }
+            else
+            {
+                var user = await _userManager.FindByEmailAsync(pEmail);
+                if (Input != null)
+                {
+                    if (pNewEmail != null)
+                    {
+                        Input.NewEmail = pNewEmail;
+                    }
+                }
+
+                await LoadAsync(user);
+            }
             return Page();
         }
 

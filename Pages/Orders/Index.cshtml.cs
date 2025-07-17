@@ -60,7 +60,7 @@ namespace NLI_POS.Pages.Orders
                 })
                 .ToListAsync();
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Order List");
+            //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Order List");
 
             return new JsonResult(new { data = orders });
         }

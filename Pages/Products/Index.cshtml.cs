@@ -19,6 +19,8 @@ namespace NLI_POS.Pages.Products
 
         public IList<Product> Product { get; set; } = default!;
         public List<Country> Countries { get; set; } = new();
+        [BindProperty(SupportsGet = true)]
+        public int? PageNumber { get; set; }
 
         public async Task OnGetAsync()
         {
@@ -45,7 +47,7 @@ namespace NLI_POS.Pages.Products
                     active = p.IsActive
                 }).ToList();
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Products List");
+            //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Products List");
 
             return new JsonResult(new { data = result });
         }

@@ -13,7 +13,7 @@
     </div>
     <hr />
     <div class="row g-3 mb-4">
-        <form method="get" class="row g-2 align-items-end mb-4">
+        <form method="get" class="row g-2 align-items-end mb-4" onsubmit="return validateAndShowLoader(this)">
     <div class="col-md-3">
         <label for="officeFilter" class="form-label">Office</label>
         <select id="officeFilter" name="officeId" class="form-select" required>
@@ -114,7 +114,7 @@
                             <td>@order.OrderType</td>
                             <td>@item.ProductCat</td>
                             <td>@item.ProductName</td>
-                            <td>@item.ComboName</td>
+                            <td>@(@item.ComboName == "No Combination Available" ? "--" : @item.ComboName)</td>
                             <td>@order.Office?.Name</td>
                             <td>@item.Price.ToString("N2")</td>
                             <td>@item.Quantity</td>
@@ -174,7 +174,7 @@
                     }
                 ],
                 columnDefs: [
-                    { targets: [13,14,15, 16, 17, 18, 19], visible: false }
+                    { targets: [9,13,14,15, 16, 17, 18, 19], visible: false }
                 ],
                 paging: true,
                 ordering: true,

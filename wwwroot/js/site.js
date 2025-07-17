@@ -254,16 +254,6 @@ setTimeout(() => {
     closeSalesPopup();
 }, 5000);
 
-// Change the background
-//document.addEventListener('click', function (e) {
-//    if (e.target.classList.contains('bg-thumb')) {
-//        const imgUrl = e.target.src;
-//        document.body.style.backgroundImage = `url('${imgUrl}')`;
-//        document.body.style.backgroundSize = 'cover';
-//        document.body.style.backgroundPosition = 'center';
-//    }
-//});
-
 document.addEventListener('DOMContentLoaded', function () {
     const modalEl = document.getElementById('changebgModal');
     modalEl.addEventListener('shown.bs.modal', function () {
@@ -293,10 +283,14 @@ function initializeBackgroundSelector() {
     saveButton.addEventListener('click', function () {
         const selected = hiddenInput.value;
         if (!selected) {
-            alert("Please select a background first.");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Select First',
+                text: 'Please select a background first.',
+            });
             return;
         }
-
+        showLoader();
         fetch('/Utilities/ChangeBackground/_ChangeBackgroundPartial?handler=SaveBackground', {
             method: 'POST',
             headers: {
@@ -307,12 +301,24 @@ function initializeBackgroundSelector() {
         })
             .then(res => {
                 if (res.ok) {
-                    alert("Background saved!");
+                    hideLoader();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Applied!',
+                        text: 'Background applied successfully.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                     const modalEl = document.getElementById("changebgModal");
                     const modal = bootstrap.Modal.getInstance(modalEl);
                     modal.hide();
                 } else {
-                    alert("Failed to save background.");
+                    hideLoader();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: 'Failed to save background.',
+                    });
                 }
             });
     });
@@ -323,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const contextMenu = document.getElementById('customContextMenu');
 
     document.body.addEventListener('contextmenu', function (e) {
-        //return; //temporary disable
+        return; //temporary disable for debugging
         e.preventDefault();
 
         contextMenu.style.left = `${e.pageX}px`;
@@ -414,3 +420,12 @@ function startClock(clockElementId) {
     setInterval(updateClock, 1000);
 }
 
+document.addEventListener('keydown', function (event) {
+    // F2 key code is 113
+    if (event.key === "F6" || event.keyCode === 115) {
+        event.preventDefault(); // Prevent browser default behavior (optional)
+
+        const modal = new bootstrap.Modal(document.getElementById('changebgModal'));
+        modal.show();
+    }
+});

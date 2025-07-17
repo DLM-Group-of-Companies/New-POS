@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 using NuGet.Packaging.Signing;
 
 namespace NLI_POS.Pages.Products
@@ -41,8 +42,12 @@ namespace NLI_POS.Pages.Products
         [BindProperty]
         public ProductPrice ProductPrice { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public int? PageNumber { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
+            Console.WriteLine("Page Number: " + PageNumber);
             if (id == null)
             {
                 return NotFound();
@@ -123,11 +128,6 @@ namespace NLI_POS.Pages.Products
                 }
             }
 
-            //ProductCombo.ProductId = int.Parse(prodId);
-            //ProductCombo.ProductIdList = prodIds;
-            //ProductCombo.ProductsDesc = combText;
-            //ProductCombo.QuantityList = qtyList;
-
             if (!int.TryParse(prodId, out int parsedId))
             {
                 throw new ArgumentException("Invalid Product ID");
@@ -183,36 +183,6 @@ namespace NLI_POS.Pages.Products
                 });
             }
         }
-
-
-        //public async Task<IActionResult> OnPostAsync()
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        GetProductList();
-        //        return Page();
-        //    }
-
-        //    _context.Attach(Products).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!ProductExists(Products.Id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return RedirectToPage("./Index");
-        //}
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -278,6 +248,7 @@ namespace NLI_POS.Pages.Products
 
             await _context.SaveChangesAsync();
 
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Edited Product: {originalProduct.ProductName}");
             return RedirectToPage("./Index");
         }
 

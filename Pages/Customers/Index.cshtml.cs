@@ -79,7 +79,7 @@ namespace NLI_POS.Pages.Customers
                 .Take(length)
                 .ToListAsync();
 
-                await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Customer List");
+                //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Customer List");
 
 
             return new JsonResult(new

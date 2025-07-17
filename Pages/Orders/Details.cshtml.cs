@@ -75,7 +75,7 @@ namespace NLI_POS.Pages.Orders
                 Payments = payments
             };
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Viewed Order Details of {Order.OrderNo}");
+            //await AuditHelpers.LogAsync(HttpContext, _context, User, $"Viewed Order Details of {Order.OrderNo}");
             return Page();
         }
 

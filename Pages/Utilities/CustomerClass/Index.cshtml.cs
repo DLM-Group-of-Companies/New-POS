@@ -25,7 +25,7 @@ namespace NLI_POS.Pages.Utilities.CustomerClass
         public async Task OnGetAsync()
         {
             CustClass = await _context.CustClass.ToListAsync();
-            await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed CustClass List");
+            //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed CustClass List");
         }
     }
 }

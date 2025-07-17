@@ -53,7 +53,7 @@ namespace NLI_POS.Pages.Report
                 return Page(); // prevent querying with invalid timezone
             }
 
-            var query = _context.Orders
+            var query = _context.Orders.Where(o => !o.IsVoided)
                 .Include(o => o.Customers)
                 .Include(o => o.Office)
                 .Include(o => o.ProductItems)

@@ -112,7 +112,7 @@ namespace NLI_POS.Pages.Orders
 
         public IActionResult OnGetProductComboList(int ProdId)
         {
-            List<SelectListItem> SectionList = (from d in _context.ProductCombos.Where(p => p.ProductId == ProdId)
+            List<SelectListItem> SectionList = (from d in _context.ProductCombos.Where(p => p.ProductId == ProdId && p.IsActive)
                                                 select new SelectListItem
                                                 {
                                                     Text = d.ProductsDesc,
