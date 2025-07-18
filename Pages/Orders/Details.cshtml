@@ -38,6 +38,9 @@
     <div>
         <br />
         @* <partial name="_OrderDetailsPartial" model="Model.OrderList"></partial> *@
+        @{
+            ViewData["IdPrefix"] = "main";
+        }
         <partial name="_OrderDetailsPartial" model="Model.OrderSummary" />
 
     </div>
@@ -56,21 +59,6 @@
         <div class="col-auto d-flex justify-content-end">
             @if (!Model.Order.IsVoided)
             {
-                @*                 <form method="post" onsubmit="return validateAndShowLoader(this)" asp-page-handler="Void" onsubmit="return confirm('Are you sure you want to void this order?');" class="me-2">
-            <input type="hidden" asp-for="Order.OrderNo" />
-            <button type="submit" class="btn btn-danger">
-            <i class="fas fa-ban"></i> Void Order
-            </button>
-            </form> *@
-                <!-- Void Button -->
-@*                 <button type="button"
-                        class="btn btn-danger"
-                        data-bs-toggle="modal"
-                        data-bs-target="#voidOrderModal"
-                        data-orderno="@Model.Order.OrderNo"
-                        data-customer="@Model.Order.Customers.FirstName @Model.Order.Customers.LastName">
-                    <i class="fas fa-ban me-2"></i> Void Order
-                </button> *@
                 <button type="button"
                         class="btn btn-danger"
                         onclick="confirmVoid('@Model.Order.OrderNo')">
@@ -94,14 +82,13 @@
     <input type="hidden" name="OrderNo" id="voidOrderNoInput" value="" />
 </form>
 
-
 <!-- Modal Receipt -->
 <div class="modal fade" id="printReceipt" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="printReceiptLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div id="printableOrderDetails" class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title text-primary" id="printReceiptLabel"><i class="fas fa-receipt me-2 "></i> Receipt</h5>
-                <button type="button" class="btn-close text-danger"  data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close text-danger" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row pb-3">
@@ -132,6 +119,9 @@
                 </div>
 
                 @* Details here *@
+                @{
+                    ViewData["IdPrefix"] = "modal";
+                }
                 <partial name="_OrderDetailsPartial" model="Model.OrderSummary"></partial>
 
                 <div class="row">
@@ -241,21 +231,26 @@
         }
     });
 
-    function buildEmailHtml(orderNo, date, customerName, items, payments, change) {
+    function buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTot) {
         let html = `
-            <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div style="flex-shrink: 0; margin-right: 20px;">
-                    <img src="https://pos.ournoblelife.com/images/nli-logo.png" style="width: 200px;" />
-                <p style="margin: 5px 0 0; font-style: italic;">We care for you <strong>naturally</strong>!</p>
-            </div>
-            <div style="font-size: 12px; text-align: right; line-height: 1.5;">
-                <p style="margin: 0;">Bay 9 St. Anthony Bldg.</p>
-                <p style="margin: 0;">891 Aurora Blvd. Cubao, Quezon City 1109</p>
-                <p style="margin: 0;">Email: <a href="mailto:wecare@ournoblelife.com">wecare@ournoblelife.com</a></p>
-                <p style="margin: 0;">+63 917 828 0696</p>
-            </div>
-        </div>
+                <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="width: 100%;">
+                        <tr>
+                            <!-- Logo block -->
+                            <td style="width: 50%; vertical-align: top;">
+                                <img src="https://pos.ournoblelife.com/images/nli-logo.png" style="width: 200px;" alt="Logo" />
+                                <p style="margin: 5px 0 0; font-style: italic;">We care for you <strong>naturally</strong>!</p>
+                            </td>
+
+                            <!-- Address block -->
+                            <td style="width: 50%; vertical-align: top; text-align: right; font-size: 12px; line-height: 1.5;">
+                                <p style="margin: 0;">Bay 9 St. Anthony Bldg.</p>
+                                <p style="margin: 0;">891 Aurora Blvd. Cubao, Quezon City 1109</p>
+                                <p style="margin: 0;">Email: <a href="mailto:wecare@ournoblelife.com">wecare@ournoblelife.com</a></p>
+                                <p style="margin: 0;">+63 917 828 0696</p>
+                            </td>
+                        </tr>
+                    </table>
 
 
                 <h2 style="margin-top: 20px;">Purchase Order Receipt</h2>
@@ -279,52 +274,74 @@
 
         items.forEach((item, i) => {
             html += `
-                        <tr>
-                            <td style="border: 1px solid #ccc; padding: 8px;">${i + 1}</td>
-                            <td style="border: 1px solid #ccc; padding: 8px;">${item.category}</td>
-                            <td style="border: 1px solid #ccc; padding: 8px;">${item.name}</td>
-                            <td style="border: 1px solid #ccc; padding: 8px;">${item.combo}</td>
-                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.price}</td>
-                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.qty}</td>
-                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.amount}</td>
-                        </tr>`;
+                                                    <tr>
+                                                        <td style="border: 1px solid #ccc; padding: 8px;">${i + 1}</td>
+                                                        <td style="border: 1px solid #ccc; padding: 8px;">${item.category}</td>
+                                                        <td style="border: 1px solid #ccc; padding: 8px;">${item.name}</td>
+                                                        <td style="border: 1px solid #ccc; padding: 8px;">${item.combo}</td>
+                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.price}</td>
+                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.qty}</td>
+                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.amount}</td>
+                                                    </tr>`;
         });
 
         html += `</tbody></table>`;
 
+        //Totals section
+        let subtotalDisp = parseFloat(subtotal).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        let discountDisp = parseFloat(discount).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        let grandTotDisp = parseFloat(grandTot).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+        html += `
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <tr>
+                <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Subtotal:</td>
+                    <td style="text-align: right; padding: 8px;">${subtotalDisp}</td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Discount:</td>
+                    <td style="text-align: right; padding: 8px;">${discountDisp}</td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Grand Total:</td>
+                    <td style="text-align: right; padding: 8px; font-weight: bold;">${grandTotDisp}</td>
+            </tr>
+        </table>`;
+
+
         // Payments section
         html += `<h3 style="margin-top: 30px;">Payment Summary</h3>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead style="background-color: #f2f2f2;">
-                        <tr>
-                            <th style="border: 1px solid #ccc; padding: 8px;">Payment Method</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+                                            <table style="width: 100%; border-collapse: collapse;">
+                                                <thead style="background-color: #f2f2f2;">
+                                                    <tr>
+                                                        <th style="border: 1px solid #ccc; padding: 8px;">Payment Method</th>
+                                                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>`;
 
         payments.forEach(p => {
             html += `
-                        <tr>
-                            <td style="border: 1px solid #ccc; padding: 8px;">${p.method}</td>
-                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${p.amount}</td>
-                        </tr>`;
+                                                    <tr>
+                                                        <td style="border: 1px solid #ccc; padding: 8px;">${p.method}</td>
+                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${p.amount}</td>
+                                                    </tr>`;
         });
 
         html += `
-                        <tr>
-                            <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">Change</td>
-                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right; font-weight: bold;">${change}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                                                    <tr>
+                                                        <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">Change</td>
+                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right; font-weight: bold;">${change}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
 
-                <p style="font-size: 12px; margin-top: 30px; font-style: italic; color: #666;">
-                    NOTE: This is a computer-generated receipt. No signature is required.
-                </p>
+                                            <p style="font-size: 12px; margin-top: 30px; font-style: italic; color: #666;">
+                                                NOTE: This is a computer-generated receipt. No signature is required.
+                                            </p>
 
-                <p style="text-align: right; font-weight: bold;">Cashier: System Admin</p>
-            </div>`;
+                                            <p style="text-align: right; font-weight: bold;">Cashier: System Admin</p>
+                                        </div>`;
 
         return html;
     }
@@ -337,7 +354,7 @@
 
         // Extract product rows
         const items = [];
-        document.querySelectorAll('#cartTable tbody tr').forEach(row => {
+        document.querySelectorAll('#main_cartTable tbody tr').forEach(row => {
             const cols = row.querySelectorAll('td');
             if (cols.length >= 7) {
                 items.push({
@@ -351,28 +368,12 @@
             }
         });
 
-    @*                         const productItems  = [];
-            document.querySelectorAll('#productTableBody tr').forEach(row => {
-            const cols = row.querySelectorAll('td');
-            if (cols.length >= 7) {
-            productItems .push({
-            category: cols[1].textContent.trim(),
-            name: cols[2].textContent.trim(),
-            combo: cols[3].textContent.trim(),
-            price: cols[4].textContent.trim(),
-            qty: cols[5].textContent.trim(),
-            amount: cols[6].textContent.trim()
-            });
-            }
-            }); *@
-
-
         // Extract payment rows (text-based)
         const payments = [];
-        document.querySelectorAll('#paymentTableBody tr[data-payment]').forEach(row => {
+        document.querySelectorAll('#main_paymentTableBody tr[data-payment]').forEach(row => {
             const cells = row.querySelectorAll('td');
-            const method = cells[5]?.textContent.trim() || '';
-            const amount = cells[6]?.textContent.trim() || '';
+            const method = cells[1]?.textContent.trim() || '';
+            const amount = cells[2]?.textContent.trim() || '';
             if (method && amount) {
                 payments.push({ method, amount });
             }
@@ -382,7 +383,9 @@
 
         // Get grand total and total paid to calculate change
         const grandText = document.getElementById("grandTotal")?.textContent?.replace(/[^\d.-]/g, '') || "0";
-        const grandTotal = parseFloat(grandText);
+        let grandTotal = parseFloat(grandText);
+
+        const discount = 0;          
 
         let paidTotal = 0;
         payments.forEach(p => {
@@ -390,10 +393,12 @@
             paidTotal += amt;
         });
 
+        let grandTotDisplay = grandTotal.toFixed(2);
+        let subtotal = grandTotDisplay; //For now while discount is not yet functional
         const change = (paidTotal - grandTotal).toFixed(2);
 
         // Build email body
-        const html = buildEmailHtml(orderNo, date, customerName, items, payments, change);
+        const html = buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTotDisplay);
         const email = prompt("Enter recipient email:");
         if (!email) return;
 
