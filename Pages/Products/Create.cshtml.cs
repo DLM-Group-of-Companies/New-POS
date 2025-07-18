@@ -85,7 +85,7 @@ namespace NLI_POS.Pages.Products
                 ViewData["ProductType"] = new SelectList(_context.ProductTypes, "Name", "Name");
                 ViewData["Product"] = new SelectList(_context.Products.OrderBy(p => p.ProductName), "Id", "ProductName");
                 Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
-                //ProductCombos = _context.ProductCombos.Where(p => p.ProductId == Id).ToList();
+                
                 return Page();
             }
 

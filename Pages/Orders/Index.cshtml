@@ -51,29 +51,40 @@
     <script>
         $(document).ready(function () {
 
+            const referrer = document.referrer;
+
+            if (referrer.includes("/Index") || referrer.endsWith("/")) {
+                sessionStorage.removeItem('OrdersTableState');
+            }
+
             let selectedLocale = $('#officeFilter option:selected').data('locale');
 
-            // ✅ Show loader before DataTable initializes
             showLoader();
 
-            // Initialize the DataTable
-            var table = $('#ordersTable').DataTable({
+            const table = $('#ordersTable').DataTable({
+                stateSave: true,
+                stateSaveCallback: function (settings, data) {
+                    sessionStorage.setItem('OrdersTableState', JSON.stringify(data));
+                },
+                stateLoadCallback: function (settings) {
+                    return JSON.parse(sessionStorage.getItem('OrdersTableState'));
+                },
+
                 ajax: {
-                    url: '@Url.Page("Index", "Orders")',
+                    url: '@Url.Page("Index", "Orders")', // Ensure this returns JSON
                     data: function (d) {
                         d.officeId = $('#officeFilter').val();
                         d.timeZone = $('#officeFilter option:selected').data('timezone');
                     },
                     dataSrc: function (json) {
-                        // ✅ Hide loader once data is received
                         hideLoader();
                         return json.data;
                     },
                     error: function () {
-                        // ✅ Hide loader on error too
                         hideLoader();
                     }
                 },
+
                 columns: [
                     { data: 'orderNo' },
                     {
@@ -98,7 +109,7 @@
                                 }
                             },
                             sort: function (data) {
-                                return new Date(data).getTime(); // ⏱️ Sort by timestamp
+                                return new Date(data).getTime();
                             }
                         }
                     },
@@ -129,6 +140,7 @@
                         }
                     }
                 ],
+
                 columnDefs: [
                     { targets: 6, orderable: false }
                 ],
@@ -144,7 +156,7 @@
                 ]
             });
 
-            // Wrap search & filter
+            // Wrap search & filter nicely
             const $filterWrapper = $('<div class="d-flex align-items-center gap-2"></div>');
             $filterWrapper.append($('#ordersTable_filter label'));
             $filterWrapper.prepend($('#officeFilter'));
@@ -157,4 +169,5 @@
             });
         });
     </script>
+
 }

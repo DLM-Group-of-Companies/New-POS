@@ -30,11 +30,11 @@
             </tr>
         </thead>
     </table>
-
+    @Html.AntiForgeryToken()
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true">
+@* <div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-danger text-white">
@@ -66,7 +66,7 @@
             </form>
         </div>
     </div>
-</div>
+</div> *@
 
 @{
     var canDelete = User.HasPermission("Delete");
@@ -74,10 +74,23 @@
 
 @section Scripts {
     <script>
-        const userCanDelete = @User.HasPermission("Delete").ToString().ToLower();
+        const referrer = document.referrer;
+
+        if (referrer.includes("/Index") || referrer.endsWith("/")) {
+            sessionStorage.removeItem('CustomerTableState');
+        }
+
+        const userCanDelete = @(User.HasPermission("Delete").ToString().ToLower() == "true" ? "true" : "false");
 
         $(document).ready(function () {
             const table = $('#customerTable').DataTable({
+                stateSave: true,
+                stateSaveCallback: function (settings, data) {
+                    sessionStorage.setItem('CustomerTableState', JSON.stringify(data));
+                },
+                stateLoadCallback: function (settings) {
+                    return JSON.parse(sessionStorage.getItem('CustomerTableState'));
+                },
                 processing: true,
                 serverSide: true,
                 ajax: {
@@ -94,14 +107,14 @@
                     {
                         data: 'id',
                         render: function (data, type, row) {
-                            let name = `${row.custCode}: ${row.firstName} ${row.lastName}`;
+                            let name = `${row.custCode}: ${row.fullName}`;
                             return `
-                                   <a href="/Customers/Edit?id=${data}" class="btn btn-success btn-sm btn-icon" title="Edit"><i class="fas fa-user-edit"></i></a>
-                                   <a href="/Customers/Details?id=${data}" class="btn btn-primary btn-sm btn-icon" title="Details"><i class="fas fa-user-tag"></i></a>
-                                   <button type="button" class="btn btn-danger btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal" data-id="${data}" data-name="${name}" title="Delete">
-                                        <i class="fas fa-user-times"></i>
-                                    </button>
-                                `;
+                                           <a href="/Customers/Edit?id=${data}" class="btn btn-success btn-sm btn-icon" title="Edit"><i class="fas fa-user-edit"></i></a>
+                                           <a href="/Customers/Details?id=${data}" class="btn btn-primary btn-sm btn-icon" title="Details"><i class="fas fa-user-tag"></i></a>
+                                                   <button type="button" class="delete-btn btn btn-danger btn-sm btn-icon" data-id="${data}" data-name="${name}" title="Delete">
+                                                <i class="fas fa-user-times"></i>
+                                            </button>
+                                        `;
                         },
                         orderable: false,
                         searchable: false
@@ -109,28 +122,11 @@
                 ]
             });
 
-            // Delete modal logic
-            const deleteModal = document.getElementById('deleteCustomerModal');
-            deleteModal.addEventListener('show.bs.modal', function (event) {
-                if (!userCanDelete) {
-                    event.preventDefault();
-                    toastr.error("You are not authorized to delete.");
-                    return;
-                }
-
-                const button = event.relatedTarget;
-                const customerId = button.getAttribute('data-id');
-                const customerName = button.getAttribute('data-name');
-
-                document.getElementById('deleteCustomerId').value = customerId;
-                document.getElementById('deleteCustomerName').textContent = customerName;
-            });
         });
     </script>
 
-    <script>
-        const userCanDelete = @User.HasPermission("Delete").ToString().ToLower(); // outputs true or false
-
+@*     <script>
+        const userCanDelete = @(User.HasPermission("Delete").ToString().ToLower() == "true" ? "true" : "false");
         // Listen to modal's "show" event
         const deleteModal = document.getElementById('deleteCustomerModal');
 
@@ -148,5 +144,51 @@
             document.getElementById('deleteCustomerId').value = customerId;
             document.getElementById('deleteCustomerName').textContent = customerName;
         });
+    </script> *@
+
+    <script>
+        $(document).on('click', '.delete-btn', function () {
+            const customerId = $(this).data('id');
+            const customerName = $(this).data('name');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Delete customer: ${customerName}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#d33'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // ⛑ Get anti-forgery token
+                    const token = $('input[name="__RequestVerificationToken"]').val();
+
+                    fetch(`/Customers?handler=Delete&id=${customerId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token
+                        },
+                        body: JSON.stringify({})
+                    })
+                        .then(async response => {
+                            const data = await response.json(); // parse JSON even for error
+                            if (response.ok) {
+                                Swal.fire('Deleted!', data.message, 'success');
+                                $('#customerTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire('Failed', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            Swal.fire('Error', 'Unexpected error occurred', 'error');
+                        });
+
+                }
+            });
+        });
     </script>
+
 }

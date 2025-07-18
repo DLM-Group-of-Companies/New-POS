@@ -14,55 +14,55 @@
     <hr />
     <div class="row g-3 mb-4">
         <form method="get" class="row g-2 align-items-end mb-4" onsubmit="return validateAndShowLoader(this)">
-    <div class="col-md-3">
-        <label for="officeFilter" class="form-label">Office</label>
-        <select id="officeFilter" name="officeId" class="form-select" required>
-            <option value="">Select Office</option>
-            @foreach (var office in Model.OfficeList)
-            {
-                <option value="@office.Value"
-                        data-timezone="@office.TimeZone"
-                        data-currency="@office.CurrencyCode"
+            <div class="col-md-3">
+                <label for="officeFilter" class="form-label">Office</label>
+                <select id="officeFilter" name="officeId" class="form-select" required>
+                    <option value="">Select Office</option>
+                    @foreach (var office in Model.OfficeList)
+                    {
+                        <option value="@office.Value"
+                                data-timezone="@office.TimeZone"
+                                data-currency="@office.CurrencyCode"
                                 selected="@(office.Value == Model.Office ? "selected" : null)">
-                    @office.Text
-                </option>
-            }
-        </select>
+                            @office.Text
+                        </option>
+                    }
+                </select>
                 <input type="hidden" id="timeZoneInput" name="timeZone" />
 
-    </div>
-    <div class="col-md-2">
-        <label for="dateFilter" class="form-label">Date</label>
-@{
-    var timeZoneId = Request.Query["timeZone"].ToString();
+            </div>
+            <div class="col-md-2">
+                <label for="dateFilter" class="form-label">Date</label>
+                @{
+                    var timeZoneId = Request.Query["timeZone"].ToString();
 
-    TimeZoneInfo timeZone;
-    DateTime localDate;
+                    TimeZoneInfo timeZone;
+                    DateTime localDate;
 
-    try
-    {
-        timeZone = !string.IsNullOrWhiteSpace(timeZoneId)
-            ? TimeZoneInfo.FindSystemTimeZoneById(timeZoneId)
-            : TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila"); // Fallback
+                    try
+                    {
+                        timeZone = !string.IsNullOrWhiteSpace(timeZoneId)
+                        ? TimeZoneInfo.FindSystemTimeZoneById(timeZoneId)
+                        : TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila"); // Fallback
 
-        localDate = Model.Date.HasValue
-            ? TimeZoneInfo.ConvertTimeFromUtc(Model.Date.Value, timeZone)
-            : TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
-    }
-    catch
-    {
-        // Fallback in case of invalid time zone
-        localDate = DateTime.UtcNow.AddHours(8);
-    }
-}
-<input type="date" id="dateFilter" name="dDate" class="form-control"
-       value="@localDate.ToString("yyyy-MM-dd")" required />
+                        localDate = Model.Date.HasValue
+                        ? TimeZoneInfo.ConvertTimeFromUtc(Model.Date.Value, timeZone)
+                        : TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+                    }
+                    catch
+                    {
+                        // Fallback in case of invalid time zone
+                        localDate = DateTime.UtcNow.AddHours(8);
+                    }
+                }
+                <input type="date" id="dateFilter" name="dDate" class="form-control"
+                       value="@localDate.ToString("yyyy-MM-dd")" required />
 
-    </div>
-    <div class="col-md-1">
-        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i> Filter</button>
-    </div>
-</form>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i> Filter</button>
+            </div>
+        </form>
 
     </div>
 
@@ -94,35 +94,43 @@
             </thead>
             <tbody>
                 @foreach (var order in Model.Order)
-                {int itemNo = 1;
+                {
+                    int itemNo = 1;
                     foreach (var item in order.ProductItems)
-                    {                         
+                    {
                         <tr>
                             <td>@order.OrderNo</td>
-                            
+
                             <td>
-                                    @{
-                                        var tz = TimeZoneInfo.FindSystemTimeZoneById(Request.Query["timeZone"]);
-                                        var vlocalDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, tz);
-                                    }
-                                    @vlocalDate.ToString("yyyy-MM-dd")
+                                @{
+                                    var tz = TimeZoneInfo.FindSystemTimeZoneById(Request.Query["timeZone"]);
+                                    var vlocalDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, tz);
+                                    var encodeDate = order.EncodeDate.HasValue
+                                    ? TimeZoneInfo.ConvertTimeFromUtc(order.EncodeDate.Value, tz).ToString("yyyy-MM-dd HH:mm:ss")
+                                    : "";
+                                    var updDate = order.UpdateDate.HasValue
+                                    ? TimeZoneInfo.ConvertTimeFromUtc(order.UpdateDate.Value, tz).ToString("yyyy-MM-dd HH:mm:ss")
+                                    : "";
+                                }
+                                @vlocalDate.ToString("yyyy-MM-dd")
                             </td>
 
                             <td>@order.Customers?.CustCode</td>
                             <td>@($"{order.Customers?.FirstName} {order.Customers?.LastName}")</td>
-                            <td>@itemNo</td> 
+                            <td>@itemNo</td>
                             <td>@order.OrderType</td>
                             <td>@item.ProductCat</td>
                             <td>@item.ProductName</td>
                             <td>@(@item.ComboName == "No Combination Available" ? "--" : @item.ComboName)</td>
                             <td>@order.Office?.Name</td>
-                            <td>@item.Price.ToString("N2")</td>
-                            <td>@item.Quantity</td>
-                            <td>
+                            <td class="text-end">@item.Price.ToString("N2")</td>
+                            <td class="text-end">@item.Quantity</td>
+                            <td class="text-end">
                                 @{
                                     var total = item.Price * item.Quantity;
                                 }
-                            @total.ToString("N2")</td>
+                                @total.ToString("N2")
+                            </td>
                             <td>
                                 @string.Join(", ", order.Payments.Select(p => p.PayMethod))
                             </td>
@@ -130,16 +138,39 @@
                                 @string.Join(", ", order.Payments.Select(p => p.ReferenceNo))
                             </td>
                             <td>@order.Notes</td>
-                            <td>@order.EncodeDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@encodeDate</td>
                             <td>@order.EncodedBy</td>
-                            <td>@order.UpdateDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@updDate</td>
                             <td>@order.UpdatedBy</td>
                         </tr>
                         itemNo++;
                     }
                 }
             </tbody>
-
+            <tfoot class="table-warning fw-bold text-end">
+                <tr>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0 text-start">TOTALS:</td>
+                    <td class="border-0 text-end">@Model.Order.SelectMany(o => o.ProductItems).Sum(i => i.Price).ToString("N2")</td>
+                    <td class="border-0 text-end">@Model.Order.SelectMany(o => o.ProductItems).Sum(i => i.Quantity).ToString("N0")</td>
+                    <td class="border-0 text-end">
+                            @{
+                                var totalAmount = Model.Order.SelectMany(o => o.ProductItems)
+                                .Sum(i => i.Price * i.Quantity);
+                            }
+                        @totalAmount.ToString("N2")
+                    </td>        
+                    <td colspan="7" class="border-0"></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
@@ -152,29 +183,35 @@
                 buttons: [
                     {
                         extend: 'excelHtml5',
+                        footer: true,
                         className: 'btn btn-outline-success',
                         exportOptions: {
-                            columns: ':visible'
+                            columns: ':visible',
+                            format: {
+                                footer: function (data, column, row, node) {
+                                    return data || $(node).text().trim() || '';
+                                }
+                            }
                         },
-                        filename: function () {
-                            const office = $('select[name="officeFilter"]').val() || 'AllOffices';
-                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);                            
-                            return `DailySales_${office}_${date}`;
+                        filename: function () {                            
+                            const officeText = $('select[name="officeId"] option:selected').text().trim() || 'AllOffices';
+                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);
+                            return `DailySales_${officeText}_${date}`;
                         }
                     },
                     {
                         extend: 'pdfHtml5',
-                        className: 'btn btn-outline-danger',
-                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                        footer: true,
+                        className: 'btn btn-outline-danger'
                     },
                     {
                         extend: 'print',
-                        className: 'btn btn-outline-secondary',
-                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                        footer: true,
+                        className: 'btn btn-outline-secondary'
                     }
                 ],
                 columnDefs: [
-                    { targets: [9,13,14,15, 16, 17, 18, 19], visible: false }
+                    
                 ],
                 paging: true,
                 ordering: true,
@@ -183,29 +220,29 @@
                 autoWidth: true,
                 searching: false
             });
-});
-            
+        });
+
 
     </script>
-<script>
-    function syncTimeZoneBeforeSubmit() {
-        const select = document.getElementById('officeFilter');
-        const tz = select.options[select.selectedIndex].getAttribute('data-timezone');
-        
-        document.getElementById('timeZoneInput').value = tz;
-    }
+    <script>
+        function syncTimeZoneBeforeSubmit() {
+            const select = document.getElementById('officeFilter');
+            const tz = select.options[select.selectedIndex].getAttribute('data-timezone');
 
-    // Attach to form
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('form[method="get"]');
-        if (form) {
-            form.addEventListener('submit', syncTimeZoneBeforeSubmit);
+            document.getElementById('timeZoneInput').value = tz;
         }
 
-        // Set default value on page load
-        syncTimeZoneBeforeSubmit();
-    });
-</script>
+        // Attach to form
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form[method="get"]');
+            if (form) {
+                form.addEventListener('submit', syncTimeZoneBeforeSubmit);
+            }
+
+            // Set default value on page load
+            syncTimeZoneBeforeSubmit();
+        });
+    </script>
 
 
 }

@@ -318,44 +318,87 @@
         });
 
         /*Save Combo*/
+        // $("#btnSaveCombo").click(function () {
+        //     ProductComboList = []; // reset before collecting
+
+        //     $("#newRow .row").each(function (index) {
+        //         const productId = $(this).find("select").val();
+        //         const quantity = $(this).find("input[type='number']").val();
+        //         const mainId = $(this).find("input[type='hidden']").eq(0).val();
+        //         var combDesc = $(this).find("input[type='hidden']").eq(1).val();
+        //         ProductComboList.push([mainId, productId, quantity, combDesc]);
+        //     });
+
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "?handler=AddRow",
+        //         data: JSON.stringify(ProductComboList),
+        //         contentType: "application/json; charset=utf-8",
+        //         headers: {
+        //             'RequestVerificationToken': gettoken() // <- required for ASP.NET Core
+        //         },
+        //         success: function (response) {
+        //             if (response) {
+        //                 toastr.options.closeButton = false;
+        //                 toastr.options.timeOut = 800;
+        //                 toastr.options.fadeOut = 1000;
+        //                 toastr.options.onHidden = function () { selRow.remove(); }
+        //                 toastr.success('Combination successfully added!');
+        //                 $("#myListModal").modal('hide');
+        //                 window.location.reload();
+        //             }
+        //         },
+        //         error: function (jqXHR, textStatus, errorThrown) {
+        //             // Handle errors
+        //             console.log(errorThrown);
+        //             alert('error:' + textStatus);
+        //         }
+        //     });
+        // });
+
         $("#btnSaveCombo").click(function () {
-            //alert('save');
-            ProductComboList = []; // reset before collecting
+    ProductComboList = []; // reset before collecting
 
-            $("#newRow .row").each(function (index) {
-                const productId = $(this).find("select").val();
-                const quantity = $(this).find("input[type='number']").val();
-                const mainId = $(this).find("input[type='hidden']").eq(0).val();
-                var combDesc = $(this).find("input[type='hidden']").eq(1).val();
-                ProductComboList.push([mainId, productId, quantity, combDesc]);
-            });
+    $("#newRow .inputRow").each(function () {
+        const select = $(this).find("select");
+        const qtyInput = $(this).find("input[type='number']");
+        const hiddenInputs = $(this).find("input[type='hidden']");
 
-            $.ajax({
-                type: "POST",
-                url: "?handler=AddRow",
-                data: JSON.stringify(ProductComboList),
-                contentType: "application/json; charset=utf-8",
-                headers: {
-                    'RequestVerificationToken': gettoken() // <- required for ASP.NET Core
-                },
-                success: function (response) {
-                    if (response) {
-                        toastr.options.closeButton = false;
-                        toastr.options.timeOut = 800;
-                        toastr.options.fadeOut = 1000;
-                        toastr.options.onHidden = function () { selRow.remove(); }
-                        toastr.success('Combination successfully added!');
-                        $("#myListModal").modal('hide');
-                        window.location.reload();
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    // Handle errors
-                    console.log(errorThrown);
-                    alert('error:' + textStatus);
-                }
-            });
-        });
+        const mainId = hiddenInputs.eq(0).val();         // [0] MainId
+        const quantity = qtyInput.val();                 // [2] Quantity
+        const productId = select.val();                  // [1] ProductId
+        let combDesc = hiddenInputs.eq(1).val();         // [3] Description
+
+        if (!combDesc || combDesc.trim() === "") {
+            const selectedText = select.find("option:selected").text();
+            combDesc = `${quantity} ${selectedText}`;
+        }
+
+        ProductComboList.push([mainId, productId, quantity, combDesc]);
+    });
+
+    $.ajax({
+        type: "POST",
+        url: "?handler=AddRow",
+        data: JSON.stringify(ProductComboList),
+        contentType: "application/json; charset=utf-8",
+        headers: {
+            'RequestVerificationToken': gettoken()
+        },
+        success: function (response) {
+            if (response) {
+                toastr.success('Combination successfully added!');
+                $("#myListModal").modal('hide');
+                window.location.reload();
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+            alert('error:' + textStatus);
+        }
+    });
+});
+
 
         $(document).on('click', '.removeRow', function () {
             var rowCount = parseInt($("#encodedList").val());
@@ -452,6 +495,23 @@
             return combText;
         };
         //rowCount++;
+        function populateMissingComboDescriptions() {
+            $("#newRow .inputRow").each(function () {
+                const qtyInput = $(this).find("input[type='number']");
+                const select = $(this).find("select");
+                const descInput = $(this).find("input[type='hidden']").eq(1);
+
+                if (qtyInput.length && select.length && descInput.length) {
+                    const qty = qtyInput.val();
+                    const selectedText = select.find("option:selected").text();
+
+                    if (!descInput.val()) {
+                        descInput.val(qty + ' ' + selectedText);
+                    }
+                }
+            });
+        }
+
     </script>
 
     <script>
@@ -500,5 +560,6 @@
             }
         });
     </script>
+
 }
 

@@ -1,9 +1,9 @@
 ﻿@page
 @model NLI_POS.Pages.Products.IndexModel
-
 @{
     ViewData["Title"] = "Products";
 }
+
 <div class="container-fluid bg-white bg-gradient shadow p-2">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0 text-primary">
@@ -13,29 +13,18 @@
     </div>
     <hr />
     <p>
-        <a asp-page="Create" class="btn btn-primary"><i class="fas fa-plus-square fa-xl"></i>  Add New</a>
+        <a asp-page="Create" class="btn btn-primary"><i class="fas fa-plus-square fa-xl"></i> Add New</a>
     </p>
 
     <table id="ProductTable" class="table table-striped table-sm">
         <thead>
             <tr>
                 <th hidden></th>
-                <th> 
-                    @Html.DisplayNameFor(model => model.Product[0].ProductCode)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Product[0].ProductName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Product[0].ProductType)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Product[0].ProductCategory)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Product[0].IsActive)
-                </th>
-
+                <th>@Html.DisplayNameFor(model => model.Product[0].ProductCode)</th>
+                <th>@Html.DisplayNameFor(model => model.Product[0].ProductName)</th>
+                <th>@Html.DisplayNameFor(model => model.Product[0].ProductType)</th>
+                <th>@Html.DisplayNameFor(model => model.Product[0].ProductCategory)</th>
+                <th>@Html.DisplayNameFor(model => model.Product[0].IsActive)</th>
                 <th></th>
             </tr>
         </thead>
@@ -44,19 +33,11 @@
             {
                 var rowClass = item.IsActive ? "" : "opacity-50";
                 <tr class="@rowClass">
-                    <td hidden>@Html.DisplayFor(modelItem => item.Id)</td>
-                    <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.ProductCode)
-                    </td>
-                    <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.ProductName)
-                    </td>
-                    <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.ProductType)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ProductCategory)
-                    </td>
+                    <td hidden>@item.Id</td>
+                    <td class="align-middle">@item.ProductCode</td>
+                    <td class="align-middle">@item.ProductName</td>
+                    <td class="align-middle">@item.ProductType</td>
+                    <td>@item.ProductCategory</td>
                     <td class="align-middle">
                         @if (item.IsActive)
                         {
@@ -66,198 +47,154 @@
                         {
                             <span class="badge bg-secondary opacity-50">No</span>
                         }
-                        
                     </td>
-
                     <td class="align-middle">
-                        @* <a asp-page="./Edit" asp-route-pageNumber="@Model.PageNumber" class="btn btn-success btn-sm " title="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a> *@
                         <a href="javascript:;" class="btn btn-success btn-sm edit-product" data-id="@item.Id" title="Edit"><i class="far fa-edit"></i></a>
-                        <a asp-page="./Details" class="btn btn-primary btn-sm "  title="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a>
+                        <a asp-page="./Details" class="btn btn-primary btn-sm" title="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a>
                         @if (User.IsInRole("Admin"))
                         {
-                           <a class="details btn btn-danger btn-sm " title="Delete" href="javascript:;"><i class="fas fa-trash-alt"></i> </a>
+                            <a class="btn btn-danger btn-sm delete-product" href="javascript:;" title="Delete"><i class="fas fa-trash-alt"></i></a>
                         }
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-
- @*    <table id="productsTable" class="display nowrap w-100">
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Category</th>
-            <th>Class</th>
-            <th>Available</th>
-        </tr>
-    </thead>
-</table> *@
 </div>
 
-<script>
+@section Scripts {
+    @Html.AntiForgeryToken()
 
-    $(document).ready(function () {
-        $('#ProductTable').DataTable({
-            dom: 'Bfrtip',
-            responsive: true,
-            buttons: [
-                {
-                    extend: 'copy',
-                    className: 'btn btn-sm btn-outline-secondary',
-                    exportOptions: { columns: ':not(:last-child)' }
+    <script>
+        $(document).ready(function () {
+            // Clear sessionStorage if coming from Home or Index (but not from Details or Edit)
+            const referrer = document.referrer;
+            if (referrer.includes("/Home") || referrer.endsWith("/Index") || referrer.endsWith("/")) {
+                sessionStorage.removeItem('ProductsTableState');
+            }
+
+            // Initialize DataTable with sessionStorage state saving
+            const table = $('#ProductTable').DataTable({
+                stateSave: true,
+                stateSaveCallback: function (settings, data) {
+                    sessionStorage.setItem('ProductsTableState', JSON.stringify(data));
                 },
-                {
-                    extend: 'csv',
-                    className: 'btn btn-sm btn-outline-success',
-                    exportOptions: { columns: ':not(:last-child)' }
+                stateLoadCallback: function (settings) {
+                    return JSON.parse(sessionStorage.getItem('ProductsTableState'));
                 },
-                {
-                    extend: 'excel',
-                    className: 'btn btn-sm btn-outline-success',
-                    exportOptions: { columns: ':not(:last-child)' }
-                },
-                {
-                    extend: 'pdfHtml5',
-                    orientation: 'landscape',
-                    className: 'btn btn-sm btn-outline-danger',
-                    exportOptions: { columns: ':not(:last-child)' }
-                },
-                {
-                    extend: 'print',
-                    className: 'btn btn-sm btn-outline-dark',
-                    exportOptions: { columns: ':not(:last-child)' }
-                }
-            ],
-            columnDefs: [
-                { targets: [0], visible: false }, // Hide ID column
-                { targets: -1, orderable: false } // Disable sort on last column (Actions)
-            ]
-        });
-    });
+                dom: 'Bfrtip',
+                responsive: true,
+                buttons: [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-sm btn-outline-secondary',
+                        exportOptions: { columns: ':not(:last-child)' }
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-sm btn-outline-success',
+                        exportOptions: { columns: ':not(:last-child)' }
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-sm btn-outline-success',
+                        exportOptions: { columns: ':not(:last-child)' }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        orientation: 'landscape',
+                        className: 'btn btn-sm btn-outline-danger',
+                        exportOptions: { columns: ':not(:last-child)' }
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-sm btn-outline-dark',
+                        exportOptions: { columns: ':not(:last-child)' }
+                    }
+                ],
+                columnDefs: [
+                    { targets: [0], visible: false }, // Hide ID column
+                    { targets: -1, orderable: false } // Disable sort on last column
+                ]
+            });
 
-    $(document).ready(function () {
-    var page = getUrlParameter('pageNumber') || 1;
-    var table = $('#ProductTable').DataTable();
+            // Edit product handler
+            $('#ProductTable').on('click', '.edit-product', function () {
+                const id = $(this).data('id');
+                window.location.href = `/Products/Edit?id=${id}`;
+            });
 
-    table.page(parseInt(page) - 1).draw(false);
-});
+            // Handle delete modal open
+            $('#ProductTable').on('click', '.details', function () {
+                const vID = $(this).closest("tr").find("td").eq(0).text().trim();
+                window.selRow = $(this).closest("tr"); // store for delete
 
-function getUrlParameter(name) {
-    const url = window.location.search;
-    const params = new URLSearchParams(url);
-    return params.get(name);
-}
-</script>
-
-<script>
-    $(document).ready(function () {
-        var table = $('#ProductTable').DataTable();
-
-        $('#ProductTable').on('click', '.edit-product', function () {
-            const id = $(this).data('id');
-            const pageIndex = table.page(); // 0-based
-
-            // Navigate to Edit page with pageNumber
-            window.location.href = `/Products/Edit?id=${id}&pageNumber=${pageIndex + 1}`;
-        });
-    });
-</script>
-
-
-<script type="text/javascript">
-    var vID;
-    var selRow;
-    $(function () {
-        $("#ProductTable .details").click(function () {
-            vID = $(this).closest("tr").find("td").eq(0).html();
-            selRow = $(this).closest("tr");
-            // alert(vID.trim())
-            $.ajax({
-                cache: false,
-                type: "GET",
-                url: '@Url.Page("Delete")',
-                data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
-                // contentType: "application/json; charset=utf-8",
-                // dataType: "html",
-                success: function (response) {
-                    // alert('response:' + response);
-                    $("#partialModal").find(".modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
-                    $("#partialModal").find(".modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-user-times"></i> Delete</button>');
-
-                    $("#partialModal").find(".modal-body").html(response);
-                    $("#partialModal").modal('show');
-                },
-                failure: function (response) {
-                    alert('failure:' + response.responseText);
-                },
-                error: function (response) {
-                    $("#partialModal").find(".modal-body").html(response);
-                    // alert('error:' + response.responseText);
-                    alert('Error encountered. This record may already have been deleted.');
-                }
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Page("Delete")',
+                    data: { __RequestVerificationToken: getToken(), id: vID },
+                    success: function (response) {
+                        $("#partialModal .modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
+                        $("#partialModal .modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-user-times"></i> Delete</button>');
+                        $("#partialModal .modal-body").html(response);
+                        $("#partialModal").modal('show');
+                        window.vID = vID; // store globally for deleteRecord
+                    },
+                    error: function () {
+                        alert('Error encountered. This record may already have been deleted.');
+                    }
+                });
             });
         });
-    });
 
-    function deleteRecord() {
-        // var vPatID = $(this).closest("tr").find("td").eq(0).html();
-        alert(vID);
-
-        // Send AJAX request to check if the record exists
-        $.ajax({
-            // url: '/Patients/Create/PatientExists', // Adjust the URL to match your route
-            url: '@Url.Page("Delete")',
-            type: 'POST',
-            cache: false,
-            data: { __RequestVerificationToken: gettoken(), id: vID.trim() },
-            success: function (successDelete) {
-                if (successDelete) {
-                    toastr.options.closeButton = false;
-                    toastr.options.timeOut = 800;
-                    toastr.options.fadeOut = 1000;
-                    toastr.options.onHidden = function () { selRow.remove(); }
-                    toastr.success('Successfully deleted!');
-                    $("#partialModal").modal('hide');
+        function deleteRecord() {
+            $.ajax({
+                url: '@Url.Page("Delete")',
+                type: 'POST',
+                cache: false,
+                data: {
+                    __RequestVerificationToken: getToken(),
+                    id: window.vID
+                },
+                success: function (successDelete) {
+                    if (successDelete) {
+                        toastr.options.closeButton = false;
+                        toastr.options.timeOut = 800;
+                        toastr.options.fadeOut = 1000;
+                        toastr.options.onHidden = function () {
+                            window.selRow.remove();
+                        };
+                        toastr.success('Successfully deleted!');
+                        $("#partialModal").modal('hide');
+                    }
+                },
+                error: function (xhr) {
+                    alert('An error occurred while deleting the record.');
+                    console.error(xhr.responseText);
                 }
-            },
-            error: function (xhr, status, error) {
-                //toastr.waring('@TempData["Message"]');
-                alert('An error occurred while deleting the record.');
-                alert('err:' + xhr.responseText);
-            }
+            });
+        }
+
+        function getToken() {
+            const tokenInput = $('input[name="__RequestVerificationToken"]');
+            return tokenInput.val();
+        }
+
+        // Clean up modal on close
+        $('body').on('hidden.bs.modal', '.modal', function () {
+            $(this).removeData('bs.modal');
         });
-    }
 
-    function gettoken() {
-        var token = '@Html.AntiForgeryToken()';
-        token = $(token).val();
-        return token;
-    }
-
-</script>
-<script>
-    $('body').on('hidden.bs.modal', '.modal', function () {
-        $(this).removeData('bs.modal');
-        // alert('closed');
-    });
-</script>
-
-<script>
-    //For paging display fix
-    $(document).ready(function () {
-        $('ul.pagination > li.disabled > a').addClass('page-link');
-    });
-</script>
-
-<script type="text/javascript">
-
-    $(function () {
-        $("#pageSize").change(function () {
-            //alert($("#pageSize").val());
-            $("#form1").submit();
+        // Fix pagination UI
+        $(document).ready(function () {
+            $('ul.pagination > li.disabled > a').addClass('page-link');
         });
-    });
-</script>
+
+        // PageSize dropdown form submit
+        $(function () {
+            $("#pageSize").change(function () {
+                $("#form1").submit();
+            });
+        });
+    </script>
+}

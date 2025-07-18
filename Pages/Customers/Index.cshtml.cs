@@ -92,27 +92,37 @@ namespace NLI_POS.Pages.Customers
 
         }
 
-        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        public async Task<IActionResult> OnPostDeleteAsync(int? id)
         {
             if (!User.HasPermission("Delete"))
             {
                 TempData["ErrorMessage"] = "You are not authorized to perform this action.";
                 return RedirectToPage();
             }
+
+            if (id == null)
+            {
+                return new JsonResult(new { success = false, message = "Invalid ID" }) { StatusCode = 400 };
+            }
+
             var customer = await _context.Customer.FindAsync(id);
-            if (customer != null)
+            if (customer == null)
             {
-                _context.Customer.Remove(customer);
-                await _context.SaveChangesAsync();
-                await AuditHelpers.LogAsync(HttpContext, _context, User, $"Deleted {customer.CustCode}: {customer.FirstName} {customer.LastName}");
-                TempData["SuccessMessage"] = "Customer deleted successfully.";
+                return new JsonResult(new { success = false, message = "Customer not found" }) { StatusCode = 404 };
             }
-            else
+
+            var hasOrders = await _context.Orders.AnyAsync(o => o.CustomerId == id);
+            if (hasOrders)
             {
-                TempData["ErrorMessage"] = "Customer not found.";
+                return new JsonResult(new { success = false, message = "Cannot delete: customer has transaction(s)." }) { StatusCode = 400 };
             }
-            
-            return RedirectToPage(); // This triggers OnGetAsync again
+
+            _context.Customer.Remove(customer);
+            await _context.SaveChangesAsync();
+
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Deleted {customer.CustCode}: {customer.FirstName} {customer.LastName}");
+
+            return new JsonResult(new { success = true, message = "Customer deleted successfully." });
         }
 
     }

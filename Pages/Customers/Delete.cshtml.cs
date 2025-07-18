@@ -42,22 +42,31 @@ namespace NLI_POS.Pages.Customers
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OnPostDeleteAsync(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return new JsonResult(new { success = false, message = "Invalid ID" }) { StatusCode = 400 };
             }
 
             var customer = await _context.Customer.FindAsync(id);
-            if (customer != null)
+            if (customer == null)
             {
-                Customer = customer;
-                _context.Customer.Remove(Customer);
-                await _context.SaveChangesAsync();
+                return new JsonResult(new { success = false, message = "Customer not found" }) { StatusCode = 404 };
             }
 
-            return RedirectToPage("./Index");
+            var hasOrders = await _context.Orders.AnyAsync(o => o.CustomerId == id);
+            if (hasOrders)
+            {
+                return new JsonResult(new { success = false, message = "Cannot delete: customer has transaction(s)." }) { StatusCode = 400 };
+            }
+
+            _context.Customer.Remove(customer);
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(new { success = true, message = "Customer deleted successfully." });
         }
+
     }
 }
