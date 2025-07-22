@@ -32,7 +32,7 @@ namespace NLI_POS.Pages.Customers
 
             try
             {
-                ViewData["CustClass"] = new SelectList(await _context.CustClass.ToListAsync(), "Id", "Name");
+                ViewData["CustClass"] = new SelectList(await _context.CustClass.Where(c=>c.IsActive).ToListAsync(), "Id", "Name");
             }
             catch (Exception ex)
             {
@@ -110,6 +110,7 @@ namespace NLI_POS.Pages.Customers
             _context.Customer.Add(Customer);
             await _context.SaveChangesAsync();
 
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added Customer: {Customer.CustCode} | {Customer.FirstName} {Customer.LastName}");
             return RedirectToPage("./Index");
         }
     }

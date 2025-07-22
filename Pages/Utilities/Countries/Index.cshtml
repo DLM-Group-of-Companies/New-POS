@@ -37,7 +37,7 @@
                     </td>
                     <td>
                         @* <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> *@
-                        <button class="btn btn-sm btn-success edit-btn" data-id="@item.Id" title="Edit"><i class="far fa-edit"></i></button>
+                        <button class="btn btn-sm btn-success edit-btn"  data-id="@item.Id" title="Edit"><i class="far fa-edit"></i></button>
                     </td>
                 </tr>
             }
@@ -53,18 +53,32 @@
         <div class="modal-content">
             <form id="editCountryForm" method="post">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Country</h5>
+                    <h5 class="modal-title text-success"><i class="far fa-edit me-2"></i> Edit Country</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="Id" id="CountryId" />
-                    <div class="mb-3">
-                        <label for="CountryCode" class="form-label">Code</label>
-                        <input type="text" class="form-control" name="Code" id="CountryCode" readonly />
-                    </div>
-                    <div class="mb-3">
+                    <div class="row">
+                    <div class="col-12 mb-3">
                         <label for="CountryName" class="form-label">Name</label>
                         <input type="text" class="form-control" name="Name" id="CountryName" readonly />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="CountryCode" class="form-label">Code</label>
+                            <input type="text" class="form-control" name="CountryCode" id="CountryCode" readonly />
+                    </div>
+                        <div class="col-6 mb-3">
+                            <label for="CurrencyCode" class="form-label">Currency</label>
+                            <input type="text" class="form-control" name="CurrencyCode" id="CurrencyCode" readonly />
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label for="TimeZone" class="form-label">Time Zone</label>
+                            <input type="text" class="form-control" name="TimeZone" id="TimeZone" readonly />
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label for="Locale" class="form-label">Locale</label>
+                            <input type="text" class="form-control" name="Locale" id="Locale" readonly />
+                        </div>
                     </div>
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="IsActive" id="CountryIsActive" />
@@ -91,18 +105,22 @@
             pagingType: 'simple_numbers',
         });
 
-        $('.edit-btn').click(function () {
+        // Use delegated binding for dynamically replaced buttons
+        $(document).on('click', '.edit-btn', function () {
             const id = $(this).data('id');
+            // Optionally remove alert
+            // alert(id);
 
             // Fetch data via AJAX
-            $.get(`/Countries?handler=Get&id=${id}`, function (data) {
-                // Fill the modal form
+            $.get(`/Utilities/Countries?handler=Get&id=${id}`, function (data) {
                 $('#CountryId').val(data.id);
                 $('#CountryCode').val(data.code);
                 $('#CountryName').val(data.name);
+                $('#CurrencyCode').val(data.currency);
+                $('#TimeZone').val(data.timezone);
+                $('#Locale').val(data.locale);
                 $('#CountryIsActive').prop('checked', data.isActive);
 
-                // Show the modal using Bootstrap 5 API
                 const modal = new bootstrap.Modal(document.getElementById('editCountryModal'));
                 modal.show();
             });
@@ -119,4 +137,5 @@
             });
         });
     });
+
 </script>

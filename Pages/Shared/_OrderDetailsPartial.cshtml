@@ -3,7 +3,7 @@
     var idPrefix = ViewData["IdPrefix"]?.ToString() ?? "default";
 }
 <div class="table-responsive">
-    <table id="@($"{idPrefix}_cartTable")" class="table table-bordered table-hover shadow-sm rounded bg-white">
+    <table id="@($"{idPrefix}_cartTable")" class="table table-bordered table-hover shadow-sm rounded bg-white small">
         <thead class="table-primary text-center">
             <tr>
                 <th>Item #</th>
@@ -47,7 +47,7 @@
                 decimal totalAmt = Model.ProductItems.Sum(i => i.Amount);
 
                 <tr>
-                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                    <td colspan="4" class="text-end fw-bold">Sub Total:</td>
                     <td class="text-end fw-bold">@totalPrice.ToString("N2")</td>
                     <td class="text-end fw-bold">@totalQty.ToString("0")</td>
                     <td class="text-end fw-bold"><span id="grandTotal">@totalAmt.ToString("N2")</span></td>
@@ -60,7 +60,7 @@
             @{
                 var paidAmount = Model.Order.TotPaidAmount;
                 var totalAmount = Model.ProductItems.Sum(i => i.Amount);
-                var change = paidAmount - totalAmount;
+                // var change = paidAmount - totalAmount;
 
                 var payments = Model.Payments;
                 var isCash = payments.All(p => p.PayMethod?.ToLower() == "cash");
@@ -75,8 +75,32 @@
                     <td class="text-muted small">@(!string.IsNullOrWhiteSpace(payment.ReferenceNo) ? $"Ref#: {payment.ReferenceNo}" : "")</td>
                 </tr>
             }
+            @{
+                var totalServiceCharge = Model.Payments?.Sum(p => p.ServiceChargeAmount ?? 0) ?? 0;
+                var serviceChargeRate = (Model.Payments?.Sum(p => p.ServiceChargePercent ?? 0) ?? 0) * 100;
+                var grandTotal = totalAmount + totalServiceCharge;
+                var change = paidAmount - grandTotal;
+            }
 
+            @if (totalServiceCharge > 0)            
+            {
+                <tr class="table-light fw-light">
+                    <td colspan="6" class="text-end text-secondary">Credit Card Service Charge (@serviceChargeRate.ToString("N2")%):</td>
+                    <td class="text-end text-secondary">@totalServiceCharge.ToString("N2")</td>
+                    <td></td>
+                </tr>
+            }
             <tr class="table-light">
+                <td colspan="6" class="text-end">Grand Total:</td>
+                <td class="text-end text-black">@grandTotal.ToString("N2")</td>
+                <td></td>
+            </tr>
+            <tr class="table-light">
+                <td colspan="6" class="text-end">Total Payment:</td>
+                <td class="text-end">@paidAmount.ToString("N2")</td>
+                <td></td>
+            </tr>
+            <tr class="table-light fw-light">
                 <td colspan="6" class="text-end">Change:</td>
                 <td class="text-end">@change.ToString("N2")</td>
                 <td></td>

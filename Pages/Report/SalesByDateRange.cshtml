@@ -75,8 +75,8 @@
     </div>
 
     <div class="table-responsive">
-        <table id="ordersTable" class="table table-bordered table-hover table-sm small w-100 text-nowrap">
-            <thead class="table-light text-center">
+        <table id="ordersTable" class="table table-bordered table-striped table-sm small w-100 text-nowrap">
+            <thead class="table-success  text-center">
                 <tr>
                     <th>Order No.</th>
                     <th>Order Date</th>
@@ -124,10 +124,10 @@
                             <td>@item.ProductCat</td>
                             <td>@item.ProductName</td>
                             <td>@(@item.ComboName == "No Combination Available" ? "--" : @item.ComboName)</td>
-                            <td>@order.Office?.Name</td>
-                            <td>@item.Price.ToString("N2")</td>
-                            <td>@item.Quantity</td>
-                            <td>
+                            <td class="text-start">@order.Office?.Name</td>
+                            <td class="text-end">@item.Price.ToString("N2")</td>
+                            <td class="text-end">@item.Quantity</td>
+                            <td class="text-end">
                                 @{
                                     var total = item.Price * item.Quantity;
                                 }
@@ -140,21 +140,46 @@
                                 @string.Join(", ", order.Payments.Select(p => p.ReferenceNo))
                             </td>
                             <td>@order.Notes</td>
-                            <td>@order.EncodeDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@order.EncodeDate?.ToString("yyyy-MM-dd HH:mm:ss")</td>
                             <td>@order.EncodedBy</td>
-                            <td>@order.UpdateDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@order.UpdateDate?.ToString("yyyy-MM-dd HH:mm:ss")</td>
                             <td>@order.UpdatedBy</td>
                         </tr>
                         itemNo++;
                     }
                 }
             </tbody>
+            <tfoot class="table-success fw-bold text-end">
+                <tr>
+                    <th class="border-0 border-top">TOTALS:</th><!-- Order No  -->
+                    <th class="border-0 border-top"></th><!-- Order Date -->
+                    <th class="border-0 border-top" ></th><!-- Customer Code -->
+                    <th class="border-0 border-top"></th><!-- Name  -->
+                    <th class="border-0 border-top"></th><!-- Item#a -->
+                    <th class="border-0 border-top"></th><!-- Type -->
+                    <th class="border-0 border-top"></th><!-- Category -->
+                    <th class="border-0 border-top"></th><!-- Product -->
+                    <th class="border-0 border-top"></th><!-- Combo -->
+                    <th class="border-0 border-top"></th><!-- Moved on first col -->
+                    <th class="border-0 border-top text-end" id="totalPriceFooter"></th> <!-- Price Column -->
+                    <th class="border-0 border-top text-end" id="totalQtyFooter"></th>   <!-- Quantity Column -->
+                    <th class="border-0 border-top text-end" id="totalAmountFooter"></th> <!-- Amount Column -->
+                    <th class="border-0 border-top"></th> <!-- Payment Method -->
+                    <th class="border-0 border-top"></th> <!-- Ref No -->
+                    <th class="border-0 border-top"></th> <!-- Notes -->
+                    <th class="border-0 border-top"></th> <!-- Encode Date -->
+                    <th class="border-0 border-top"></th> <!-- Encoded By -->
+                    <th class="border-0 border-top"></th> <!-- Update Date -->
+                    <th class="border-0 border-top"></th> <!-- Updated By -->
+                </tr>
+            </tfoot>
 
         </table>
     </div>
 </div>
 
 @section Scripts {
+  
     <script>
         $(document).ready(function () {
             const table = $('#ordersTable').DataTable({
@@ -162,60 +187,177 @@
                 buttons: [
                     {
                         extend: 'excelHtml5',
+                        footer: true,
                         className: 'btn btn-outline-success',
                         exportOptions: {
                             columns: ':visible'
                         },
                         filename: function () {
-                            const office = $('select[name="officeFilter"]').val() || 'AllOffices';
-                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);
-                            return `DailySales_${office}_${date}`;
+                            const officeText = $('select[name="officeId"] option:selected').text().trim() || 'AllOffices';
+                            const dateF = $('#dateFilterFrom').val() || new Date().toISOString().slice(0, 10);
+                            const dateT = $('#dateFilterTo').val() || new Date().toISOString().slice(0, 10);
+                            return `SalesByDateRange_${officeText}_${dateF}_${dateT}`;
+                        },
+                        customize: function (xlsx) {
+                            const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            const styles = xlsx.xl['styles.xml'];
+                            const lastRow = $('sheetData row', sheet).last();
+                            const rowIndex = parseInt(lastRow.attr('r'));
+                            const firstDataRow = 3;
+
+                            // Ensure numFmts exists
+                            let numFmts = $('numFmts', styles);
+                            if (numFmts.length === 0) {
+                                $('styleSheet', styles).prepend('<numFmts count="1"></numFmts>');
+                                numFmts = $('numFmts', styles);
+                            }
+
+                            // Define number formats
+                            const numFmtDecimalId = 165;
+                            const numFmtIntegerId = 166;
+
+                            numFmts.append(`<numFmt numFmtId="${numFmtDecimalId}" formatCode="#,##0.00"/>`);
+                            numFmts.append(`<numFmt numFmtId="${numFmtIntegerId}" formatCode="#,##0"/>`);
+
+                            // Append corresponding xf styles
+                            $('cellXfs', styles).append(`
+            <xf numFmtId="${numFmtDecimalId}" applyNumberFormat="1" applyFont="1">
+                <alignment horizontal="right"/>
+                <font><b/></font>
+            </xf>`);
+                            const decimalStyleIndex = $('cellXfs xf', styles).length - 1;
+
+                            $('cellXfs', styles).append(`
+            <xf numFmtId="${numFmtIntegerId}" applyNumberFormat="1" applyFont="1">
+                <alignment horizontal="right"/>
+                <font><b/></font>
+            </xf>`);
+                            const integerStyleIndex = $('cellXfs xf', styles).length - 1;
+
+                            // Assign styles per column
+                            const columnStyles = {
+                                'K': decimalStyleIndex, // Price
+                                'L': integerStyleIndex, // Quantity
+                                'M': decimalStyleIndex  // Amount
+                            };
+
+                            // Loop through columns to apply formula and correct style
+                            ['K', 'L', 'M'].forEach(function (col) {
+                                const formula = `SUM(${col}${firstDataRow}:${col}${rowIndex - 1})`;
+                                const $cell = $(`c[r="${col}${rowIndex}"]`, sheet);
+
+                                if ($cell.length) {
+                                    $cell.attr('t', 'str');
+                                    $cell.attr('s', columnStyles[col]);
+                                    $cell.html(`<f>${formula}</f>`);
+                                }
+                            });
+
                         }
                     },
                     {
                         extend: 'pdfHtml5',
                         className: 'btn btn-outline-danger',
-                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                        exportOptions: {
+                            // To ensure footer appears, you must export the columns that contain your totals.
+                            // ':visible' is often the easiest way to ensure all visible columns (and their footer cells) are included.
+                            columns: ':visible',
+                            footer: true // Include footer in PDF export
+                        },
+                        title: 'Sales Report by Date Range' // Add a title for the PDF document
                     },
                     {
                         extend: 'print',
                         className: 'btn btn-outline-secondary',
-                        exportOptions: { columns: [0, 1, 2, 4, 5, 6, 7, 8] }
+                        exportOptions: {
+                            // ':visible' works well here too.
+                            columns: ':visible',
+                            footer: true // Include footer in Print export
+                        },
+                        title: 'Sales Report by Date Range' // Add a title for the print page
                     }
                 ],
                 columnDefs: [
-                    { targets: [9,13, 14, 15, 16, 17, 18, 19], visible: false }
+                    // Keeping original hidden columns.
+                    // If you want any of these to show in exports for the footer, remove them from here.
+                    //{ targets: [9, 13, 14, 15, 16, 17, 18, 19], visible: false }
                 ],
                 paging: true,
                 ordering: true,
                 scrollX: true,
                 responsive: false,
                 autoWidth: true,
-                searching: false
+                searching: false,
+                // ADD THIS FOOTER CALLBACK
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Function to parse formatted number strings (e.g., "1,234.56" to 1234.56)
+                    var parseFormattedNumber = function (i) {
+                        if (typeof i === 'string') {
+                            // Remove any non-numeric characters except for the decimal point and leading minus sign
+                            return parseFloat(i.replace(/[^\d.-]/g, ''));
+                        }
+                        return parseFloat(i); // Already a number or can be directly parsed
+                    };
+
+                    // Function to format numbers for display in the footer
+                    var formatNumber = function (num) {
+                        return num.toLocaleString('en-PH', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    };
+
+                    // Calculate total for the 'Price' column (index 10)
+                    var totalPrice = api
+                        .column(10, { page: 'current' }) // 'current' sums only visible data after filtering/pagination
+                        .data()
+                        .reduce(function (a, b) {
+                            var val = parseFormattedNumber(b);
+                            return a + (isNaN(val) ? 0 : val);
+                        }, 0);
+
+                    // Calculate total for the 'Qty' column (index 11)
+                    var totalQty = api
+                        .column(11, { page: 'current' })
+                        .data()
+                        .reduce(function (a, b) {
+                            var val = parseFormattedNumber(b); // Quantity might be integer, but parsing float is safe
+                            return a + (isNaN(val) ? 0 : val);
+                        }, 0);
+
+                    // Calculate total for the 'Amount' column (index 12)
+                    var totalAmount = api
+                        .column(12, { page: 'current' })
+                        .data()
+                        .reduce(function (a, b) {
+                            var val = parseFormattedNumber(b);
+                            return a + (isNaN(val) ? 0 : val);
+                        }, 0);
+
+                    // Update the footer cells
+                    $(api.column(10).footer()).html(formatNumber(totalPrice));
+                    $(api.column(11).footer()).html(totalQty.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })); // Quantity as whole numbers
+                    $(api.column(12).footer()).html(formatNumber(totalAmount));
+                }
             });
         });
 
-
-    </script>
-    <script>
+        // Your existing functions (syncTimeZoneBeforeSubmit, validateAndShowLoader)
         function syncTimeZoneBeforeSubmit() {
             const select = document.getElementById('officeFilter');
             const tz = select.options[select.selectedIndex].getAttribute('data-timezone');
-
             document.getElementById('timeZoneInput').value = tz;
         }
 
-        // Attach to form
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.querySelector('form[method="get"]');
             if (form) {
                 form.addEventListener('submit', syncTimeZoneBeforeSubmit);
             }
-
-            // Set default value on page load
-            syncTimeZoneBeforeSubmit();
+            syncTimeZoneBeforeSubmit(); // Set default value on page load
         });
     </script>
-
-
 }
+

@@ -35,6 +35,7 @@ namespace NLI_POS.Pages.Utilities.PaymentMethods
                 return Page();
             }
 
+            PaymentMethods.ServiceCharge = PaymentMethods.ServiceCharge / 100;
             _context.PaymentMethods.Add(PaymentMethods);
             await _context.SaveChangesAsync();
 

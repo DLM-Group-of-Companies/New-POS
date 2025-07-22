@@ -1,6 +1,7 @@
 ﻿using NLI_POS.Data;
 using NLI_POS.Models;
 using System.Diagnostics;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace NLI_POS.Services
@@ -101,6 +102,49 @@ namespace NLI_POS.Services
             }
         }
 
+        //for Audit on Products
+        public static bool TryGetChanges<T>(T original, T current, out List<string> changes, params string[] ignoreProps)
+        {             
+            changes = new List<string>();
+            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var prop in props)
+            {
+                if (ignoreProps.Contains(prop.Name)) continue;
+
+                var originalValue = prop.GetValue(original)?.ToString() ?? "null";
+                var currentValue = prop.GetValue(current)?.ToString() ?? "null";
+
+                if (originalValue != currentValue)
+                {
+                    changes.Add($"{prop.Name}: '{originalValue}' → '{currentValue}'");
+                }
+            }
+
+            return changes.Any();
+        }
+
+        public static List<string> CompareProductPrice(ProductPrice oldPrice, ProductPrice newPrice)
+        {
+            var changes = new List<string>();
+
+            void Compare(string name, decimal? oldVal, decimal? newVal)
+            {
+                if (!Equals(oldVal, newVal))
+                    changes.Add($"{name}: '{oldVal}' → '{newVal}'");
+            }
+
+            Compare("UnitCost", oldPrice.UnitCost, newPrice.UnitCost);
+            Compare("RegPrice", oldPrice.RegPrice, newPrice.RegPrice);
+            Compare("DistPrice", oldPrice.DistPrice, newPrice.DistPrice);
+            Compare("StaffPrice", oldPrice.StaffPrice, newPrice.StaffPrice);
+            Compare("BPPPrice", oldPrice.BPPPrice, newPrice.BPPPrice);
+            Compare("MedPackPrice", oldPrice.MedPackPrice, newPrice.MedPackPrice);
+            Compare("CorpAccPrice", oldPrice.CorpAccPrice, newPrice.CorpAccPrice);
+            Compare("NaturoPrice", oldPrice.NaturoPrice, newPrice.NaturoPrice);
+
+            return changes;
+        }
     }
 
 }

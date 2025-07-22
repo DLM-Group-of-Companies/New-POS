@@ -45,9 +45,9 @@
 
     </div>
 
-    <div class="row p-3">
+    <div class="row p-3 pt-1">
         @Html.DisplayNameFor(model => model.Order.Notes)
-        <textarea class="form-control" asp-for="Order.Notes" rows="3" readonly></textarea>
+        <textarea class="form-control" asp-for="Order.Notes" rows="2" readonly></textarea>
     </div>
     <div class="row d-flex justify-content-between align-items-center">
         <div class="col-auto">
@@ -144,42 +144,6 @@
 
 </div>
 
-<!-- Void Confirmation Modal -->
-@* <div class="modal fade" id="voidOrderModal" tabindex="-1" aria-labelledby="voidOrderLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form method="post" asp-page-handler="Void" onsubmit="return validateAndShowLoader(this)">
-            @Html.AntiForgeryToken()
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="voidOrderLabel">Confirm Void</h5>
-                    <button type="button" class="btn-close"  data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-
-                    <div class="text-center">
-                        <i class="fas fa-exclamation-triangle fa-7x text-warning mb-5"></i>
-                        <p class="text-center border-top">
-                            <h4>Are you sure you want to void this order?</h4>
-                            <input type="hidden" id="voidOrderNo" name="OrderNo" />
-
-                            <!-- Optional text display areas -->
-                            <h5>
-                                Customer: <span id="voidCustomerName"></span><br />
-                                Order No: <span id="voidCustOrderNo"></span>
-                            </h5>
-                        </p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Confirm Void</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div> *@
-
-
 <script>
     function confirmVoid(orderNo) {
         Swal.fire({
@@ -201,36 +165,7 @@
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const voidModal = document.getElementById('voidOrderModal');
-
-        if (voidModal) {
-            voidModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const orderNo = button.getAttribute('data-orderno');
-                const customerName = button.getAttribute('data-customer');
-
-                const orderNoInput = document.getElementById('voidOrderNo');
-                const customerNameDisplay = document.getElementById('voidCustomerName');
-                const orderNoDisplay = document.getElementById('voidCustOrderNo');
-
-                if (orderNoInput) {
-                    orderNoInput.value = orderNo;
-                }
-
-                if (customerNameDisplay) {
-                    customerNameDisplay.textContent = customerName;
-                }
-
-                if (orderNoDisplay) {
-                    orderNoDisplay.textContent = orderNo;
-                }
-
-                console.log("Order No:", orderNo);
-            });
-        }
-    });
-
+ 
     function buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTot) {
         let html = `
                 <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">

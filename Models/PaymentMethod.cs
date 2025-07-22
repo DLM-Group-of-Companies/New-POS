@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace NLI_POS.Models
 {
@@ -10,7 +11,8 @@ namespace NLI_POS.Models
         [Required]
         public string Name { get; set; }
         public string? Description { get; set; }
-
+        [Precision(10, 4)]
+        public decimal? ServiceCharge { get; set; } 
         public bool IsActive { get; set; } = true;
     }
 }

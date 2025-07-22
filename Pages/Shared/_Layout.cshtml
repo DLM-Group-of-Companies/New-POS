@@ -20,7 +20,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
 
-
     <title>@ViewData["Title"] - NobleLife POS</title>
     @* Default *@
     <link id="bootstrap-theme" rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -72,9 +71,7 @@
 </head>
 <body class="@((User.Identity?.IsAuthenticated ?? false) ? "with-sidebar" : "no-sidebar")">
 
-    @* <div class="d-flex"> *@
     <div>
-        @* @if (!isLoginPage) *@
         @if (User.Identity.IsAuthenticated)
         {
             <!-- ✅ Sidebar for desktop (md+) only -->
@@ -213,7 +210,7 @@
             }
 
 
-            <main role="main" class="main-content">
+            <main role="main" class="main-content p-1 pb-4">
                 @RenderBody()
             </main>
         </div>
@@ -260,15 +257,6 @@
             const preloader = document.getElementById("preloader");
             if (preloader) preloader.style.display = "none";
         }
-
-        // function updateClock() {
-        //     const now = new Date();
-        //     const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        //     document.getElementById('liveClock').textContent = now.toLocaleTimeString([], options);
-        // }
-
-        // setInterval(updateClock, 1000);
-        // updateClock(); // initialize immediately
 
     </script>
  

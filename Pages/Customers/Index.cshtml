@@ -5,19 +5,37 @@
 @{
     ViewData["Title"] = "Customers";
 }
-<div class="container-fluid bg-white bg-gradient shadow p-4 pb-1">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0 text-primary">
+<div class="container-fluid bg-white bg-gradient shadow p-2 pb-1">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+        <h4 class="m-2 mb-0 text-primary">
             <i class="fas fa-users"></i> Customers
         </h4>
         <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
     </div>
     <hr />
-    <p>
-        <a class="btn btn-primary btn-gradient" asp-page="Create"><i class="fas fa-user-plus"></i> Add Customer</a>
-    </p>
+@*     <p>
+        <a class="btn btn-primary btn-gradient" asp-page="Create"><i class="fas fa-user-plus me-2"></i> New Customer</a>
+    </p> *@
 
-    <table id="customerTable" class="table table-striped table-sm">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2" id="customFilterRow">
+        <a class="btn btn-primary btn-gradient" asp-page="Create"><i class="fas fa-user-plus me-2"></i> New Customer</a>
+        <div id="exportButtons"></div>
+
+        <div class="d-flex flex-column flex-md-row align-items-center gap-2" id="rightControls">
+            <select id="countrySelect" class="form-select" title="Filter by Country">
+                <option value="">All Countries</option>
+                @foreach (var country in (IEnumerable<SelectListItem>)ViewBag.Countries)
+                {
+                    <option value="@country.Value">@country.Text</option>
+                }
+            </select>
+
+            <div id="searchBoxContainer" title="Search by name, email, mobile, city..."></div>
+        </div>
+    </div>
+
+
+    <table id="customerTable" class="table table-striped table-sm align-middle">
         <thead class="table-primary">
             <tr>
                 <th>Cust Code</th>
@@ -32,41 +50,6 @@
     </table>
     @Html.AntiForgeryToken()
 </div>
-
-<!-- Delete Confirmation Modal -->
-@* <div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteCustomerModalLabel"><i class="fas fa-user-times me-2"></i>Confirm Deletion</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="post" asp-page-handler="Delete">
-                <div class="modal-body">
-
-                    <div class="text-center">
-                        <i class="fa-regular fa-circle-question fa-7x text-danger mb-5"></i>
-
-                        <input type="hidden" name="id" id="deleteCustomerId" />
-                        <p class="text-center">
-                            Are you sure you want to delete <br />
-                            <h4 class="text-center" id="deleteCustomerName">?</h4>
-                        </p>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash me-1"></i> Delete
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div> *@
 
 @{
     var canDelete = User.HasPermission("Delete");
@@ -84,6 +67,16 @@
 
         $(document).ready(function () {
             const table = $('#customerTable').DataTable({
+                dom: 'Bfrtip', // We'll manually move the buttons and search box // 'B' for Buttons, 'f' for searching, 'r' for processing display, 't' for table, 'i' for information, 'p' for pagination
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel me-2"></i>  Export to Excel ', // Custom button text
+                        title: 'Customers', // Title for the Excel file
+                        exportOptions: {
+                            columns: ':visible' // Only export visible columns
+                        }
+                    }],
                 stateSave: true,
                 stateSaveCallback: function (settings, data) {
                     sessionStorage.setItem('CustomerTableState', JSON.stringify(data));
@@ -95,8 +88,12 @@
                 serverSide: true,
                 ajax: {
                     url: '@Url.Page("Index", "Data")',
-                    type: 'GET'
+                    type: 'GET',
+                    data: function (d) {
+                        d.country = $('#countrySelect').val();
+                    }
                 },
+                responsive: true,
                 columns: [
                     { data: 'custCode' },
                     { data: 'fullName' },
@@ -106,45 +103,65 @@
                     { data: 'className' },
                     {
                         data: 'id',
+                        className: 'text-end',
                         render: function (data, type, row) {
                             let name = `${row.custCode}: ${row.fullName}`;
                             return `
-                                           <a href="/Customers/Edit?id=${data}" class="btn btn-success btn-sm btn-icon" title="Edit"><i class="fas fa-user-edit"></i></a>
-                                           <a href="/Customers/Details?id=${data}" class="btn btn-primary btn-sm btn-icon" title="Details"><i class="fas fa-user-tag"></i></a>
-                                                   <button type="button" class="delete-btn btn btn-danger btn-sm btn-icon" data-id="${data}" data-name="${name}" title="Delete">
-                                                <i class="fas fa-user-times"></i>
-                                            </button>
-                                        `;
+                                                   <a href="/Customers/Edit?id=${data}" class="btn btn-success btn-sm btn-icon" title="Edit"><i class="fas fa-user-edit"></i></a>
+                                                   <a href="/Customers/Details?id=${data}" class="btn btn-primary btn-sm btn-icon" title="Details"><i class="fas fa-user-tag"></i></a>
+                                                           <button type="button" class="delete-btn btn btn-danger btn-sm btn-icon" data-id="${data}" data-name="${name}" title="Delete">
+                                                        <i class="fas fa-user-times"></i>
+                                                    </button>
+                                                `;
                         },
+
                         orderable: false,
                         searchable: false
                     }
-                ]
-            });
+                ],
+                initComplete: function () {
+                    // Style and place export buttons
+                    const $buttons = table.buttons().container().addClass('d-inline-block');
+                    $buttons.find('button')
+                        .removeClass('dt-button')
+                        .addClass('btn btn-outline-success btn-gradient me-2');
+                    $('#exportButtons').append($buttons);
 
+                    // Move and style search input
+                    const $searchInput = $('#customerTable_filter input')
+                        .addClass('form-control')
+                        .attr('placeholder', '🔍 Search...')
+                        .css('min-width', '250px');
+
+                    // Remove label text from default search wrapper
+                    $('#customerTable_filter label').contents().filter(function () {
+                        return this.nodeType === 3;
+                    }).remove();
+
+                    // Move Country dropdown next to search
+                    const $countrySelect = $('#countrySelect')
+                        .addClass('form-select')
+                        .css('min-width', '180px');
+
+                    // Wrap both in a flexbox container
+                    const $searchGroup = $('<div class="d-flex flex-column flex-md-row align-items-center gap-2 w-100 justify-content-end"></div>')
+                        .append($countrySelect)
+                        .append($searchInput);
+
+
+                    $('#searchBoxContainer').append($searchGroup);
+                }
+
+            });
         });
+
+        //Reload on Country change
+        $('#countrySelect').on('change', function () {
+            $('#customerTable').DataTable().ajax.reload();
+        });
+
     </script>
 
-@*     <script>
-        const userCanDelete = @(User.HasPermission("Delete").ToString().ToLower() == "true" ? "true" : "false");
-        // Listen to modal's "show" event
-        const deleteModal = document.getElementById('deleteCustomerModal');
-
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            if (!userCanDelete) {
-                event.preventDefault(); // 🔴 Stop the modal from opening
-                toastr.error("You are not authorized to delete.");
-                return;
-            }
-
-            const button = event.relatedTarget;
-            const customerId = button.getAttribute('data-id');
-            const customerName = button.getAttribute('data-name');
-
-            document.getElementById('deleteCustomerId').value = customerId;
-            document.getElementById('deleteCustomerName').textContent = customerName;
-        });
-    </script> *@
 
     <script>
         $(document).on('click', '.delete-btn', function () {
@@ -176,7 +193,7 @@
                             const data = await response.json(); // parse JSON even for error
                             if (response.ok) {
                                 Swal.fire('Deleted!', data.message, 'success');
-                                $('#customerTable').DataTable().ajax.reload();
+                                $('#customerTable').DataTable().ajax.reload(null, false);
                             } else {
                                 Swal.fire('Failed', data.message, 'error');
                             }

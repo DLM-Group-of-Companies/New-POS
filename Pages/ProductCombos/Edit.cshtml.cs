@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.ProductCombos
 {
@@ -50,7 +51,7 @@ namespace NLI_POS.Pages.ProductCombos
 
             combo.IsActive = isActive;
             await _context.SaveChangesAsync();
-
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Change active status of '{combo.ProductsDesc}' of Product ID: {combo.ProductId} to {combo.IsActive}");
             return new JsonResult(new { success = true });
         }
 

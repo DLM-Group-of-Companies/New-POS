@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Offices
 {
@@ -37,6 +38,7 @@ namespace NLI_POS.Pages.Offices
             _context.OfficeCountry.Add(OfficeCountry);
             await _context.SaveChangesAsync();
 
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added Office: {OfficeCountry.Name}");
             return RedirectToPage("./Index");
         }
     }

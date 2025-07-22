@@ -12,8 +12,8 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250717173203_AddisActiveProdCombo")]
-    partial class AddisActiveProdCombo
+    [Migration("20250719112200_CustClassAddIsActive")]
+    partial class CustClassAddIsActive
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -324,6 +324,9 @@ namespace NLI_POS.Migrations
 
                     b.Property<string>("EncodedBy")
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()

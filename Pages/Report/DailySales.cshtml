@@ -67,8 +67,8 @@
     </div>
 
     <div class="table-responsive">
-        <table id="ordersTable" class="table table-bordered table-hover table-sm small w-100 text-nowrap">
-            <thead class="table-light text-center">
+        <table id="ordersTable" class="table table-bordered table-striped table-sm small w-100 text-nowrap align-middle">
+            <thead class="table-secondary text-center">
                 <tr>
                     <th>Order No.</th>
                     <th>Order Date</th>
@@ -147,18 +147,18 @@
                     }
                 }
             </tbody>
-            <tfoot class="table-warning fw-bold text-end">
-                <tr>
-                    <td class="border-0"></td>
-                    <td class="border-0"></td>
-                    <td class="border-0"></td>
-                    <td class="border-0"></td>
-                    <td class="border-0"></td>
-                    <td class="border-0"></td>
-                    <td class="border-0"></td>
-                    <td class="border-0"></td>
-                    <td class="border-0"></td>
+            <tfoot class="table-secondaryfw-bold text-end">
+                <tr class=" fw-bold">
                     <td class="border-0 text-start">TOTALS:</td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
+                    <td class="border-0"></td>
                     <td class="border-0 text-end">@Model.Order.SelectMany(o => o.ProductItems).Sum(i => i.Price).ToString("N2")</td>
                     <td class="border-0 text-end">@Model.Order.SelectMany(o => o.ProductItems).Sum(i => i.Quantity).ToString("N0")</td>
                     <td class="border-0 text-end">

@@ -37,11 +37,25 @@ namespace NLI_POS.Pages.Orders
         [BindProperty]
         public string GrandTotal { get; set; }
 
+        public class PaymentMethodVM
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public decimal? ServiceCharge { get; set; }
+        }
+
+        [BindProperty]
+        public decimal ServiceChargeValue { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
+            //Reset cart
+            HttpContext.Session.Remove("Cart");
+            HttpContext.Session.Remove("Payments");
+
             SelectedProducts = HttpContext.Session.GetObject<List<ProductItem>>("Cart") ?? new List<ProductItem>();
 
-            ViewData["CustomerId"] = new SelectList(_context.Customer.OrderByDescending(c=>c.Id)
+            ViewData["CustomerId"] = new SelectList(_context.Customer.OrderByDescending(c => c.Id)
                 .Take(30)
                 .Select(c => new
                 {
@@ -52,12 +66,15 @@ namespace NLI_POS.Pages.Orders
             OfficeList = await GetUserOfficesAsync(); //Filters office by Office Assignment
 
 
-            //ViewData["ProductId"] = new SelectList(await _context.Products
-            //    .Where(p => p.IsActive)
-            //    .Select(p => new { p.Id, p.ProductName })
-            //    .ToListAsync(), "Id", "ProductName");
-
-            ViewData["PaymentMethod"] = new SelectList(await _context.PaymentMethods.Where(p=>p.IsActive).ToListAsync(), "Name", "Name");
+            ViewData["PaymentMethod"] = _context.PaymentMethods
+                .Where(p => p.IsActive)
+                .Select(p => new PaymentMethodVM
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    ServiceCharge = p.ServiceCharge
+                })
+                .ToList();
 
             return Page();
         }
@@ -68,7 +85,7 @@ namespace NLI_POS.Pages.Orders
                 .Where(p => p.IsActive && p.ProductCategory == categoryId)
                 .Select(p => new { id = p.Id, name = p.ProductName })
                 .ToList();
-                
+
             return new JsonResult(products);
         }
 
@@ -205,7 +222,17 @@ namespace NLI_POS.Pages.Orders
             //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
             OfficeList = await GetUserOfficesAsync(); //Filters office by Office Assignment
             ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
-            ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
+            //ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
+            ViewData["PaymentMethod"] = _context.PaymentMethods
+                .Where(p => p.IsActive)
+                .Select(p => new PaymentMethodVM
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    ServiceCharge = p.ServiceCharge
+                })
+                .ToList();
+
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -315,7 +342,7 @@ namespace NLI_POS.Pages.Orders
                 OrderType = orderType,
                 EncodedBy = User.Identity.Name,
                 TotAmount = Order.TotAmount,
-                TotPaidAmount = Payments.Sum(p => p.Amount),
+                TotPaidAmount = Payments.Sum(p => p.Amount) + ServiceChargeValue,
                 Notes = Order.Notes
             };
 
@@ -330,14 +357,16 @@ namespace NLI_POS.Pages.Orders
                 ComboName = item.ComboName,
                 Price = item.Price,
                 Quantity = item.Quantity,
-                Amount = item.Price * item.Quantity,
+                Amount = item.Price * item.Quantity,  
+                ServiceChargeAmount = item.ServiceChargeAmount,
+                ServiceChargePct = item.ServiceChargePct,
                 ItemNo = itemNo++
             }).ToList();
 
             // Attach Payments
             order.Payments = Payments;
 
-            // Save entire order graph
+            // Save entire order 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
@@ -417,14 +446,6 @@ namespace NLI_POS.Pages.Orders
             TempData["SuccessMessage"] = "Order has been successfully submitted.";
             return RedirectToPage("./Details", new { orderNo = orderNo });
         }
-
-        //public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId)
-        //{
-        //    var stock = await _context.InventoryStocks
-        //        .FirstOrDefaultAsync(s => s.ProductId == productId && s.OfficeId == officeId);
-
-        //    return new JsonResult(stock?.StockQty ?? 0);
-        //}
 
         //Verify Stocks
         public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId)
@@ -509,6 +530,8 @@ namespace NLI_POS.Pages.Orders
             public decimal Price { get; set; }
             public int Quantity { get; set; }
             public decimal Amount { get; set; }
+            public decimal ServiceChargeAmount { get; set; } = 0;
+            public decimal ServiceChargePct { get; set; } = 0;
 
             public int ItemNo { get; set; } // optional
         }
@@ -583,7 +606,7 @@ namespace NLI_POS.Pages.Orders
             //Search Customers via Modal
             var results = _context.Customer
                 .Where(c => (c.FirstName + " " + c.LastName).Contains(term) ||  // Full name
-                    c.FirstName.Contains(term) || c.LastName.Contains(term) || c.CustCode.Contains(term) || 
+                    c.FirstName.Contains(term) || c.LastName.Contains(term) || c.CustCode.Contains(term) ||
                     c.MobileNo.Contains(term) || c.Email.Contains(term))
                 .Select(c => new
                 {

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Prices
 {
@@ -40,6 +41,7 @@ namespace NLI_POS.Pages.Prices
             _context.ProductPrices.Add(ProductPrice);
             await _context.SaveChangesAsync();
 
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added Price(s) for Product ID: {ProductPrice.ProductId} in {ProductPrice?.Country?.Name}");
             return RedirectToPage("./Index");
         }
     }

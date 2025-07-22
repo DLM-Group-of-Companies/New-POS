@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using NLI_POS.Data;
 using NLI_POS.Models;
 using NLI_POS.Services;
-using NuGet.Packaging.Signing;
+using System.Text;
 
 namespace NLI_POS.Pages.Products
 {
@@ -144,6 +139,7 @@ namespace NLI_POS.Pages.Products
             ModelState.Remove("Products");
             _context.ProductCombos.Add(ProductCombo);
             await _context.SaveChangesAsync();
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added Combo {ProductCombo.ProductsDesc} for Product ID: {ProductCombo.ProductId}");
             return Page();
         }
 
@@ -186,15 +182,17 @@ namespace NLI_POS.Pages.Products
 
         public async Task<IActionResult> OnPostAsync()
         {
+            Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
+
             if (!ModelState.IsValid)
             {
-                Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
                 return Page();
             }
 
-            // Load the current product from the database
-            var originalProduct = await _context.Products
-                .AsNoTracking()
+            var selectedCountry = Countries.FirstOrDefault(c => c.Id == ProductPrice.CountryId);
+            string selectedCountryName = selectedCountry?.Name;
+
+            var originalProduct = await _context.Products.AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == Products.Id);
 
             if (originalProduct == null)
@@ -202,15 +200,10 @@ namespace NLI_POS.Pages.Products
                 return NotFound();
             }
 
-            // Track if the product entity was changed
-            bool isProductModified = !_context.Entry(Products).CurrentValues.Properties.All(prop =>
-            {
-                var originalValue = originalProduct.GetType().GetProperty(prop.Name)?.GetValue(originalProduct);
-                var postedValue = Products.GetType().GetProperty(prop.Name)?.GetValue(Products);
-                return Equals(originalValue, postedValue);
-            });
+            AuditHelpers.TryGetChanges(originalProduct, Products, out var productChanges, "UpdateDate", "UpdatedBy");
 
-            // Attach and mark the product as modified only if changed
+            bool isProductModified = productChanges.Any();
+
             if (isProductModified)
             {
                 Products.UpdateDate = DateTime.UtcNow;
@@ -219,21 +212,25 @@ namespace NLI_POS.Pages.Products
                 await _context.SaveChangesAsync();
             }
 
-            // Always save or update the ProductPrice (as requested)
             ProductPrice.ProductId = Products.Id;
             ProductPrice.EncodeDate = DateTime.UtcNow;
             ProductPrice.EncodedBy = User.Identity?.Name ?? "System";
 
-            // Check if price exists
             var existingPrice = await _context.ProductPrices
                 .FirstOrDefaultAsync(p => p.ProductId == Products.Id && p.CountryId == ProductPrice.CountryId);
+
+            List<string> priceChanges;
 
             if (existingPrice == null)
             {
                 _context.ProductPrices.Add(ProductPrice);
+                priceChanges = new List<string> { $"New pricing added for {selectedCountryName}." };
             }
             else
             {
+                priceChanges = AuditHelpers.CompareProductPrice(existingPrice, ProductPrice);
+
+                // Apply the changes
                 existingPrice.UnitCost = ProductPrice.UnitCost;
                 existingPrice.RegPrice = ProductPrice.RegPrice;
                 existingPrice.DistPrice = ProductPrice.DistPrice;
@@ -248,7 +245,25 @@ namespace NLI_POS.Pages.Products
 
             await _context.SaveChangesAsync();
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Edited Product: {originalProduct.ProductName}");
+            var fullAuditMessage = new StringBuilder();
+            fullAuditMessage.AppendLine($"Edited Product: {originalProduct.ProductName}");
+
+            if (productChanges.Any())
+            {
+                fullAuditMessage.AppendLine("Product detail changes:");
+                foreach (var change in productChanges)
+                    fullAuditMessage.AppendLine($" - {change}");
+            }
+
+            if (priceChanges.Any())
+            {
+                fullAuditMessage.AppendLine($"Product price changes for {selectedCountryName}:");
+                foreach (var change in priceChanges)
+                    fullAuditMessage.AppendLine($" - {change}");
+            }
+
+            await AuditHelpers.LogAsync(HttpContext, _context, User, fullAuditMessage.ToString());
+
             return RedirectToPage("./Index");
         }
 

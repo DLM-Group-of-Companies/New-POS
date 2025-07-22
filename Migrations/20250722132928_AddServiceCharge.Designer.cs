@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NLI_POS.Data;
 
@@ -11,9 +12,11 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250722132928_AddServiceCharge")]
+    partial class AddServiceCharge
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -715,13 +718,11 @@ namespace NLI_POS.Migrations
                     b.Property<string>("ReferenceNo")
                         .HasColumnType("longtext");
 
-                    b.Property<decimal?>("ServiceChargeAmount")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
+                    b.Property<double?>("ServiceChargeAmount")
+                        .HasColumnType("double");
 
-                    b.Property<decimal?>("ServiceChargePercent")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("decimal(10,4)");
+                    b.Property<double?>("ServiceChargePercent")
+                        .HasColumnType("double");
 
                     b.HasKey("Id");
 
@@ -748,9 +749,8 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<decimal?>("ServiceCharge")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("decimal(10,4)");
+                    b.Property<double?>("ServiceCharge")
+                        .HasColumnType("double");
 
                     b.HasKey("Id");
 

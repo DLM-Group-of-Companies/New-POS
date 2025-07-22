@@ -31,6 +31,13 @@
                 <input asp-for="PaymentMethods.Description" class="form-control" placeholder="Optional description" />
                 <span asp-validation-for="PaymentMethods.Description" class="text-danger small"></span>
             </div>
+
+            <div class="mb-3">
+                <label asp-for="PaymentMethods.ServiceCharge" class="form-label">Service Charge (%)</label>
+                <input asp-for="PaymentMethods.ServiceCharge" class="form-control" />
+                <span asp-validation-for="PaymentMethods.ServiceCharge" class="text-danger small"></span>
+            </div>
+
             <div class="form-group form-check form-switch">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="PaymentMethods.IsActive" /> Active

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
 using NLI_POS.Services;
@@ -19,12 +20,20 @@ namespace NLI_POS.Pages.Customers
         }
 
         public IList<Customer> Customer { get; set; } = default!;
+        //public List<Country> Countries { get; set; } = new();
 
-        public async Task OnGetAsync()
+        public void OnGet()
         {
-            //Customer = await _context.Customer
-            //    .Include(c => c.CustClasses)
-            //    .Include(c => c.OfficeCountry).ToListAsync();
+            var countries = _context.Country.Where(c => c.IsActive)
+                .Select(o => new SelectListItem
+                {
+                    Value = o.Code,
+                    Text = o.Name
+
+                })
+                .ToList();
+
+            ViewData["Countries"] = countries;
         }
 
         public async Task<IActionResult> OnGetDataAsync()
@@ -40,10 +49,10 @@ namespace NLI_POS.Pages.Customers
 
             string[] columnNames = { "custCode", "fullName", "email", "mobile", "landline", "city", "className" };
 
+            var country = requestForm["country"].FirstOrDefault();
 
             var query = _context.Customer
                 .Include(c => c.CustClasses)
-                .Include(c => c.OfficeCountry)
                 .AsNoTracking()
                 .Select(c => new
                 {
@@ -53,8 +62,8 @@ namespace NLI_POS.Pages.Customers
                     email = c.Email,
                     mobile = c.MobileNo,
                     landline = c.LandlineNo,
-                    city = c.City,
-                    country = c.OfficeCountry != null ? c.OfficeCountry.Name : "",
+                    city = c.City,           
+                    country = c.Country,
                     className = c.CustClasses != null ? c.CustClasses.Name : ""
                 });
 
@@ -70,6 +79,11 @@ namespace NLI_POS.Pages.Customers
                     c.className.Contains(searchValue));
             }
 
+            if (!string.IsNullOrWhiteSpace(country))
+            {
+                query = query.Where(c => c.country == country); //Filters by code
+            }
+
             var totalRecords = await query.CountAsync();
 
             var sortedColumn = columnNames[sortColumnIndex];
@@ -79,7 +93,7 @@ namespace NLI_POS.Pages.Customers
                 .Take(length)
                 .ToListAsync();
 
-                //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Customer List");
+            //await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Customer List");
 
 
             return new JsonResult(new

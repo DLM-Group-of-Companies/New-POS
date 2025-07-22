@@ -14,7 +14,7 @@
     </div>
     <hr />
     <p>
-        <a class="btn btn-primary btn-gradient" asp-page="New"><i class="fas fa-cart-plus"></i> New Order</a>
+        <a class="btn btn-primary btn-gradient" asp-page="New"><i class="fas fa-cart-plus me-2"></i> New Order</a>
     </p>
     <div class="mb-3">
         <select id="officeFilter" class="form-control form-select ms-2" style="width: auto;" title="Filter by Office">
@@ -27,10 +27,9 @@
                 </option>
             }
         </select>
-
     </div>
 
-    <table id="ordersTable" class="table table-striped table-sm text-nowrap">
+    <table id="ordersTable" class="table table-striped table-sm text-nowrap align-middle">
         <thead class="table-primary">
             <tr>
                 <th>Order No.</th>
@@ -71,7 +70,7 @@
                 },
 
                 ajax: {
-                    url: '@Url.Page("Index", "Orders")', // Ensure this returns JSON
+                    url: '@Url.Page("Index", "Orders")', // returns JSON
                     data: function (d) {
                         d.officeId = $('#officeFilter').val();
                         d.timeZone = $('#officeFilter option:selected').data('timezone');
@@ -156,11 +155,28 @@
                 ]
             });
 
-            // Wrap search & filter nicely
-            const $filterWrapper = $('<div class="d-flex align-items-center gap-2"></div>');
-            $filterWrapper.append($('#ordersTable_filter label'));
-            $filterWrapper.prepend($('#officeFilter'));
+            // Wrap search input and dropdown nicely
+            const $searchInput = $('#ordersTable_filter input')
+                .addClass('form-control form-control-sm') // Bootstrap styling
+                .attr('placeholder', '🔍 Search...')
+                .css('min-width', '250px');
+
+            // Remove label text (just keep the input)
+            $('#ordersTable_filter label').contents().filter(function () {
+                return this.nodeType === 3; // text node
+            }).remove();
+
+            // Wrap both Office filter and Search in one line
+            const $filterWrapper = $('<div class="d-flex align-items-center gap-2 ms-auto"></div>');
+
+            // Add office filter and search input
+            $filterWrapper
+                .append($('#officeFilter').addClass('form-select form-select-sm')) // make sure this exists in HTML
+                .append($searchInput);
+
+            // Replace original filter container
             $('#ordersTable_filter').html($filterWrapper);
+
 
             // Reload table on filter change
             $('#officeFilter').on('change', function () {

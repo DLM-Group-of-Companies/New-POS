@@ -6,7 +6,7 @@
     ViewData["Title"] = "New Order";
 }
 <div class="container-fluid bg-white bg-gradient shadow p-3">
-    <div class="d-flex justify-content-between align-items-center mb-2">
+    <div class="d-flex justify-content-between align-items-center mb-1">
         <h4 class="mb-0 text-primary">
             <i class="fas fa-cart-plus me-2"></i> New Order
         </h4>
@@ -14,228 +14,242 @@
     </div>
     <hr />
 
-    <form method="post" id="myForm" >
-        @Html.AntiForgeryToken()
-        <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75 mb-2"></div>
+    <div class="container-fluid bg-primary bg-gradient bg-opacity-25 rounded-3 shadow p-2">
+        <form method="post" id="myForm">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger small bg-danger text-white p-2 bg-opacity-75 mb-2"></div>
 
-        <div class="row gx-2">
-            <!-- Left Panel -->
-            <div class="col-lg-4">
-                <!-- Office Info -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2">
-                        <i class="fas fa-building text-primary"></i> Office Info
-                    </h5>
-                    <input type="hidden" asp-for="Order.OrderNo" />
-                    <div class="row gx-2">
-                        <div class="col-6 mb-2">
-                            <label asp-for="Order.OfficeId" class="form-label"></label>
-                            <select id="OfficeId" asp-for="Order.OfficeId" class="form-control form-select">
-                                @foreach (var office in Model.OfficeList)
-                                {
-                                    <option value="@office.Value"
-                                            data-locale="@office.Locale"
-                                            data-currency="@office.CurrencyCode">
-                                        @office.Text
-                                    </option>
-                                }
-                            </select>
+            <div class="row gx-2">
+                <!-- Left Panel -->
+                <div class="col-lg-4">
+                    <!-- Office Info -->
+                    <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                        <h5 class="text-secondary border-bottom pb-1 mb-2">
+                            <i class="fas fa-building text-primary"></i> Office Info
+                        </h5>
+                        <input type="hidden" asp-for="Order.OrderNo" />
+                        <div class="row gx-2">
+                            <div class="col-6 mb-2">
+                                <label asp-for="Order.OfficeId" class="form-label"></label>
+                                <select id="OfficeId" asp-for="Order.OfficeId" class="form-control form-control-sm form-select form-select-sm">
+                                    @foreach (var office in Model.OfficeList)
+                                    {
+                                        <option value="@office.Value"
+                                                data-locale="@office.Locale"
+                                                data-currency="@office.CurrencyCode">
+                                            @office.Text
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <label asp-for="Order.OrderDate" class="form-label"></label>
+                                <input asp-for="Order.OrderDate" class="form-control form-control-sm" value="@DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="Order.OrderDate" class="text-danger small"></span>
+                            </div>
                         </div>
-                        <div class="col-6 mb-2">
-                            <label asp-for="Order.OrderDate" class="form-label"></label>
-                            <input asp-for="Order.OrderDate" class="form-control" value="@DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd")" />
-                            <span asp-validation-for="Order.OrderDate" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Customer Info -->
+                    <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                        <h5 class="text-secondary border-bottom pb-1 mb-2">
+                            <i class="fas fa-user text-success"></i> Customer Info
+                        </h5>
+                        <label asp-for="Order.CustomerId" class="form-label"></label>
+                        <div class="input-group mb-2">
+                            <!-- Visible input (for searching by name) -->
+                            <input type="text" id="CustomerSearchInput" class="form-control form-control-sm " placeholder="Search customer..." autocomplete="off" />
+
+                            <!-- Hidden input (for actual submission of CustomerId) -->
+                            <input type="hidden" name="Order.CustomerId" id="CustomerId" />
+                            <button class="btn btn-success" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="mb-2">
+                            <span id="CustClassDisplay" class="badge bg-success"></span>
+                            <input id="Order_CustClass" name="Order.CustClass" type="hidden" />
+                        </div>
+                        <span asp-validation-for="Order.CustomerId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Product Selection -->
+                    <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                        <h5 class="text-secondary border-bottom pb-1 mb-2">
+                            <i class="fas fa-box text-info"></i> Product Selection
+                        </h5>
+                        <div class="row gx-2">
+                            <div class="col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
+                                <label class="form-label">Category</label>
+                                <select id="ProductCategory" class="form-control form-control-sm form-select form-select-sm">
+                                    <option value="Regular">Regular</option>
+                                    <option value="Package">Package</option>
+                                    <option value="Freebie">Freebie</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-8 col-md-12 col-sm-12 col-12 mb-2">
+                                <label class="form-label">Product</label>
+                                <select id="ProductId" class="form-control form-control-sm form-select form-select-sm" asp-items="ViewBag.ProductId"></select>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Combo (if applicable)</label>
+                            <select id="ComboId" class="form-control form-control-sm form-select form-select-sm" asp-items="ViewBag.ProductCombos"></select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">Quantity</label>
+                                <input id="Qty" type="number" class="form-control form-control-sm" value="1" min="1" />
+                            </div>
+                            <div class="col-md-8 mb-2">
+                                <label class="form-label">Amount</label>
+                                <input id="Amount" type="text" class="form-control form-control-sm fw-bold" readonly />
+                            </div>
+                        </div>
+                        <input id="Price" type="hidden" />
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-info bg-gradient bg-opacity-50" onclick="addProduct()">
+                                <i class="fas fa-cart-plus me-2"></i> Add to Cart <i class="fas fa-angle-double-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Customer Info -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2">
-                        <i class="fas fa-user text-success"></i> Customer Info
-                    </h5>
-                    <label asp-for="Order.CustomerId" class="form-label"></label>
-                    <div class="input-group mb-2">
-                        @*                         <select asp-for="Order.CustomerId" id="CustomerId" class="form-control form-select" asp-items="ViewBag.CustomerId">
-                        <option value="">-- Select Customer--</option>
-                        </select> *@
+                <!-- Right Panel -->
+                <div class="col-lg-8">
+                    <!-- Cart Section -->
+                    <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                        <h5 class="text-dark border-bottom pb-1 mb-2">
+                            <i class="fas fa-shopping-cart text-secondary"></i> Cart
+                        </h5>
+                        <div class="table-responsive">
+                            <table id="cartTable" class="table table-bordered table-sm small align-middle">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>Product Items</th>
+                                        <th>Product Combo</th>
+                                        <th>Price</th>
+                                        <th>Qty</th>
+                                        <th>Amount</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.SelectedProducts.Any())
+                                    {
+                                        foreach (var item in Model.SelectedProducts)
+                                        {
+                                            <tr>
+                                                <td>@item.ProductName</td>
+                                                <td>@item.ComboName</td>
+                                                <td class="text-end">@item.Price.ToString("N2")</td>
+                                                <td class="text-end">@item.Quantity</td>
+                                                <td class="text-end">@(item.Price * item.Quantity).ToString("N2")</td>
+                                                <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(@item.ProductId)"><i class="fas fa-trash"></i></button></td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr><td colspan="6" class="text-center text-muted">No items in cart.</td></tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="3" class="text-end fw-bold text-uppercase">Sub Total</td>
+                                        <td class="text-end">
+                                            <strong><span id="subTotal">0</span></strong>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="3" class="text-end fw-bold text-uppercase">Total Amount Due</td>
+                                        <td class="text-end">
+                                            <strong><span id="grandTotal">0</span></strong>
+                                            <input type="hidden" asp-for="Order.TotAmount" name="Order.TotAmount" id="GrandTotalInput" value="0" />
+                                            <input type="hidden" asp-for="ServiceChargeValue" name="ServiceChargeValue" id="ServiceChargeValue"  />
+                                        </td>
+                                        <td></td>
+                                    </tr>
 
-                        <!-- Visible input (for searching by name) -->
-                        <input type="text" id="CustomerSearchInput" class="form-control" placeholder="Search customer..." autocomplete="off" />
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
 
-                        <!-- Hidden input (for actual submission of CustomerId) -->
-                        <input type="hidden" name="Order.CustomerId" id="CustomerId" />
-                        <button class="btn btn-success" type="button" onclick="openCustomerSearchModal()"><i class="fas fa-search"></i></button>
-                    </div>
-                    <div class="mb-2">
-                        <span id="CustClassDisplay" class="badge bg-success"></span>
-                        <input id="Order_CustClass" name="Order.CustClass" type="hidden" />
-                    </div>
-                    <span asp-validation-for="Order.CustomerId" class="text-danger small"></span>
-                </div>
+                    <!-- Payment Section -->
+                    <div class="p-3 bg-light border rounded shadow-sm mb-2">
+                        <h5 class="text-secondary border-bottom pb-1 mb-2">
+                            <i class="fas fa-credit-card text-warning"></i> Payment
+                        </h5>
+                        <select id="paymentOptionsSource" class="d-none">
+                            @foreach (var method in ViewBag.PaymentMethod)
+                            {
+                                var charge = method.ServiceCharge ?? 0.0;
+                                <option value="@method.Name" data-charge="@charge">@method.Name</option>
+                            }
+                        </select>
+                        <table class="table table-sm" id="paymentTable">
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Amount</th>
+                                    <th>Charge</th>
+                                    <th>Ref No.</th>
+                                    <th colspan="2"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentTableBody">
+                                <tr>
+                                    <td>
+                                        <select name="Payments[0].PayMethod" class="form-control form-control-sm form-select form-select-sm payment-method">
+                                            @foreach (var method in ViewBag.PaymentMethod)
+                                            {
+                                                var charge = method.ServiceCharge ?? 0.0;
+                                                <option value="@method.Name" data-charge="@charge">@method.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Payments[0].Amount" class="form-control form-control-sm payment-amount" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Payments[0].ServiceChargeAmount" class="form-control form-control-sm payment-charge" readonly />
+                                        <input id="serviceChargePercent" type="hidden" name="Payments[0].ServiceChargePercent" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="Payments[0].RefNo" class="form-control form-control-sm" />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="removePaymentRow(this)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-warning text-white" title="Add" onclick="addPaymentRow()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div id="paymentError" class="text-danger small mb-2" style="display:none;"></div>
 
-                <!-- Product Selection -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2">
-                        <i class="fas fa-box text-info"></i> Product Selection
-                    </h5>
-                    <div class="row gx-2">
-                        <div class="col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
-                            <label class="form-label">Category</label>
-                            <select id="ProductCategory" class="form-control form-select">
-                                <option value="Regular">Regular</option>
-                                <option value="Package">Package</option>
-                                <option value="Freebie">Freebie</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-8 col-md-12 col-sm-12 col-12 mb-2">
-                            <label class="form-label">Product</label>
-                            <select id="ProductId" class="form-control form-select" asp-items="ViewBag.ProductId"></select>
+                        <div class="mb-2">
+                            <label asp-for="Order.Notes" class="form-label"></label>
+                            <textarea asp-for="Order.Notes" class="form-control form-control-sm" rows="3"></textarea>
                         </div>
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label">Combo (if applicable)</label>
-                        <select id="ComboId" class="form-control form-select" asp-items="ViewBag.ProductCombos"></select>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-2">
-                            <label class="form-label">Quantity</label>
-                            <input id="Qty" type="number" class="form-control" value="1" min="1" />
-                        </div>
-                        <div class="col-md-8 mb-2">
-                            <label class="form-label">Amount</label>
-                            <input id="Amount" type="text" class="form-control fw-bold" readonly />
-                        </div>
-                    </div>
-                    <input id="Price" type="hidden" />
-                    <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-info bg-gradient" onclick="addProduct()">
-                            <i class="fas fa-cart-plus me-2"></i> Add to Cart <i class="fas fa-angle-double-right"></i>
+
+                    <div class="d-flex justify-content-end pt-3">
+                        <button type="submit" class="btn btn-primary btn-lg bg-gradient fw-bold">
+                            <i class="fas fa-cash-register me-2 fa-xl py-4"></i> Place Order
                         </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Right Panel -->
-            <div class="col-lg-8">
-                <!-- Cart Section -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-dark border-bottom pb-1 mb-2">
-                        <i class="fas fa-shopping-cart text-secondary"></i> Cart
-                    </h5>
-                    <div class="table-responsive">
-                        <table id="cartTable" class="table table-bordered table-sm small align-middle">
-                            <thead class="table-secondary">
-                                <tr>
-                                    <th>Product Items</th>
-                                    <th>Product Combo</th>
-                                    <th>Price</th>
-                                    <th>Qty</th>
-                                    <th>Amount</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model.SelectedProducts.Any())
-                                {
-                                    foreach (var item in Model.SelectedProducts)
-                                    {
-                                        <tr>
-                                            <td>@item.ProductName</td>
-                                            <td>@item.ComboName</td>
-                                            <td class="text-end">@item.Price.ToString("N2")</td>
-                                            <td class="text-end">@item.Quantity</td>
-                                            <td class="text-end">@(item.Price * item.Quantity).ToString("N2")</td>
-                                            <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(@item.ProductId)"><i class="fas fa-trash"></i></button></td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr><td colspan="6" class="text-center text-muted">No items in cart.</td></tr>
-                                }
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td></td>
-                                    <td colspan="3" class="text-end fw-bold text-uppercase">Total Amount Due</td>
-                                    <td class="text-end">
-                                        <strong><span id="grandTotal">0</span></strong>
-                                        <input type="hidden" asp-for="Order.TotAmount" name="Order.TotAmount" id="GrandTotalInput" value="0" />
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Payment Section -->
-                <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                    <h5 class="text-secondary border-bottom pb-1 mb-2">
-                        <i class="fas fa-credit-card text-warning"></i> Payment
-                    </h5>
-                    <select id="paymentOptionsSource" class="d-none">
-                        @foreach (var method in ViewBag.PaymentMethod as SelectList)
-                        {
-                            <option value="@method.Value">@method.Text</option>
-                        }
-                    </select>
-                    <table class="table table-sm" id="paymentTable">
-                        <thead>
-                            <tr>
-                                <th>Method</th>
-                                <th>Amount</th>
-                                <th>Ref No.</th>
-                                <th colspan="2"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="paymentTableBody">
-                            <tr>
-                                <td>
-                                    <select name="Payments[0].PayMethod" class="form-control form-select">
-                                        @foreach (var method in ViewBag.PaymentMethod as SelectList)
-                                        {
-                                            <option value="@method.Value">@method.Text</option>
-                                        }
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="number" name="Payments[0].Amount" class="form-control payment-amount" />
-                                </td>
-                                <td>
-                                    <input type="text" name="Payments[0].RefNo" class="form-control" />
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="removePaymentRow(this)">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-warning text-white" title="Add" onclick="addPaymentRow()">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div id="paymentError" class="text-danger small mb-2" style="display:none;"></div>
-
-                    <div class="mb-2">
-                        <label asp-for="Order.Notes" class="form-label"></label>
-                        <textarea asp-for="Order.Notes" class="form-control" rows="3"></textarea>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end pt-3">
-                    <button type="submit" class="btn btn-primary btn-lg bg-gradient fw-bold">
-                        <i class="fas fa-cash-register me-2 fa-xl"></i> Place Order
-                    </button>
-                </div>
-            </div>
-        </div>
-    </form>
-
+        </form>
+    </div>
     <!-- Customer Search Modal -->
     <div class="modal fade" id="customerSearchModal" tabindex="-1" aria-labelledby="customerSearchLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -276,6 +290,7 @@
         let cart = [];
 
         function addProduct() {
+            showLoader();
             const validationSummary = document.querySelector('.validation-summary-errors');
             if (validationSummary) {
                 validationSummary.innerHTML = '';
@@ -285,8 +300,10 @@
             if ($('#CustomerId').val() === "") {
                 toastr.warning('Please select a customer.');
                 document.getElementById('CustomerId').focus();
+                hideLoader();
                 return;
             }
+
 
             const prodCat = $('#ProductCategory option:selected').text();
             const selectedProductId = $('#ProductId').val();
@@ -297,6 +314,7 @@
                 if (comboId === "" || comboId === null) {
                     toastr.warning('Please select a combination.');
                     document.getElementById('ComboId').focus();
+                    hideLoader();
                     return;
                 }
             }
@@ -304,6 +322,7 @@
             if (selectedProductId == 0 || selectedProductId == null) {
                 toastr.warning('Please select a product.');
                 document.getElementById('ProductId').focus();
+                hideLoader();
                 return;
             }
             const rawPrice = $("#Price").val();
@@ -345,8 +364,10 @@
 
                     syncCartWithServer();
                     updateCartTable();
+                    hideLoader();
                 },
                 error: function () {
+                    hideLoader();
                     toastr.error('Error checking stock.');
                 }
             });
@@ -374,14 +395,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                                <tr>
-                                                    <td>${item.productName}</td>
-                                                    <td>${item.comboName}</td>
-                                                    <td>${formattedPrice}</td>
-                                                    <td><input type="number" min="1" class="form-control input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                            <td>${formattedTotalItem}</td>
-                                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                </tr>`);
+                                                        <tr>
+                                                            <td>${item.productName}</td>
+                                                            <td>${item.comboName}</td>
+                                                            <td class="text-end">${formattedPrice}</td>
+                                                            <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                    <td>${formattedTotalItem}</td>
+                                                            <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                        </tr>`);
                 });
             }
 
@@ -455,7 +476,6 @@
                 hideLoader();
             }
         }
-
 
         function gettoken() {
             return $('input[name="__RequestVerificationToken"]').val();
@@ -537,7 +557,6 @@
                     alert('Error retrieving price.');
                 },
                 complete: function () {
-                    // Always hide the loader, whether success or failure
                     hideLoader();
                 }
             });
@@ -640,19 +659,19 @@
 
                 data.forEach(customer => {
                     tbody.append(`
-                                <tr>
-                                    <td>${customer.custcode}</td>
-                                    <td>${customer.name}</td>
-                                    <td>${customer.email}</td>
-                                    <td>${customer.phone}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-success" title="Select"
-                                                onclick='selectCustomer(${JSON.stringify(customer)})'>
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            `);
+                                                                                        <tr>
+                                                                                            <td>${customer.custcode}</td>
+                                                                                            <td>${customer.name}</td>
+                                                                                            <td>${customer.email}</td>
+                                                                                            <td>${customer.phone}</td>
+                                                                                            <td>
+                                                                                                <button class="btn btn-sm btn-success" title="Select"
+                                                                                                        onclick='selectCustomer(${JSON.stringify(customer)})'>
+                                                                                                    <i class="fas fa-check"></i>
+                                                                                                </button>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    `);
                 });
             });
         });
@@ -673,110 +692,95 @@
     }
 
     <script>
-        let paymentIndex = 1;
+    $(document).ready(function () {
+        bindPaymentEvents();
+        reindexPaymentRows(); // ensure initial rows are indexed
+        updateChargesPerRow();
+    });
 
-        function addPaymentRow() {
-            const options = $('#paymentOptionsSource').html();
+    function addPaymentRow() {
+        const options = $('#paymentOptionsSource').html();
 
-            const row = `
-                                                                                                <tr>
-                                                                                                    <td>
-                                                                                                        <select name="Payments[${paymentIndex}].PayMethod" class="form-control form-select">
-                                                                                                    ${options}
-                                                                                                </select>
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <input type="number" name="Payments[${paymentIndex}].Amount" class="form-control payment-amount" />
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <input type="text" name="Payments[${paymentIndex}].RefNo" class="form-control" />
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
-                                                                                                            <i class="fas fa-times"></i>
-                                                                                                        </button>
-                                                                                                    </td>
+        const row = `
+            <tr>
+                <td>
+                    <select class="form-control form-control-sm form-select form-select-sm payment-method">
+                        ${options}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm payment-amount" />
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm payment-charge" readonly />
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm payment-ref" />
+                </td>
+                <td>
+                <input type="hidden" class="payment-percent" />
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            </tr>`;
 
-                                                                                                </tr>
-                                                                                            `;
+        $('#paymentTableBody').append(row);
+        reindexPaymentRows();
+        updateChargesPerRow();
+    }
 
-            $('#paymentTableBody').append(row);
-            paymentIndex++;
-        }
+    function removePaymentRow(btn) {
+        $(btn).closest('tr').remove();
+        reindexPaymentRows();
+        updateChargesPerRow();
+    }
 
-        function removePaymentRow(button) {
-            const row = $(button).closest('tr');
-            const rowCount = $('#paymentTable tbody tr').length;
-
-            if (rowCount > 1) {
-                row.remove();
-            } else {
-                toastr.warning("At least one payment method is required.");
-            }
-        }
-
-
-        // // ✅ Add default row on page load
-        // $(document).ready(function () {
-        //     addPaymentRow();
-        // });
-
-
-    </script>
-
-    @* <script>
-        document.querySelector('form').addEventListener('submit', function (e) {
-            //Check if cart is empty
-            if (!cart || cart.length === 0) {
-                hideLoader();
-                e.preventDefault();
-                toastr.warning('Your cart is empty. Please add products before placing the order.');
-                return false;
-            }
-
-            let totalPaid = 0;
-
-            // Sum all payment amounts
-            $('.payment-amount').each(function () {
-                let val = parseFloat($(this).val().replace(/,/g, '')) || 0;
-                totalPaid += val;
-            });
-
-            // Fallback: if .payment-amounts are not used, use single input (legacy)
-            if (totalPaid === 0) {
-                const paidInput = document.getElementById('paidAmount');
-                if (paidInput) {
-                    totalPaid = parseFloat(paidInput.value.replace(/,/g, '')) || 0;
-                }
-            }
-
-            // Get grand total
-            let grandText = $('#grandTotal').text().replace(/[^\d.-]/g, '');
-            let grandTotal = parseFloat(grandText) || 0;
-
-            if (totalPaid < grandTotal) {
-                e.preventDefault();
-                hideLoader?.();
-
-                $('#paymentError').show().text(
-                    `Total paid (${totalPaid.toLocaleString(locale, { style: 'currency', currency })}) is less than order total (${grandTotal.toLocaleString(locale, { style: 'currency', currency })}).`
-                );
-
-                return false;
-            }
-
-            // confirm before submit
-            const confirmed = confirm("Are you sure you want to place this order?");
-            if (!confirmed) {
-                e.preventDefault();
-                hideLoader?.();
-                return false;
-            }
-
-            formIsDirty = false;
+    function bindPaymentEvents() {
+        $('#paymentTableBody').on('change', '.payment-method, .payment-amount', function () {
+            updateChargesPerRow();
         });
-    </script> *@
+    }
 
+    function updateChargesPerRow() {
+        $('#paymentTableBody tr').each(function () {
+            const $row = $(this);
+            const $selectedOption = $row.find('.payment-method option:selected');
+            const selectedText = $selectedOption.text().trim();
+            const serviceChargeRate = parseFloat($selectedOption.data('charge')) || 0;
+            const amount = parseFloat($row.find('.payment-amount').val()) || 0;
+
+            if (selectedText === 'Credit Card' && amount > 0) {
+                const charge = amount * serviceChargeRate;
+                $row.find('.payment-charge').val(charge.toFixed(2));
+                $row.find('.payment-percent').val(serviceChargeRate.toFixed(4));
+                updateServiceCharge(charge, serviceChargeRate);
+            } else {
+                $row.find('.payment-charge').val('');
+                $row.find('.payment-percent').val('');
+            }
+        });
+    }
+
+    function updateServiceCharge(charge, rate) {
+        $('#ServiceChargeValue').val(charge.toFixed(2));
+        $('#serviceChargePercent').val(rate.toFixed(4)); // 4 decimals now
+    }
+
+    function reindexPaymentRows() {
+        $('#paymentTableBody tr').each(function (i) {
+            $(this).find('select.payment-method').attr('name', `Payments[${i}].PayMethod`);
+            $(this).find('input.payment-amount').attr('name', `Payments[${i}].Amount`);
+            $(this).find('input.payment-charge').attr('name', `Payments[${i}].ServiceChargeAmount`);
+            $(this).find('input.payment-ref').attr('name', `Payments[${i}].RefNo`);
+            $(this).find('input.payment-percent').attr('name', `Payments[${i}].ServiceChargePercent`);
+
+        });
+    }
+</script>
+
+
+    @* //For Payment functionality *@
     <script>
         document.querySelector('form').addEventListener('submit', function (e) {
             e.preventDefault(); // Always prevent default until we're sure
@@ -856,5 +860,73 @@
             }
         });
     </script>
+
+    <script>
+        function recalculateTotals() {
+            let subtotal = 0;
+
+            // Sum cart item prices
+            cart.forEach(item => {
+                subtotal += item.price * item.quantity;
+            });
+
+            // Step 2: No need to calculate service charge here anymore!
+            const totalWithSC = subtotal;
+
+            const formattedSubTotal = subtotal.toLocaleString(locale, { style: 'currency', currency });
+            const formattedTotal = totalWithSC.toLocaleString(locale, { style: 'currency', currency });
+
+            $('#subTotal').text(formattedSubTotal);
+            $('#grandTotal').text(formattedTotal);
+            $('#GrandTotalInput').val(totalWithSC.toFixed(2));
+        }
+
+
+        // Run recalculateTotals every time payment method or amount is changed
+        $(document).on('change', '.payment-amount, .form-select', function () {
+            recalculateTotals();
+        });
+
+        // Also run it after adding or removing a product
+        function updateCartTable() {
+            const tbody = $('#cartTable tbody').empty();
+            let total = 0;
+
+            if (cart.length === 0) {
+                tbody.append('<tr><td colspan="6" class="text-center text-muted">No items in cart.</td></tr>');
+            } else {
+                cart.forEach(item => {
+                    total += item.price * item.quantity;
+
+                    const formattedPrice = new Intl.NumberFormat(locale, {
+                        style: 'currency',
+                        currency: currency
+                    }).format(item.price);
+
+                    const totalItem = item.price * item.quantity;
+                    const formattedTotalItem = new Intl.NumberFormat(locale, {
+                        style: 'currency',
+                        currency: currency
+                    }).format(totalItem);
+
+                    tbody.append(`
+                                                                            <tr>
+                                                                                <td>${item.productName}</td>
+                                                                                <td>${item.comboName}</td>
+                                                                                <td class="text-end">${formattedPrice}</td>
+                                                                                <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" style="max-width: 90px; width: 100%;" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                                <td>${formattedTotalItem}</td>
+                                                                                <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                                            </tr>`);
+                });
+            }
+
+            // Call recalculation to update totals
+            recalculateTotals();
+
+            $('#ProductCategory, #ProductId, #ComboId, #Price, #Qty, #Amount').val('');
+        }
+    </script>
+
 }
 

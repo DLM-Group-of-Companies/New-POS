@@ -2,6 +2,8 @@
    GLOBAL BASE STYLES
 ---------------------------------------- */
 html, body {
+    font-size: 14px;
+    font-family: 'Helvetica Neue','Montserrat', 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
     height: 100%;
@@ -195,13 +197,17 @@ input[type="number"] {
     }
     /* Prevent buttons from squeezing on tablets */
     .btn-icon {
-        width: 36px;
-        height: 36px;
+        width: 32px; /* Let content define width */
+        height: 30px; /* Let line-height define height */
+        padding: 0.25rem 0.5rem; /* Same as btn-sm: 4px top/bottom, 8px left/right */
+        font-size: 0.875rem; /* 14px */
+        line-height: 1.5; /* Match Bootstrap vertical rhythm */
+        border-radius: 0.2rem; /* Same as btn-sm */
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0;
     }
+
 }
 
 
@@ -508,3 +514,13 @@ input[type="number"] {
     /* background-color: rgba(255, 255, 255, 0.8); Optional: add background to see it clearly */
     padding: 1rem;
 }
+
+/*override boostrap */
+.form-control, .form-select {
+    border-color: #bbcdd4 !important;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--bs-primary) !important;
+        box-shadow: 0 0 0 0.25rem rgba(173, 216, 230, 0.50); /* optional shadow */
+    }

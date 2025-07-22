@@ -40,6 +40,9 @@ namespace NLI_POS.Pages.Countries
                 id = country.Id,
                 code = country.Code,
                 name = country.Name,
+                timezone = country.TimeZone,
+                locale = country.Locale,
+                currency = country.CurrencyCode,
                 isActive = country.IsActive
             });
 

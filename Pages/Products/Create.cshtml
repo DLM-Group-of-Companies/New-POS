@@ -96,21 +96,21 @@
             <div class="row g-2 mt-2">
                 <div class="col-md-3">
                     <label asp-for="ProductPrice.UnitCost" class="form-label"></label>
-                    <input asp-for="ProductPrice.UnitCost" class="form-control" />
+                    <input asp-for="ProductPrice.UnitCost" class="form-control" onblur="if (this.value === '') this.value = '0';" />
                 </div>
                 <div class="col-md-3">
                     <label asp-for="ProductPrice.RegPrice" class="form-label"></label>
-                    <input asp-for="ProductPrice.RegPrice" class="form-control" />
+                    <input asp-for="ProductPrice.RegPrice" class="form-control" onblur="if (this.value === '') this.value = '0';" />
                     <span asp-validation-for="ProductPrice.RegPrice" class="text-danger small"></span>
                 </div>
                 <div class="col-md-3">
                     <label asp-for="ProductPrice.DistPrice" class="form-label"></label>
-                    <input asp-for="ProductPrice.DistPrice" class="form-control" />
+                    <input asp-for="ProductPrice.DistPrice" class="form-control" onblur="if (this.value === '') this.value = '0';" />
                     <span asp-validation-for="ProductPrice.DistPrice" class="text-danger small"></span>
                 </div>
                 <div class="col-md-3">
                     <label asp-for="ProductPrice.StaffPrice" class="form-label"></label>
-                    <input asp-for="ProductPrice.StaffPrice" class="form-control" />
+                    <input asp-for="ProductPrice.StaffPrice" class="form-control" onblur="if (this.value === '') this.value = '0';" />
                     <span asp-validation-for="ProductPrice.StaffPrice" class="text-danger small"></span>
                 </div>
             </div>
@@ -118,22 +118,22 @@
             <div class="row g-2 mt-2">
                 <div class="col-md-3">
                     <label asp-for="ProductPrice.BPPPrice" class="form-label"></label>
-                    <input asp-for="ProductPrice.BPPPrice" class="form-control" />
+                    <input asp-for="ProductPrice.BPPPrice" class="form-control" onblur="if (this.value === '') this.value = '0';" />
                     <span asp-validation-for="ProductPrice.BPPPrice" class="text-danger small"></span>
                 </div>
                 <div class="col-md-3">
                     <label asp-for="ProductPrice.MedPackPrice" class="form-label"></label>
-                    <input asp-for="ProductPrice.MedPackPrice" class="form-control" />
+                    <input asp-for="ProductPrice.MedPackPrice" class="form-control" onblur="if (this.value === '') this.value = '0';" />
                     <span asp-validation-for="ProductPrice.MedPackPrice" class="text-danger small"></span>
                 </div>
                 <div class="col-md-3">
                     <label asp-for="ProductPrice.CorpAccPrice" class="form-label"></label>
-                    <input asp-for="ProductPrice.CorpAccPrice" class="form-control" />
+                    <input asp-for="ProductPrice.CorpAccPrice" class="form-control" onblur="if (this.value === '') this.value = '0';" />
                     <span asp-validation-for="ProductPrice.CorpAccPrice" class="text-danger small"></span>
                 </div>
                 <div class="col-md-3">
                     <label asp-for="ProductPrice.NaturoPrice" class="form-label"></label>
-                    <input asp-for="ProductPrice.NaturoPrice" class="form-control" />
+                    <input asp-for="ProductPrice.NaturoPrice" class="form-control" onblur="if (this.value === '') this.value = '0';" />
                     <span asp-validation-for="ProductPrice.NaturoPrice" class="text-danger small"></span>
                 </div>
             </div>

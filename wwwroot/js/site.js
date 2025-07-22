@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const contextMenu = document.getElementById('customContextMenu');
 
     document.body.addEventListener('contextmenu', function (e) {
-        return; //temporary disable for debugging
+        //return; //temporary disable for debugging
         e.preventDefault();
 
         contextMenu.style.left = `${e.pageX}px`;

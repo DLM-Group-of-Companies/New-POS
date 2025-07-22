@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
+using NLI_POS.Services;
 
 namespace NLI_POS.Pages.Products
 {
@@ -95,15 +97,14 @@ namespace NLI_POS.Pages.Products
                 ModelState.Remove("ProductCombos[" + i + "].Products");                
             }
 
-            //ModelState.Remove("Products.ProductTypes");
-
             Products.ProductClass = ProductClassInput; //Assign Main or Coll
 
             if (!ModelState.IsValid)
             {
                 return Page();
             }
-            
+
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added Product {Products.ProductName}");
             _context.Products.Add(Products);
             await _context.SaveChangesAsync();
 

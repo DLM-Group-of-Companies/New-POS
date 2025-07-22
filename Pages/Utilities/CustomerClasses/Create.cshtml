@@ -1,0 +1,61 @@
+﻿@page
+@model NLI_POS.Pages.Utilities.CustomerClass.CreateModel
+
+@{
+    ViewData["Title"] = "New Customer Class";
+}
+
+<div class="container-fluid d-flex justify-content-center mt-5">
+    <div class="card shadow-lg rounded-4 p-4" style="max-width: 500px; width: 100%;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="text-primary mb-0"><i class="fas fa-user-tag me-2"></i> @ViewData["Title"]</h3>
+            <a asp-page="Index" >
+                <i class="fas fa-window-close fa-2xl text-danger"></i>
+            </a>
+        </div>
+        <hr/>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="CustClass.Name" class="form-label fw-semibold">
+                    <span class="text-danger">*</span> Name
+                </label>
+                <input asp-for="CustClass.Name" class="form-control" />
+                <span asp-validation-for="CustClass.Name" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CustClass.Description" class="form-label fw-semibold">Description</label>
+                <input asp-for="CustClass.Description" class="form-control" />
+                <span asp-validation-for="CustClass.Description" class="text-danger small"></span>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+                <input asp-for="CustClass.IsActive" type="checkbox" class="form-check-input" role="switch" />
+                <label asp-for="CustClass.IsActive" class="form-check-label">Active</label>
+                <span asp-validation-for="CustClass.IsActive" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="CustClass.EncodeDate" value="@DateTime.UtcNow" />
+
+            <input type="hidden" asp-for="CustClass.EncodedBy" value="@User.Identity.Name" />
+
+
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i> Create
+                </button>
+                <a asp-page="Index" class="btn btn-secondary ms-2">
+                    <i class="fas fa-chevron-left me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

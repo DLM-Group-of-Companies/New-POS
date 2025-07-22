@@ -59,7 +59,9 @@ namespace NLI_POS.Pages.Orders
                     ProductCombo = pi.ProductCombo,
                     ComboName = pi.ComboName,
                     Price = pi.Price,
-                    Quantity = pi.Quantity,
+                    Quantity = pi.Quantity,                    
+                    ServiceChargeAmount = pi.ServiceChargeAmount,
+                    ServiceChargePct = pi.ServiceChargePct,
                     Amount = pi.Price * pi.Quantity
                 })
                 .ToListAsync();

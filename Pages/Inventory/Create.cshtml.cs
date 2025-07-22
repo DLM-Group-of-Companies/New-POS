@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 using NLI_POS.Services;
+using NuGet.Versioning;
 
 namespace NLI_POS.Pages.Inventory
 {
@@ -64,6 +66,8 @@ namespace NLI_POS.Pages.Inventory
             //var userTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
             //var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, userTimeZone);
 
+            var cntryOffice = _context.OfficeCountry.Include(c => c.Country).FirstOrDefault(c=>c.Id == officeId);
+
             InventoryStock.EncodeDate = DateTime.UtcNow;
             InventoryStock.EncodedBy = User?.Identity.Name;
 
@@ -78,7 +82,7 @@ namespace NLI_POS.Pages.Inventory
 
             var product = await _context.Products.FindAsync(InventoryStock.ProductId);
             var productName = product?.ProductName ?? "Unknown";
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added inventory product: {productName} with {InventoryStock.StockQty} stock(s)");
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added inventory product: {productName} with {InventoryStock.StockQty} stock(s) for {cntryOffice?.Country.Name}");
 
 
             return RedirectToPage("./Index", new { officeId = officeId });

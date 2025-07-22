@@ -113,7 +113,7 @@ namespace NLI_POS.Pages.Inventory
             var product = await _context.Products.FindAsync(original.ProductId);
             var productName = product?.ProductName ?? "Unknown";
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated inventory stock: {original.StockQty} for: {productName}");
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated inventory stock: {original.StockQty} for: {productName} on {countryInfo?.Country.Name}");
 
             return RedirectToPage("./Index", new { officeId = original.OfficeId });
         }
