@@ -122,7 +122,7 @@
 
             <div class="row g-2 mt-1">
                 <div class="col-md-4">
-                    <label asp-for="Customer.Country" class="form-label">Country</label>
+                    <label asp-for="Customer.Country" class="form-label">Country <span class="text-danger">*</span></label>
                     <select asp-for="Customer.Country" class="form-control form-select" asp-items="ViewBag.Country">
                         <option value="">Select</option>
                     </select>

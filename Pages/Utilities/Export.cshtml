@@ -1,60 +1,35 @@
 ﻿@page
-@model ExportModel
+@model NLI_POS.Pages.Utilities.ExportModel
 @{
-    ViewData["Title"] = "Database Export";
+    ViewData["Title"] = "Export Table to CSV";
 }
 
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card shadow-lg p-4 rounded-4" style="width: 100%; max-width: 500px;">
-        <a title="Close" class="text-danger " style="cursor: pointer;" onclick="window.location = '/';">
-            <i class="fas fa-window-close fa-2xl float-end"></i>
-        </a>
-        <div class="card-body text-center">
-            <h4 class="mb-4 text-primary"><i class="fas fa-database me-2"></i>Export Database</h4>
+<div class="container">
+    <div class="bg-white shadow-sm p-4 rounded mx-auto" style="max-width: 600px;">
+        <i class="fas fa-window-close fa-2xl text-danger float-end" role="button" title="Close" onclick="window.location = '/';"></i>
+        <h4 class="text-primary mb-3"><i class="fas fa-file-export me-2"></i> Export Table to CSV</h4>        
+        <hr />
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        else if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
 
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
-                </div>
-            }
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
-                </div>
-            }
-
-            <p class="text-muted mb-4">Click the button below to export all table data from the database as CSV files.</p>
-
-            <form method="post" onsubmit="return confirmExport();">
-                <div class="mb-3">
-                    <button id="exportBtn" type="submit" class="btn btn-outline-primary px-4">
-                        <i class="fas fa-download me-2"></i> Export Now
-                    </button>
-                </div>
-
-                <div id="progressContainer" class="progress" style="height: 20px; display: none;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                         role="progressbar"
-                         style="width: 100%">
-                        Exporting...
-                    </div>
-                </div>
-            </form>
-        </div>
+        <form method="post" onsubmit="return validateAndShowLoader(this)">
+            <div class="mb-3">
+                <label for="SelectedTable" class="form-label">Select a table:</label>
+                <select asp-for="SelectedTable" class="form-select" required>
+                    <option value="">-- Choose Table --</option>
+                    @foreach (var table in Model.TableList)
+                    {
+                        <option value="@table">@table</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-file-csv me-2"></i> Export CSV</button>
+        </form>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        function confirmExport() {
-            if (confirm("Are you sure you want to export all tables as CSV?")) {
-                document.getElementById("exportBtn").disabled = true;
-                document.getElementById("progressContainer").style.display = "block";
-                return true;
-            }
-            return false;
-        }
-    </script>
-}

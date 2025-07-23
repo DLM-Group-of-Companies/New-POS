@@ -31,8 +31,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddDefaultTokenProviders()
 .AddDefaultUI();
 
-
-
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/"); // Authorize everything

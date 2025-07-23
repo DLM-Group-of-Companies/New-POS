@@ -63,7 +63,7 @@ namespace NLI_POS.Pages.Customers
                     mobile = c.MobileNo,
                     landline = c.LandlineNo,
                     city = c.City,           
-                    country = c.Country,
+                    country = c.Country ?? "",
                     className = c.CustClasses != null ? c.CustClasses.Name : ""
                 });
 

@@ -351,12 +351,14 @@ const themeMap = {
 };
 
 function setTheme(name) {
+    showLoader();
     const link = document.getElementById('bootstrap-theme');
     if (!link || !themeMap[name]) return;
 
     link.href = themeMap[name];
     localStorage.setItem("theme", name);
     updateThemeCheck(name);
+    
 }
 
 function updateThemeCheck(selected) {
@@ -369,6 +371,8 @@ function updateThemeCheck(selected) {
     // Show selected
     const selectedIcon = document.getElementById(`check-${selected}`);
     if (selectedIcon) selectedIcon.classList.remove('d-none');
+
+    hideLoader();
 }
 
 // Load theme on startup

@@ -60,7 +60,7 @@ namespace NLI_POS.Models
         public string? Province { get; set; }
         public string? City { get; set; }
 
-        public string? Country { get; set; }
+        public string Country { get; set; }
         public string? PostalCode { get; set; }
 
         [Display(Name = "Office")]
