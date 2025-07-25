@@ -1,0 +1,49 @@
+﻿@model NLI_POS.Models.ViewModels.TransferInventoryViewModel
+<div class="container p-2">
+    <form id="transferForm" method="post" asp-page-handler="Transfer">
+        <div class="modal-header">
+            <h5 class="modal-title text-primary"><i class="fas fa-random me-2"></i>Stock Transfer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+
+            <div class="mb-3">
+                <label asp-for="FromLocationId" class="form-label">From</label>
+                <select id="FromLocationId" asp-for="FromLocationId" asp-items="Model.LocationOptions" class="form-select" disabled="@Model.LockFrom"></select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ToLocationId" class="form-label">To</label>
+                <select id="ToLocationId" asp-for="ToLocationId" asp-items="Model.LocationOptions" class="form-select"></select>
+            </div>
+
+            <div class="mb-3">
+                @if (Model.ProductId > 0)
+                {
+                    <input id="ProductId" type="hidden" name="ProductId" value="@Model.ProductId" />
+                    <div class="mb-2">
+                        <label>Product</label>
+                        <input id="ProductName"  class="form-control" value="@Model.ProductOptions.FirstOrDefault(p => p.Value == Model.ProductId.ToString())?.Text" readonly />
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-2">
+                        <label>Select Product</label>
+                        <select id="ProductId" asp-for="ProductId" asp-items="Model.ProductOptions" class="form-select"></select>
+                    </div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Quantity" class="form-label">Quantity</label>
+                <input id="Quantity" asp-for="Quantity" class="form-control" />
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-retweet me-1"></i> Transfer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-caret-left me-1"></i> Cancel</button>
+        </div>
+    </form>
+</div>

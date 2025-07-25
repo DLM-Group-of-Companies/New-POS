@@ -266,7 +266,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Country", b =>
@@ -302,7 +302,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Country");
+                    b.ToTable("Country", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.CustClass", b =>
@@ -337,7 +337,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustClass");
+                    b.ToTable("CustClass", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Customer", b =>
@@ -441,7 +441,68 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("OfficeId");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customer", (string)null);
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LocationType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("OfficeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OfficeId");
+
+                    b.ToTable("InventoryLocations", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsActive = true,
+                            LocationType = "Warehouse",
+                            Name = "Main Warehouse"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsActive = true,
+                            LocationType = "Stockroom",
+                            Name = "Central Stockroom"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsActive = true,
+                            LocationType = "Office",
+                            Name = "Manila HQ",
+                            OfficeId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsActive = true,
+                            LocationType = "Office",
+                            Name = "Singapore Office",
+                            OfficeId = 2
+                        });
                 });
 
             modelBuilder.Entity("NLI_POS.Models.InventoryStock", b =>
@@ -458,7 +519,7 @@ namespace NLI_POS.Migrations
                     b.Property<string>("EncodedBy")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("OfficeId")
+                    b.Property<int>("LocationId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
@@ -479,11 +540,11 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OfficeId");
+                    b.HasIndex("LocationId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("InventoryStocks");
+                    b.ToTable("InventoryStocks", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.InventoryStockAuditTrail", b =>
@@ -524,7 +585,52 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("InventoryStockAuditTrails");
+                    b.ToTable("InventoryStockAuditTrails", (string)null);
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EncodedBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("FromLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrderNo")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ToLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromLocationId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ToLocationId");
+
+                    b.ToTable("InventoryTransactions", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OfficeCountry", b =>
@@ -583,7 +689,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("OfficeCountry");
+                    b.ToTable("OfficeCountry", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Order", b =>
@@ -654,7 +760,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("OfficeId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OrderDetails", b =>
@@ -692,7 +798,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OrderPayment", b =>
@@ -728,7 +834,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderPayments");
+                    b.ToTable("OrderPayments", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.PaymentMethod", b =>
@@ -755,7 +861,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Product", b =>
@@ -823,7 +929,7 @@ namespace NLI_POS.Migrations
                     b.HasIndex("ProductCode")
                         .IsUnique();
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.ProductCombo", b =>
@@ -856,7 +962,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductCombos");
+                    b.ToTable("ProductCombos", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.ProductPrice", b =>
@@ -915,7 +1021,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductPrices");
+                    b.ToTable("ProductPrices", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.ProductType", b =>
@@ -953,7 +1059,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductTypes");
+                    b.ToTable("ProductTypes", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.SysParam", b =>
@@ -974,7 +1080,7 @@ namespace NLI_POS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SysParams");
+                    b.ToTable("SysParams", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Models.UserOfficeAccess", b =>
@@ -1010,7 +1116,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserOfficesAccess");
+                    b.ToTable("UserOfficesAccess", (string)null);
                 });
 
             modelBuilder.Entity("NLI_POS.Pages.Orders.NewModel+ProductItem", b =>
@@ -1064,7 +1170,7 @@ namespace NLI_POS.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("ProductItems");
+                    b.ToTable("ProductItems", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1159,23 +1265,32 @@ namespace NLI_POS.Migrations
                     b.Navigation("OfficeCountry");
                 });
 
-            modelBuilder.Entity("NLI_POS.Models.InventoryStock", b =>
+            modelBuilder.Entity("NLI_POS.Models.InventoryLocation", b =>
                 {
                     b.HasOne("NLI_POS.Models.OfficeCountry", "Office")
                         .WithMany()
-                        .HasForeignKey("OfficeId")
+                        .HasForeignKey("OfficeId");
+
+                    b.Navigation("Office");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryStock", b =>
+                {
+                    b.HasOne("NLI_POS.Models.InventoryLocation", "Location")
+                        .WithMany("Stocks")
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NLI_POS.Models.Product", "Products")
+                    b.HasOne("NLI_POS.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Office");
+                    b.Navigation("Location");
 
-                    b.Navigation("Products");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.InventoryStockAuditTrail", b =>
@@ -1195,6 +1310,29 @@ namespace NLI_POS.Migrations
                     b.Navigation("Office");
 
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryTransaction", b =>
+                {
+                    b.HasOne("NLI_POS.Models.InventoryLocation", "SourceLocation")
+                        .WithMany()
+                        .HasForeignKey("FromLocationId");
+
+                    b.HasOne("NLI_POS.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NLI_POS.Models.InventoryLocation", "DestinationLocation")
+                        .WithMany()
+                        .HasForeignKey("ToLocationId");
+
+                    b.Navigation("DestinationLocation");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("SourceLocation");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OfficeCountry", b =>
@@ -1322,6 +1460,11 @@ namespace NLI_POS.Migrations
             modelBuilder.Entity("NLI_POS.Models.Country", b =>
                 {
                     b.Navigation("OfficeCountries");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.InventoryLocation", b =>
+                {
+                    b.Navigation("Stocks");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.Order", b =>

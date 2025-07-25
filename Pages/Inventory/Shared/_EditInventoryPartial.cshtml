@@ -1,0 +1,41 @@
+﻿@model NLI_POS.ViewModels.InventoryStockEditViewModel
+
+<form method="post" asp-page-handler="Edit" onsubmit="return validateAndShowLoader(this)">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input asp-for="Id" type="hidden" />
+
+    <div class="mb-3">
+        <label class="form-label">Office</label>
+        <input asp-for="LocationName" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Product</label>
+        <input asp-for="ProductName" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StockQty" class="form-label"></label>
+        <input asp-for="StockQty" class="form-control" />
+        <span asp-validation-for="StockQty" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Remarks" class="form-label"></label>
+        <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Remarks" class="text-danger"></span>
+    </div>
+
+    <input asp-for="EncodedBy" type="hidden" />
+    <input asp-for="EncodeDate" type="hidden" />
+    <input asp-for="UpdatedBy" type="hidden" value="@User.Identity.Name" />
+    <input asp-for="UpdateDate" type="hidden" />
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save me-2"></i>Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+</form>
+

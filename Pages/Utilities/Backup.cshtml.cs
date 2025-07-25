@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using static NLI_POS.Services.AuditHelpers;
 
 namespace NLI_POS.Pages.Utilities
 {
+    [Authorize(Roles = "Admin")]
     public class BackupModel : PageModel
     {
         private readonly DatabaseBackupService _backupService;

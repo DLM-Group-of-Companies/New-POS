@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 
-namespace NLI_POS.Pages.Inventory
+namespace NLI_POS.Pages.Inventory.Office
 {
     public class DetailsModel : PageModel
     {

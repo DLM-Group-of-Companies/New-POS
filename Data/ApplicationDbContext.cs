@@ -52,7 +52,14 @@ namespace NLI_POS.Data
             modelBuilder.Entity<Product>()
     .HasIndex(p => p.ProductCode)
     .IsUnique();
-            // ... other configurations
+
+            modelBuilder.Entity<InventoryLocation>().HasData(
+    new InventoryLocation { Id = 1, Name = "Main Warehouse", LocationType = "Warehouse", IsActive = true },
+    new InventoryLocation { Id = 2, Name = "Central Stockroom", LocationType = "Stockroom", IsActive = true },
+    new InventoryLocation { Id = 3, Name = "Manila HQ", LocationType = "Office", OfficeId = 1, IsActive = true },
+    new InventoryLocation { Id = 4, Name = "Singapore Office", LocationType = "Office", OfficeId = 2, IsActive = true }
+);
+
         }
 
 
@@ -75,5 +82,7 @@ namespace NLI_POS.Data
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<SysParam> SysParams { get; set; }
+        public DbSet<InventoryLocation> InventoryLocations { get; set; }
+        public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
     }
 }

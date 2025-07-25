@@ -1,0 +1,42 @@
+﻿@using NLI_POS.Models
+@model IList<ProductCombo>
+
+
+<table id="ComboTable" class="table">
+    <thead>
+        <tr>
+            <th hidden>
+                @Html.DisplayNameFor(model => model[0].Id)
+            </th>
+            <th>
+                
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductsDesc)
+                </td>
+                <td>
+                    @if (item.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary">Inactive</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

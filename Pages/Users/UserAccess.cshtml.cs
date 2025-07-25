@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using NLI_POS.Models.ViewModels;
-using NLI_POS.Models;
-using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using NLI_POS.Services;
 using NLI_POS.Data;
+using NLI_POS.Models;
+using NLI_POS.Models.ViewModels;
+using NLI_POS.Services;
+using System.Security.Claims;
 
 namespace NLI_POS.Pages.Users
 {
+    [Authorize(Roles = "Admin")]
     public class UserAccessModel : PageModel
     {
         private readonly ApplicationDbContext _context;

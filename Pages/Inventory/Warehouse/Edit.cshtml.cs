@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
 using NLI_POS.Services;
+using NLI_POS.ViewModels;
 
-namespace NLI_POS.Pages.Inventory
+namespace NLI_POS.Pages.Inventory.Warehouse
 {
     public class EditModel : PageModel
     {
@@ -26,22 +27,24 @@ namespace NLI_POS.Pages.Inventory
                 return NotFound();
             }
 
-            var inventorystock =  await _context.InventoryStocks.FirstOrDefaultAsync(m => m.Id == id);
+            var inventorystock = await _context.InventoryStocks.FirstOrDefaultAsync(m => m.Id == id);
             if (inventorystock == null)
             {
                 return NotFound();
             }
             InventoryStock = inventorystock;
-           ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
-           ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Id");
+            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            ViewData["LocationId"] = new SelectList(_context.InventoryLocations
+     .Include(l => l.Office), "Id", "Name");
+            ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Id");
             return Page();
         }
 
         public async Task<PartialViewResult> OnGetPartialAsync(int id)
         {
             InventoryStock = await _context.InventoryStocks
-                .Include(i => i.Products)
-                .Include(i => i.Office)
+                .Include(i => i.Product)
+                .Include(i => i.Location) // ✅ updated
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (InventoryStock == null)
@@ -52,14 +55,36 @@ namespace NLI_POS.Pages.Inventory
             ViewData["ProductId"] = new SelectList(
                 await _context.Products.ToListAsync(), "Id", "ProductName", InventoryStock.ProductId);
 
-            ViewData["OfficeId"] = new SelectList(
-                await _context.OfficeCountry.ToListAsync(), "Id", "Name", InventoryStock.OfficeId);
+            //ViewData["OfficeId"] = new SelectList(
+            //    await _context.OfficeCountry.ToListAsync(), "Id", "Name", InventoryStock.OfficeId);
+
+            ViewData["LocationId"] = new SelectList(
+                await _context.InventoryLocations.Include(l => l.Office).ToListAsync(), "Id", "Name", InventoryStock.LocationId);
 
             Console.WriteLine("Offices: " + _context.OfficeCountry.Count());
             Console.WriteLine("Products: " + _context.Products.Count());
+            var found = System.IO.File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Pages", "Inventory", "Shared", "_EditInventoryPartial.cshtml"));
+            Console.WriteLine("Partial view exists: " + found);
 
+            var location = await _context.InventoryLocations
+    .Where(l => l.Id == InventoryStock.LocationId)
+    .Select(l => l.Name)
+    .FirstOrDefaultAsync();
 
-            return Partial("_EditInventoryPartial", this);
+            var vm = new InventoryStockEditViewModel
+            {
+                Id = InventoryStock.Id,
+                ProductId = InventoryStock.ProductId,
+                ProductName = InventoryStock.Product.ProductName,
+                LocationId = InventoryStock.LocationId,
+                LocationName = location,
+                StockQty = InventoryStock.StockQty,
+                Remarks = InventoryStock.Remarks
+                // Map other needed fields
+            };
+
+            return Partial("~/Pages/Inventory/Shared/_EditInventoryPartial.cshtml", vm);
+
         }
 
 
@@ -74,7 +99,8 @@ namespace NLI_POS.Pages.Inventory
             // Get original record (for preserving EncodedBy, etc.)
             var original = await _context.InventoryStocks
                 .AsNoTracking()
-                .Include(i => i.Office)
+                .Include(i => i.Location)
+                .ThenInclude(l => l.Office)
                 .FirstOrDefaultAsync(s => s.Id == InventoryStock.Id);
 
             if (original == null)
@@ -84,7 +110,7 @@ namespace NLI_POS.Pages.Inventory
             var countryInfo = await _context.OfficeCountry
                 .Include(o => o.Country)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(o => o.Id == original.OfficeId);
+                .FirstOrDefaultAsync(o => o.Id == original.Location.OfficeId);
 
             var localTime = AuditHelpers.GetLocalTime(countryInfo?.Country?.TimeZone ?? "Asia/Manila");
 
@@ -113,12 +139,11 @@ namespace NLI_POS.Pages.Inventory
             var product = await _context.Products.FindAsync(original.ProductId);
             var productName = product?.ProductName ?? "Unknown";
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated inventory stock: {original.StockQty} for: {productName} on {countryInfo?.Country.Name}");
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated inventory stock: {original.StockQty} for: {productName} on {countryInfo?.Name}");
 
-            return RedirectToPage("./Index", new { officeId = original.OfficeId });
+            return RedirectToPage("./Index", new { locationId = original.LocationId });
+
         }
-
-
 
         private bool InventoryStockExists(int id)
         {

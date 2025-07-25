@@ -268,7 +268,7 @@ namespace NLI_POS.Pages.Orders
                             int requiredQty = qtyList[i] * item.Quantity; // Multiply by how many packages were ordered
 
                             var inventory = await _context.InventoryStocks
-                                .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == Order.OfficeId);
+                                .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.Location.OfficeId == Order.OfficeId);
 
                             if (inventory == null || inventory.StockQty < requiredQty)
                             {
@@ -286,7 +286,7 @@ namespace NLI_POS.Pages.Orders
                 {
                     // Regular product stock check
                     var inventory = await _context.InventoryStocks
-                        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId);
+                        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.Location.OfficeId == Order.OfficeId);
 
                     if (inventory == null || inventory.StockQty < item.Quantity)
                     {
@@ -409,7 +409,7 @@ namespace NLI_POS.Pages.Orders
                             int requiredQty = qtyList[i] * item.Quantity;
 
                             var inventory = await _context.InventoryStocks
-                                .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == Order.OfficeId);
+                                .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.Location.OfficeId == Order.OfficeId);
 
                             //var inventory = await _context.InventoryStocks
                             //    .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.CountryId == Order.Office.CountryId);
@@ -427,7 +427,7 @@ namespace NLI_POS.Pages.Orders
                 {
                     // Regular product
                     var inventory = await _context.InventoryStocks
-                        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.OfficeId == Order.OfficeId);
+                        .FirstOrDefaultAsync(i => i.ProductId == item.ProductId && i.Location.OfficeId == Order.OfficeId);
 
                     if (inventory != null)
                     {
@@ -479,7 +479,7 @@ namespace NLI_POS.Pages.Orders
                     int requiredQtyPerBundle = qtyList[i];
 
                     var stock = await _context.InventoryStocks
-                        .FirstOrDefaultAsync(s => s.ProductId == componentId && s.OfficeId == officeId);
+                        .FirstOrDefaultAsync(s => s.ProductId == componentId && s.Location.OfficeId == officeId);
 
                     int available = stock?.StockQty ?? 0;
 
@@ -496,7 +496,7 @@ namespace NLI_POS.Pages.Orders
             {
                 // Regular product
                 var stock = await _context.InventoryStocks
-                    .FirstOrDefaultAsync(s => s.ProductId == productId && s.OfficeId == officeId);
+                    .FirstOrDefaultAsync(s => s.ProductId == productId && s.Location.OfficeId == officeId);
 
                 return new JsonResult(stock?.StockQty ?? 0);
             }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +8,7 @@ using System.Text;
 
 namespace NLI_POS.Pages.Utilities
 {
+    [Authorize(Roles = "Admin")]
     public class ExportModel : PageModel
     {
         private readonly IWebHostEnvironment _env;

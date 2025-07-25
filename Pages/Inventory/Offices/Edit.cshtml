@@ -1,0 +1,43 @@
+﻿@page
+@model NLI_POS.Pages.Inventory.Office.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "";
+}
+
+<h4>Edit Inventory Stock</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+       <form method="post" onsubmit="return validateAndShowLoader(this)">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="InventoryStock.Id" />
+            <div class="form-group">
+                <label asp-for="InventoryStock.ProductId" class="control-label"></label>
+                <select asp-for="InventoryStock.ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
+                <span asp-validation-for="InventoryStock.ProductId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="InventoryStock.StockQty" class="control-label"></label>
+                <input asp-for="InventoryStock.StockQty" class="form-control" />
+                <span asp-validation-for="InventoryStock.StockQty" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="InventoryStock.LocationId" class="control-label"></label>
+                <select asp-for="InventoryStock.LocationId" class="form-control" asp-items="ViewBag.OfficeId"></select>
+                <span asp-validation-for="InventoryStock.LocationId" class="text-danger"></span>
+            </div>
+
+            <input asp-for="InventoryStock.EncodedBy" type="hidden" />
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

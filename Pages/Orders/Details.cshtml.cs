@@ -193,7 +193,7 @@ namespace NLI_POS.Pages.Orders
                             int restockQty = qtyList[i] * item.Quantity;
 
                             var inventory = await _context.InventoryStocks
-                                .FirstOrDefaultAsync(inv => inv.ProductId == componentProductId && inv.OfficeId == order.OfficeId);
+                                .FirstOrDefaultAsync(inv => inv.ProductId == componentProductId && inv.Location.OfficeId == order.OfficeId);
 
                             if (inventory != null)
                             {
@@ -207,7 +207,7 @@ namespace NLI_POS.Pages.Orders
                 {
                     // Regular product restock
                     var inventory = await _context.InventoryStocks
-                        .FirstOrDefaultAsync(inv => inv.ProductId == item.ProductId && inv.OfficeId == order.OfficeId);
+                        .FirstOrDefaultAsync(inv => inv.ProductId == item.ProductId && inv.Location.OfficeId == order.OfficeId);
 
                     if (inventory != null)
                     {

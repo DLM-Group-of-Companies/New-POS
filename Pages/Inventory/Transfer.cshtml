@@ -1,0 +1,48 @@
+﻿@page
+@model TransferModel
+@{
+    ViewData["Title"] = "Inventory Transfer";
+}
+
+<h4 class="text-primary mb-3"><i class="fas fa-random me-1"></i> Transfer Inventory</h4>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form method="post" class="border p-3 rounded bg-light shadow-sm">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="Input.FromLocationId" class="form-label">From Location</label>
+            <select asp-for="Input.FromLocationId" asp-items="Model.LocationList" class="form-select"></select>
+            <span asp-validation-for="Input.FromLocationId" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Input.ToLocationId" class="form-label">To Location</label>
+            <select asp-for="Input.ToLocationId" asp-items="Model.LocationList" class="form-select"></select>
+            <span asp-validation-for="Input.ToLocationId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <label asp-for="Input.ProductId" class="form-label">Product</label>
+            <select asp-for="Input.ProductId" asp-items="Model.ProductList" class="form-select"></select>
+            <span asp-validation-for="Input.ProductId" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Input.Quantity" class="form-label">Quantity</label>
+            <input asp-for="Input.Quantity" class="form-control" />
+            <span asp-validation-for="Input.Quantity" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-random me-1"></i> Transfer
+    </button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

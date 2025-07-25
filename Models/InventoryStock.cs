@@ -10,30 +10,21 @@ namespace NLI_POS.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("Products")] // ✅ must match the navigation property name
-        [Display(Name = "Product")]
+        [ForeignKey("Product")]
         public int ProductId { get; set; }
 
-        [Display(Name = "Stock")]
-        public int StockQty { get; set; }
+        [ForeignKey("Location")]
+        public int LocationId { get; set; }
 
-        [ForeignKey("Office")] // ✅ must match navigation property
-        [Display(Name = "Office")]
-        public int OfficeId { get; set; }
+        public int StockQty { get; set; }
 
         [StringLength(300)]
         public string? Remarks { get; set; }
 
-        //public DateTime? EncodeDate { get; set; }
-        //public string? EncodedBy { get; set; }
-        //public DateTime? UpdateDate { get; set; }
-        //public string? UpdateddBy { get; set; }
-
         [ValidateNever]
-        public virtual Product Products { get; set; } // ✅ singular
-
+        public virtual Product Product { get; set; }
         [ValidateNever]
-        public virtual OfficeCountry Office { get; set; }
+        public virtual InventoryLocation Location { get; set; }
     }
 
 }

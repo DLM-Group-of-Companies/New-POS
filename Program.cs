@@ -14,8 +14,8 @@ var localTimeZone = "UTC";
 
 // Add services to the container.
 
-var connectionString = builder.Configuration.GetConnectionString("NLPOSLiveConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-//var connectionString = builder.Configuration.GetConnectionString("NLPOSTestConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+//var connectionString = builder.Configuration.GetConnectionString("NLPOSLiveConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("NLPOSTestConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36))));

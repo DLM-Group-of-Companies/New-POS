@@ -11,7 +11,7 @@ using NLI_POS.Models;
 using NLI_POS.Services;
 using NuGet.Versioning;
 
-namespace NLI_POS.Pages.Inventory
+namespace NLI_POS.Pages.Inventory.Warehouse
 {
     public class CreateModel : PageModel
     {
@@ -23,9 +23,9 @@ namespace NLI_POS.Pages.Inventory
         }
 
         [BindProperty(SupportsGet = true)]
-        public int? OfficeId { get; set; }
+        public int? locationId { get; set; }
 
-        public IActionResult OnGet(int officeId)
+        public IActionResult OnGet(int locationId)
         {
             if (!User.IsInRole("Admin") && !User.IsInRole("Inventory"))
             {
@@ -33,15 +33,24 @@ namespace NLI_POS.Pages.Inventory
                 return RedirectToPage();
             }
 
-            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry.Where(o => o.Id == officeId), "Id", "Name");
+            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry.Where(o => o.Id == officeId), "Id", "Name");
+
+            ViewData["LocationId"] = new SelectList(_context.InventoryLocations
+            .Include(l => l.Office) 
+            .Where(l => l.IsActive && l.Id == locationId),
+                "Id",
+                "Name"
+            );
+
+
             //ViewData["ProductId"] = new SelectList(_context.Products, "Id", "ProductName");
 
-            var usedProductIds = _context.InventoryStocks.Where(i=>i.OfficeId == officeId)
+            var usedProductIds = _context.InventoryStocks.Where(i => i.Location.Id == locationId)
             .Select(s => s.ProductId)
             .ToList();
 
             ViewData["ProductId"] = new SelectList(
-                _context.Products.Where(p=>p.ProductCategory!="Package")
+                _context.Products.Where(p => p.ProductCategory != "Package")
                     .Where(p => !usedProductIds.Contains(p.Id))
                     .Select(p => new
                     {
@@ -60,18 +69,20 @@ namespace NLI_POS.Pages.Inventory
         [BindProperty]
         public InventoryStock InventoryStock { get; set; } = default!;
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync(int officeId)
+        public async Task<IActionResult> OnPostAsync(int locationId)
         {
             //var userTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
             //var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, userTimeZone);
 
-            var cntryOffice = _context.OfficeCountry.Include(c => c.Country).FirstOrDefault(c=>c.Id == officeId);
+            var cntryOffice2 = _context.OfficeCountry.Include(c => c.Country).FirstOrDefault(c => c.Id == locationId);
+            var cntryOffice = _context.InventoryLocations
+                .Include(l => l.Office)
+                .FirstOrDefault(l => l.Id == 1);
 
             InventoryStock.EncodeDate = DateTime.UtcNow;
             InventoryStock.EncodedBy = User?.Identity.Name;
 
-            
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -82,10 +93,10 @@ namespace NLI_POS.Pages.Inventory
 
             var product = await _context.Products.FindAsync(InventoryStock.ProductId);
             var productName = product?.ProductName ?? "Unknown";
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added inventory product: {productName} with {InventoryStock.StockQty} stock(s) for {cntryOffice?.Country.Name}");
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added inventory product: {productName} with {InventoryStock.StockQty} stock(s) for {cntryOffice.Name}");
 
 
-            return RedirectToPage("./Index", new { officeId = officeId });
+            return RedirectToPage("./Index", new { locationId = locationId });
         }
     }
 }

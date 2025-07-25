@@ -1,5 +1,5 @@
 ﻿@page
-@model NLI_POS.Pages.Inventory.EditModel
+@model NLI_POS.Pages.Inventory.Stockroom.EditModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -24,9 +24,9 @@
                 <span asp-validation-for="InventoryStock.StockQty" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="InventoryStock.OfficeId" class="control-label"></label>
-                <select asp-for="InventoryStock.OfficeId" class="form-control" asp-items="ViewBag.OfficeId"></select>
-                <span asp-validation-for="InventoryStock.OfficeId" class="text-danger"></span>
+                <label asp-for="InventoryStock.LocationId" class="control-label"></label>
+                <select asp-for="InventoryStock.LocationId" class="form-control" asp-items="ViewBag.OfficeId"></select>
+                <span asp-validation-for="InventoryStock.LocationId" class="text-danger"></span>
             </div>
 
             <input asp-for="InventoryStock.EncodedBy" type="hidden" />

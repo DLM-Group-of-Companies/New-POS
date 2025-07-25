@@ -1,0 +1,235 @@
+﻿@page
+@model NLI_POS.Pages.Inventory.Stockroom.IndexModel
+
+@{
+    ViewData["Title"] = "Inventory";
+}
+<div class="container-fluid bg-white bg-gradient shadow p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0 text-primary">
+            <i class="fas fa-boxes"></i> Inventory
+        </h4>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
+    </div>
+    <hr />
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 mb-2">
+            <partial name="_InventorySubNavPartial" />
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="text-primary fw-bold mb-3">Stockroom Inventory</h5>
+                    <div class="row mb-3">
+@*                         <div class="col-lg-9">
+                            <a id="addNewBtn" class="btn btn-primary"><i class="far fa-plus-square"></i> Add New</a>
+                        </div> *@
+                        <div class="col-lg-3 d-none">
+                            <label asp-for="locationId" class="form-label fw-bold"></label>
+                            <select id="locationId" asp-for="locationId" class="form-control form-select" asp-items="ViewBag.LocationId"></select>
+                        </div>
+                    </div>
+
+                    <ul class="nav nav-tabs bg-light" id="inventoryTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active " id="main-tab" data-bs-toggle="tab" data-bs-target="#main" type="button" role="tab" aria-controls="main" aria-selected="true">Main Products</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link " id="coll-tab" data-bs-toggle="tab" data-bs-target="#coll" type="button" role="tab" aria-controls="coll" aria-selected="false">Marketing Collateral</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content p-3 border border-1 border-secondary" id="inventoryTabsContent">
+                        <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="main-tab">
+                            <table id="mainTable" class="table table-info table-striped align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Stock</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                        <div class="tab-pane fade" id="coll" role="tabpanel" aria-labelledby="coll-tab">
+                            <table id="collTable" class="table table-info table-striped align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Stock</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered ">
+            <div class="modal-content">
+                <!-- Optional: Modal header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Inventory</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <!-- Spinner -->
+                    <div id="editInventoryModalLoader" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <!-- Loaded form content -->
+                    <div id="editInventoryModalContent" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+                showLoader();
+                var mainTable = $('#mainTable').DataTable({
+                    ajax: {
+                        url: '/Inventory/Stockroom?handler=Main',
+                        data: function (d) {
+                            d.LocationId = $('#locationId').val();
+                        },
+                        dataSrc: 'data',
+                        error: function (xhr, error, thrown) {
+                            console.warn('DataTable error:', error);
+                            hideLoader(); // still hide loader even on failure
+                        },
+                        complete: function () {
+                            hideLoader(); // hide only when done
+                        }
+                    },
+                    columns: [
+                        { data: 'productName' },
+                        { data: 'productDescription' },
+                        {
+                            data: 'stockQty',
+                            className: 'text-end',
+                            orderable: false,
+                            render: function (data) {
+                                return data != null ? data.toLocaleString() : '0';
+                            }
+                        },
+                        {
+                            data: 'id',
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return `
+                                <button class="btn btn-success btn-sm m-1 edit-btn"
+                                        data-id="${data}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
+                                        title="Edit">
+                                    <i class="far fa-edit"></i>
+                                </button>`;
+                            }
+                        }
+                    ],
+                    responsive: true,
+                    dom: 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                });
+
+                var collTable = $('#collTable').DataTable({
+                    ajax: {
+                        url: '/Inventory/Stockroom?handler=Collateral',
+                        data: function (d) {
+                            d.LocationId = $('#locationId').val();
+                        },
+                        dataSrc: 'data'
+                    },
+                    columns: [
+                        { data: 'productName' },
+                        { data: 'productDescription' },
+                        {
+                            data: 'stockQty',
+                            className: 'text-end',
+                            orderable: false,
+                            render: function (data) {
+                                return data != null ? data.toLocaleString() : '0';
+                            }
+                        },
+                        {
+                            data: 'id',
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return `
+                                        <button class="btn btn-success btn-sm m-1 edit-btn"
+                                                data-id="${data}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editModal"
+                                                title="Edit">
+                                            <i class="far fa-edit"></i>
+                                        </button>`;
+                            }
+                        }
+                    ],
+                    responsive: true,
+                    dom: 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                });
+
+                $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                    $.fn.dataTable
+                        .tables({ visible: true, api: true })
+                        .columns.adjust()
+                        .responsive.recalc();
+                });
+
+                $('#LocationId').on('change', function () {
+                    showLoader();
+                    mainTable.ajax.reload();
+                    collTable.ajax.reload();
+                });
+            });
+
+            // document.getElementById("addNewBtn").addEventListener("click", function () {
+            //     const LocationId = document.getElementById("LocationId").value;
+            //     if (LocationId) {
+            //         window.location.href = `/Inventory/Create?LocationId=${LocationId}`;
+            //     } else {
+            //         alert("Please select an office.");
+            //     }
+            // });
+        </script>
+
+        <script>
+            $(document).on('click', '.edit-btn', function () {
+                const id = $(this).data('id');
+                const url = `/Inventory/Edit?id=${id}&handler=Partial`;
+
+                $('#editInventoryModalLoader').show();                // show spinner
+                $('#editInventoryModalContent').hide().empty();       // clear previous content
+
+                $('#editModal').modal('show');                        // show modal
+
+                // Load partial view
+                $('#editInventoryModalContent').load(url, function () {
+                    $('#editInventoryModalLoader').hide();            // hide spinner
+                    $('#editInventoryModalContent').fadeIn();         // show content
+                });
+            });
+        </script>
+
+    }

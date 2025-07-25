@@ -185,7 +185,8 @@
     <script>
         function openAddAccessModal(userId) {
             //alert(userId);
-            const modal = new bootstrap.Modal(document.getElementById('addAccessModal'));
+            //const modal = new bootstrap.Modal(document.getElementById('addAccessModal'));
+            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addAccessModal'));
             const contentDiv = document.getElementById('addAccessModalBody');
 
             contentDiv.innerHTML = `

@@ -1,5 +1,5 @@
 ﻿@page
-@model NLI_POS.Pages.Inventory.DeleteModel
+@model NLI_POS.Pages.Inventory.Office.DeleteModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -19,16 +19,16 @@
             @Html.DisplayFor(model => model.InventoryStock.StockQty)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.InventoryStock.Products)
+            @Html.DisplayNameFor(model => model.InventoryStock.Product)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.InventoryStock.Products.Id)
+            @Html.DisplayFor(model => model.InventoryStock.Product.Id)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.InventoryStock.OfficeId)
+            @Html.DisplayNameFor(model => model.InventoryStock.Location.OfficeId)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.InventoryStock.Office.Name)
+            @Html.DisplayFor(model => model.InventoryStock.Location.Office.Name)
         </dd>
     </dl>
     

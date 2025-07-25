@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace NLI_POS.Pages.Inventory
+namespace NLI_POS.Pages.Inventory.Shared
 {
-    public class _EditPartialModel : PageModel
+    public class _TransferPartialModel : PageModel
     {
         public void OnGet()
         {
