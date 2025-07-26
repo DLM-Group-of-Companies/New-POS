@@ -16,15 +16,25 @@ namespace NLI_POS.Pages.Inventory.Shared
 
         public async Task<TransferInventoryViewModel> BuildAsync(int fromLocationId, int? productId = null, bool lockFrom = true)
         {
-            var locations = await _context.InventoryLocations
+            var fromLocations = await _context.InventoryLocations
                 .Where(l => l.IsActive)
                 .OrderBy(l => l.Name)
                 .Select(l => new SelectListItem
-                {   
+                {
                     Value = l.Id.ToString(),
                     Text = l.Name
                 })
                 .ToListAsync();
+
+            var toLocations = await _context.InventoryLocations
+    .Where(l => l.IsActive && l.Id != fromLocationId)
+    .OrderBy(l => l.Name)
+    .Select(l => new SelectListItem
+    {
+        Value = l.Id.ToString(),
+        Text = l.Name
+    })
+    .ToListAsync();
 
             List<SelectListItem> products;
             if (productId == null)
@@ -63,7 +73,8 @@ namespace NLI_POS.Pages.Inventory.Shared
                 FromLocationId = fromLocationId,
                 ProductId = productId ?? 0,
                 LockFrom = lockFrom,
-                LocationOptions = locations,
+                LocationFromOptions = fromLocations,
+                LocationToOptions = toLocations,
                 ProductOptions = products
             };
         }

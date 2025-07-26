@@ -25,12 +25,12 @@
                 <div class="card-body">
                     <h5 class="text-primary fw-bold mb-3">Offices Inventory</h5>
                     <div class="row mb-3">
-@*                         <div class="col-lg-9">
-                            <a id="addNewBtn" class="btn btn-primary"><i class="far fa-plus-square"></i> Add New</a>
-                        </div> *@
-                        <div class="col-lg-3 d-none" >
-                            <label asp-for="officeId" class="form-label fw-bold"></label>
-                            <select id="officeId" asp-for="officeId" class="form-control form-select" asp-items="ViewBag.OfficeId"></select>
+                        <div class="col-lg-9">
+                             @* <a id="addNewBtn" class="btn btn-primary"><i class="far fa-plus-square"></i> Add New</a> *@
+                        </div>
+                        <div class="col-lg-3 ">
+                            <label asp-for="locationId" class="form-label fw-bold"></label>
+                            <select id="locationId" asp-for="locationId" class="form-control form-select" asp-items="ViewBag.LocationId"></select>
                         </div>
                     </div>
 
@@ -58,7 +58,7 @@
                         </div>
 
                         <div class="tab-pane fade" id="coll" role="tabpanel" aria-labelledby="coll-tab">
-                            <table id="collTable" class="table table-info table-striped align-middle">
+                            <table id="collTable" class="table table-primary  table-striped align-middle">
                                 <thead>
                                     <tr>
                                         <th>Product</th>
@@ -101,7 +101,14 @@
     </div>
 </div>
 
-
+<!-- Transfer Modal Placeholder -->
+<div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="transferModalContent">
+            <!-- AJAX-loaded partial goes here -->
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -111,7 +118,7 @@
                 ajax: {
                     url: '@Url.Page("Index", "Main")',
                     data: function (d) {
-                        d.officeId = $('#officeId').val();
+                        d.LocationId = $('#locationId').val();
                     },
                     dataSrc: 'data',
                     error: function (xhr, error, thrown) {
@@ -138,13 +145,13 @@
                         orderable: false,
                         render: function (data, type, row) {
                             return `
-                            <button class="btn btn-success btn-sm m-1 edit-btn"
-                                    data-id="${data}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editModal"
-                                    title="Edit">
-                                <i class="far fa-edit"></i>
-                            </button>`;
+                                                <button class="btn btn-info btn-sm transfer-btn text-white"
+                                                        data-id="${data}"
+                                                        data-product-id="${row.productId}"
+                                                        data-location-id="${$('#locationId').val()}"
+                                                        title="Transfer stock">
+                                                        <i class="fas fa-random me-1"></i>
+                                                </button>`;
                         }
                     }
                 ],
@@ -157,7 +164,7 @@
                 ajax: {
                     url: '@Url.Page("Index", "Collateral")',
                     data: function (d) {
-                        d.officeId = $('#officeId').val();
+                        d.LocationId = $('#locationId').val();
                     },
                     dataSrc: 'data'
                 },
@@ -177,13 +184,13 @@
                         orderable: false,
                         render: function (data, type, row) {
                             return `
-                                    <button class="btn btn-success btn-sm m-1 edit-btn"
-                                            data-id="${data}"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editModal"
-                                            title="Edit">
-                                        <i class="far fa-edit"></i>
-                                    </button>`;
+                                                <button class="btn btn-info btn-sm transfer-btn text-white"
+                                                        data-id="${data}"
+                                                        data-product-id="${row.productId}"
+                                                        data-location-id="${$('#locationId').val()}"
+                                                        title="Transfer stock">
+                                                        <i class="fas fa-random me-1"></i>
+                                                </button>`;
                         }
                     }
                 ],
@@ -199,7 +206,7 @@
                     .responsive.recalc();
             });
 
-            $('#officeId').on('change', function () {
+            $('#locationId').on('change', function () {
                 showLoader();
                 mainTable.ajax.reload();
                 collTable.ajax.reload();
@@ -234,4 +241,102 @@
         });
     </script>
 
+    @* //For transfers *@
+    <script>
+        $(document).on('click', '.transfer-btn', function () {
+            const productId = $(this).data('product-id');
+            const locationId = $('#locationId').val(); // <- this gets the latest value
+
+            if (!locationId || locationId === '0') {
+                Swal.fire('Missing Location', 'Please select a location first.', 'warning');
+                return;
+            }
+
+            $.get('/Inventory/Stockroom?handler=TransferPartial', {
+                locationId: locationId,
+                productId: productId
+            }).done(function (html) {
+                $('#transferModal .modal-content').html(html);
+                const modal = new bootstrap.Modal(document.getElementById('transferModal'));
+                modal.show();
+            });
+        });
+
+        $(document).on('submit', '#transferForm', function (e) {
+            e.preventDefault();
+
+            // Gather form data
+            const formData = {
+                FromLocationId: $('#FromLocationId').val(),
+                ToLocationId: $('#ToLocationId').val(),
+                ProductId: $('#ProductId').val(),
+                Quantity: parseInt($('#Quantity').val(), 10)
+            };
+            const productName = $('#ProductName').val();
+            // Show confirmation dialog
+            Swal.fire({
+                title: 'Confirm Transfer',
+                html: `
+                    <div class="row text-start">
+                        <div class="col-3 p-2"><strong>Product:</strong></div><div class="col-9  p-2 text-start"> ${productName}</div>
+                        <div class="col-3 p-2"><strong>From:</strong></div><div class="col-9 p-2 text-start">  ${$('#FromLocationId option:selected').text()}</div>
+                        <div class="col-3 p-2"><strong>To:</strong></div><div class="col-9 p-2 text-start">  ${$('#ToLocationId option:selected').text()}</div>
+                        <div class="col-3 p-2"><strong>Quantity:</strong></div><div class="col-9 p-2 text-start">  ${formData.Quantity}</div>
+                    </div>
+                    `,
+                icon: 'question',
+                customClass: {
+                    popup: 'border border-secondary shadow rounded',
+                    title: 'fs-10 text-primary',
+                    confirmButton: 'btn btn-primary me-2',
+                    cancelButton: 'btn btn-outline-secondary'
+                },
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-check me-2"></i> Yes, Transfer',
+                cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with transfer
+                    $.ajax({
+                        url: '/Inventory/Offices?handler=Transfer',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(formData),
+                        beforeSend: function (xhr) {
+                            const token = $('input[name="__RequestVerificationToken"]').val();
+                            if (token) {
+                                xhr.setRequestHeader("RequestVerificationToken", token);
+                            }
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Transfer complete!',
+                                    text: response.message || 'Inventory was transferred successfully.'
+                                }).then(() => {
+                                    $('#transferModal').modal('hide');
+                                    $('#mainTable').DataTable().ajax.reload(null, false);
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Transfer failed',
+                                    text: response.message || 'Something went wrong.'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Unable to complete the transfer. Please try again.'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 }

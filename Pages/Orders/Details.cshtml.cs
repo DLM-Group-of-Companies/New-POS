@@ -199,6 +199,20 @@ namespace NLI_POS.Pages.Orders
                             {
                                 inventory.StockQty += restockQty;
                                 _context.InventoryStocks.Update(inventory);
+
+                                //Log Inventory Trans
+                                _context.InventoryTransactions.Add(new InventoryTransaction
+                                {
+                                    OrderNo = Order.OrderNo,
+                                    ProductId = componentProductId,
+                                    FromLocationId = inventory.LocationId,
+                                    ToLocationId = null,
+                                    Quantity = -restockQty,
+                                    TransactionType = "Void",
+                                    TransactionDate = DateTime.UtcNow,
+                                    EncodedBy = User.Identity?.Name ?? "SYSTEM"
+                                });
+
                             }
                         }
                     }
@@ -213,6 +227,19 @@ namespace NLI_POS.Pages.Orders
                     {
                         inventory.StockQty += item.Quantity;
                         _context.InventoryStocks.Update(inventory);
+
+                        //Log Inventory Trans
+                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        {
+                            OrderNo = Order.OrderNo,
+                            ProductId = item.ProductId,
+                            FromLocationId = inventory.LocationId,
+                            ToLocationId = null,
+                            Quantity = -item.Quantity,
+                            TransactionType = "Void",
+                            TransactionDate = DateTime.UtcNow,
+                            EncodedBy = User.Identity?.Name ?? "SYSTEM"
+                        });
                     }
                 }
             }

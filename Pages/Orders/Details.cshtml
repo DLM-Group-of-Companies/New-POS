@@ -97,16 +97,16 @@
                         <h5>We care for you <i>naturally</i>!</h5><br />
                         <h4>Purchase Order Receipt</h4>
                         <div class="row">
-                            <div class="col-2"> ORDER NO:</div><div class="col-10 justify-content-start"> @Model.Order.OrderNo</div><br />
-                            <div class="col-2">
+                            <div class="col-3"> ORDER NO:</div><div class="col-9 justify-content-start"> @Model.Order.OrderNo</div><br />
+                            <div class="col-3">
                                 DATE:
                             </div>
-                            <div class="col-10 justify-content-start">
+                            <div class="col-9 justify-content-start">
                                 @Model.Order.OrderDate.ToString("MMMM dd, yyyy")
                             </div><br />
-                            <div class="col-2">
+                            <div class="col-3">
                                 CUSTOMER:
-                            </div><div class="col-10 justify-content-start">
+                            </div><div class="col-9 justify-content-start">
                                 @Model.Order.Customers.FirstName @Model.Order.Customers.LastName
                             </div><br />
                         </div>

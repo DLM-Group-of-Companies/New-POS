@@ -18,7 +18,14 @@ var localTimeZone = "UTC";
 var connectionString = builder.Configuration.GetConnectionString("NLPOSTestConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36))));
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36)))
+               .EnableSensitiveDataLogging()   // <-- SHOWS PARAMETER VALUES
+           .EnableDetailedErrors());
+
+builder.Logging.AddConsole();
+
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Information);
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

@@ -14,8 +14,12 @@ namespace NLI_POS.Models
         public int Quantity { get; set; }
 
         // Can be "Purchase", "Transfer", "Sale", "Adjustment"
+        [Column(TypeName = "varchar(30)")]
+        [StringLength(30)]
         public string TransactionType { get; set; }
 
+        [Column(TypeName = "varchar(50)")]
+        [StringLength(50)]
         public string? OrderNo { get; set; }
 
         [ForeignKey("SourceLocation")]
@@ -26,6 +30,12 @@ namespace NLI_POS.Models
 
         public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
 
+        [Column(TypeName = "varchar(255)")]
+        [StringLength(255)]
+        public string? Remarks { get; set; }
+
+        [Column(TypeName = "varchar(20)")]
+        [StringLength(20)]
         public string EncodedBy { get; set; }
 
         public virtual Product Product { get; set; }

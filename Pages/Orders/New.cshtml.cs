@@ -239,13 +239,6 @@ namespace NLI_POS.Pages.Orders
         {
 
             var cart = HttpContext.Session.GetObject<List<ProductItem>>("Cart");
-            //if (cart == null || !cart.Any())
-            //{
-            //    ModelState.AddModelError("", "Cart is empty. Please add products.");
-            //    await LoadDropdownsAsync(); // Reload select lists
-            //    ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Name", "Name");
-            //    return Page();
-            //}
 
             // Check inventory before proceeding
             foreach (var item in cart)
@@ -301,17 +294,9 @@ namespace NLI_POS.Pages.Orders
 
             decimal cartTotal = cart.Sum(item => item.Price * item.Quantity);
 
-            //// Compare with PaidAmount
-            //if (Order.PaidAmount < cartTotal)
-            //{
-            //    ModelState.AddModelError(string.Empty, $"Paid amount (₱{Order.PaidAmount:N2}) is less than the total amount due (₱{cartTotal:N2}). Please correct the payment.");
-            //    await LoadDropdownsAsync(); 
-            //    return Page();
-            //}
-
             // Setup base order data
             string orderNo = "";
-            bool isUnique = false;
+            //bool isUnique = false;
             var off = await _context.OfficeCountry.FirstOrDefaultAsync(o => o.Id == Order.OfficeId);
 
             //do //Generate Order Number and make sure it will not have duplicates incase multiple users saved record at same time
@@ -411,14 +396,27 @@ namespace NLI_POS.Pages.Orders
                             var inventory = await _context.InventoryStocks
                                 .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.Location.OfficeId == Order.OfficeId);
 
-                            //var inventory = await _context.InventoryStocks
-                            //    .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.CountryId == Order.Office.CountryId);
-
                             if (inventory != null)
                             {
                                 inventory.StockQty -= requiredQty;
                                 if (inventory.StockQty < 0) inventory.StockQty = 0;
                                 _context.InventoryStocks.Update(inventory);
+
+                                //Log Inventory Trans
+                                _context.InventoryTransactions.Add(new InventoryTransaction
+                                {
+                                    OrderNo = Order.OrderNo,
+                                    ProductId = componentProductId,
+                                    FromLocationId = inventory.LocationId,
+                                    ToLocationId = null,
+                                    Quantity = requiredQty,
+                                    TransactionType = "Sale",
+                                    TransactionDate = DateTime.UtcNow,
+                                    EncodedBy = User.Identity?.Name ?? "SYSTEM"
+                                });
+
+
+
                             }
                         }
                     }
@@ -434,6 +432,20 @@ namespace NLI_POS.Pages.Orders
                         inventory.StockQty -= item.Quantity;
                         if (inventory.StockQty < 0) inventory.StockQty = 0;
                         _context.InventoryStocks.Update(inventory);
+
+                        //Log Inventory Trans
+                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        {
+                            OrderNo= Order.OrderNo,
+                            ProductId = item.ProductId,
+                            FromLocationId = inventory.LocationId,
+                            ToLocationId = null,
+                            Quantity = item.Quantity,
+                            TransactionType = "Sale",
+                            TransactionDate = DateTime.UtcNow,
+                            EncodedBy = User.Identity?.Name ?? "SYSTEM"
+                        });
+
                     }
                 }
             }

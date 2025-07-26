@@ -1,7 +1,7 @@
 ﻿
 //For Printing receipt in the modal
 function printModal() {
-    const modalBody = document.querySelector('.modal-body').innerHTML;
+    const modalBody = document.querySelector('#printReceipt .modal-body').innerHTML;
     const printWindow = window.open('', '', 'width=800,height=600');
     printWindow.document.write(`
         <html>

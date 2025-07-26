@@ -18,7 +18,10 @@ namespace NLI_POS.Models.ViewModels
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
         public int Quantity { get; set; }
 
-        public List<SelectListItem> LocationOptions { get; set; } = new();
+        public string? Remarks { get; set; }
+
+        public List<SelectListItem> LocationFromOptions { get; set; } = new();
+        public List<SelectListItem> LocationToOptions { get; set; } = new();
         public List<SelectListItem> ProductOptions { get; set; } = new();
 
         public bool LockFrom { get; set; } // Used to disable FromLocation select

@@ -149,6 +149,20 @@ namespace NLI_POS.Pages.Inventory.Warehouse
 
             await _context.SaveChangesAsync();
 
+            // Save transaction log
+            _context.InventoryTransactions.Add(new InventoryTransaction
+            {
+                ProductId = vm.ProductId,
+                FromLocationId = vm.FromLocationId,
+                ToLocationId = vm.ToLocationId,
+                Quantity = vm.Quantity,
+                TransactionType = "Transfer",
+                TransactionDate = DateTime.UtcNow,
+                EncodedBy = User.Identity?.Name ?? "SYSTEM"
+            });
+
+            await _context.SaveChangesAsync();
+
             return new JsonResult(new { success = true });
         }
 

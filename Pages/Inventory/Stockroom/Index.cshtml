@@ -24,8 +24,8 @@
                 <div class="card-body">
                     <h5 class="text-primary fw-bold mb-3">Stockroom Inventory</h5>
                     <div class="row mb-3">
-@*                         <div class="col-lg-9">
-                            <a id="addNewBtn" class="btn btn-primary"><i class="far fa-plus-square"></i> Add New</a>
+                        @*                         <div class="col-lg-9">
+                        <a id="addNewBtn" class="btn btn-primary"><i class="far fa-plus-square"></i> Add New</a>
                         </div> *@
                         <div class="col-lg-3 d-none">
                             <label asp-for="locationId" class="form-label fw-bold"></label>
@@ -73,163 +73,277 @@
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered ">
-            <div class="modal-content">
-                <!-- Optional: Modal header -->
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Inventory</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <!-- Optional: Modal header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Inventory</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
 
-                <div class="modal-body p-4">
-                    <!-- Spinner -->
-                    <div id="editInventoryModalLoader" class="text-center py-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
+            <div class="modal-body p-4">
+                <!-- Spinner -->
+                <div id="editInventoryModalLoader" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-
-                    <!-- Loaded form content -->
-                    <div id="editInventoryModalContent" style="display: none;"></div>
                 </div>
+
+                <!-- Loaded form content -->
+                <div id="editInventoryModalContent" style="display: none;"></div>
             </div>
         </div>
     </div>
+</div>
 
+<!-- Transfer Modal Placeholder -->
+<div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="transferModalContent">
+            <!-- AJAX-loaded partial goes here -->
+        </div>
+    </div>
+</div>
 
-
-    @section Scripts {
-        <script>
-            $(document).ready(function () {
-                showLoader();
-                var mainTable = $('#mainTable').DataTable({
-                    ajax: {
-                        url: '/Inventory/Stockroom?handler=Main',
-                        data: function (d) {
-                            d.LocationId = $('#locationId').val();
-                        },
-                        dataSrc: 'data',
-                        error: function (xhr, error, thrown) {
-                            console.warn('DataTable error:', error);
-                            hideLoader(); // still hide loader even on failure
-                        },
-                        complete: function () {
-                            hideLoader(); // hide only when done
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            showLoader();
+            var mainTable = $('#mainTable').DataTable({
+                ajax: {
+                    url: '/Inventory/Stockroom?handler=Main',
+                    data: function (d) {
+                        d.LocationId = $('#locationId').val();
+                    },
+                    dataSrc: 'data',
+                    error: function (xhr, error, thrown) {
+                        console.warn('DataTable error:', error);
+                        hideLoader(); // still hide loader even on failure
+                    },
+                    complete: function () {
+                        hideLoader(); // hide only when done
+                    }
+                },
+                columns: [
+                    { data: 'productName' },
+                    { data: 'productDescription' },
+                    {
+                        data: 'stockQty',
+                        className: 'text-end',
+                        orderable: false,
+                        render: function (data) {
+                            return data != null ? data.toLocaleString() : '0';
                         }
                     },
-                    columns: [
-                        { data: 'productName' },
-                        { data: 'productDescription' },
-                        {
-                            data: 'stockQty',
-                            className: 'text-end',
-                            orderable: false,
-                            render: function (data) {
-                                return data != null ? data.toLocaleString() : '0';
-                            }
-                        },
-                        {
-                            data: 'id',
-                            orderable: false,
-                            render: function (data, type, row) {
-                                return `
+                    {
+                        data: 'id',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return `
+                            <button class="btn btn-success btn-sm m-1 edit-btn"
+                                    data-id="${data}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
+                                    title="Edit">
+                                <i class="far fa-edit"></i>
+                            </button>
+                            <button class="btn btn-info btn-sm transfer-btn text-white"
+                                    data-id="${data}"
+                                    data-product-id="${row.productId}"
+                                    data-location-id="${$('#locationId').val()}"
+                                    title="Transfer stock">
+                                <i class="fas fa-random me-1"></i>
+                            </button>`;
+                        }
+                    }
+                ],
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            });
+
+            var collTable = $('#collTable').DataTable({
+                ajax: {
+                    url: '/Inventory/Stockroom?handler=Collateral',
+                    data: function (d) {
+                        d.LocationId = $('#locationId').val();
+                    },
+                    dataSrc: 'data'
+                },
+                columns: [
+                    { data: 'productName' },
+                    { data: 'productDescription' },
+                    {
+                        data: 'stockQty',
+                        className: 'text-end',
+                        orderable: false,
+                        render: function (data) {
+                            return data != null ? data.toLocaleString() : '0';
+                        }
+                    },
+                    {
+                        data: 'id',
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return `
                                 <button class="btn btn-success btn-sm m-1 edit-btn"
                                         data-id="${data}"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editModal"
                                         title="Edit">
-                                    <i class="far fa-edit"></i>
-                                </button>`;
-                            }
+                                        <i class="far fa-edit"></i>
+                                </button>
+                                <button class="btn btn-info btn-sm transfer-btn text-white"
+                                        data-id="${data}"
+                                        data-product-id="${row.productId}"
+                                        data-location-id="${$('#locationId').val()}"
+                                        title="Transfer stock">
+                                        <i class="fas fa-random me-1"></i>
+                                </button>
+                                                                `;
                         }
-                    ],
-                    responsive: true,
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-
-                var collTable = $('#collTable').DataTable({
-                    ajax: {
-                        url: '/Inventory/Stockroom?handler=Collateral',
-                        data: function (d) {
-                            d.LocationId = $('#locationId').val();
-                        },
-                        dataSrc: 'data'
-                    },
-                    columns: [
-                        { data: 'productName' },
-                        { data: 'productDescription' },
-                        {
-                            data: 'stockQty',
-                            className: 'text-end',
-                            orderable: false,
-                            render: function (data) {
-                                return data != null ? data.toLocaleString() : '0';
-                            }
-                        },
-                        {
-                            data: 'id',
-                            orderable: false,
-                            render: function (data, type, row) {
-                                return `
-                                        <button class="btn btn-success btn-sm m-1 edit-btn"
-                                                data-id="${data}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editModal"
-                                                title="Edit">
-                                            <i class="far fa-edit"></i>
-                                        </button>`;
-                            }
-                        }
-                    ],
-                    responsive: true,
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-
-                $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-                    $.fn.dataTable
-                        .tables({ visible: true, api: true })
-                        .columns.adjust()
-                        .responsive.recalc();
-                });
-
-                $('#LocationId').on('change', function () {
-                    showLoader();
-                    mainTable.ajax.reload();
-                    collTable.ajax.reload();
-                });
+                    }
+                ],
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
             });
 
-            // document.getElementById("addNewBtn").addEventListener("click", function () {
-            //     const LocationId = document.getElementById("LocationId").value;
-            //     if (LocationId) {
-            //         window.location.href = `/Inventory/Create?LocationId=${LocationId}`;
-            //     } else {
-            //         alert("Please select an office.");
-            //     }
-            // });
-        </script>
-
-        <script>
-            $(document).on('click', '.edit-btn', function () {
-                const id = $(this).data('id');
-                const url = `/Inventory/Edit?id=${id}&handler=Partial`;
-
-                $('#editInventoryModalLoader').show();                // show spinner
-                $('#editInventoryModalContent').hide().empty();       // clear previous content
-
-                $('#editModal').modal('show');                        // show modal
-
-                // Load partial view
-                $('#editInventoryModalContent').load(url, function () {
-                    $('#editInventoryModalLoader').hide();            // hide spinner
-                    $('#editInventoryModalContent').fadeIn();         // show content
-                });
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $.fn.dataTable
+                    .tables({ visible: true, api: true })
+                    .columns.adjust()
+                    .responsive.recalc();
             });
-        </script>
 
-    }
+            $('#LocationId').on('change', function () {
+                showLoader();
+                mainTable.ajax.reload();
+                collTable.ajax.reload();
+            });
+        });
+
+    </script>
+
+    <script>
+        $(document).on('click', '.edit-btn', function () {
+            const id = $(this).data('id');
+            const url = `/Inventory/Edit?id=${id}&handler=Partial`;
+
+            $('#editInventoryModalLoader').show();                // show spinner
+            $('#editInventoryModalContent').hide().empty();       // clear previous content
+
+            $('#editModal').modal('show');                        // show modal
+
+            // Load partial view
+            $('#editInventoryModalContent').load(url, function () {
+                $('#editInventoryModalLoader').hide();            // hide spinner
+                $('#editInventoryModalContent').fadeIn();         // show content
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.transfer-btn', function () {
+            const productId = $(this).data('product-id');
+            const locationId = $('#locationId').val(); // <- this gets the latest value
+
+            if (!locationId || locationId === '0') {
+                Swal.fire('Missing Location', 'Please select a location first.', 'warning');
+                return;
+            }
+
+            $.get('/Inventory/Stockroom?handler=TransferPartial', {
+                locationId: locationId,
+                productId: productId
+            }).done(function (html) {
+                $('#transferModal .modal-content').html(html);
+                const modal = new bootstrap.Modal(document.getElementById('transferModal'));
+                modal.show();
+            });
+        });
+
+        $(document).on('submit', '#transferForm', function (e) {
+            e.preventDefault();
+
+            // Gather form data
+            const formData = {
+                FromLocationId: $('#FromLocationId').val(),
+                ToLocationId: $('#ToLocationId').val(),
+                ProductId: $('#ProductId').val(),
+                Quantity: parseInt($('#Quantity').val(), 10)
+            };
+            const productName = $('#ProductName').val();
+            // Show confirmation dialog
+            Swal.fire({
+                title: 'Confirm Transfer',
+                html: `
+                                    <div class="row text-start">
+                                                <div class="col-3 p-2"><strong>Product:</strong></div><div class="col-9  p-2 text-start"> ${productName}</div>
+                                                <div class="col-3 p-2"><strong>From:</strong></div><div class="col-9 p-2 text-start">  ${$('#FromLocationId option:selected').text()}</div>
+                                                <div class="col-3 p-2"><strong>To:</strong></div><div class="col-9 p-2 text-start">  ${$('#ToLocationId option:selected').text()}</div>
+                                                <div class="col-3 p-2"><strong>Quantity:</strong></div><div class="col-9 p-2 text-start">  ${formData.Quantity}</div>
+                                    </div>
+                                `,
+                icon: 'question',
+                customClass: {
+                    popup: 'border border-secondary shadow rounded',
+                    title: 'fs-10 text-primary',
+                    confirmButton: 'btn btn-primary me-2',
+                    cancelButton: 'btn btn-outline-secondary'
+                },
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-check me-2"></i> Yes, Transfer',
+                cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with transfer
+                    $.ajax({
+                        url: '/Inventory/Stockroom?handler=Transfer',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(formData),
+                        beforeSend: function (xhr) {
+                            const token = $('input[name="__RequestVerificationToken"]').val();
+                            if (token) {
+                                xhr.setRequestHeader("RequestVerificationToken", token);
+                            }
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Transfer complete!',
+                                    text: response.message || 'Inventory was transferred successfully.'
+                                }).then(() => {
+                                    $('#transferModal').modal('hide');
+                                    $('#mainTable').DataTable().ajax.reload(null, false);
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Transfer failed',
+                                    text: response.message || 'Something went wrong.'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Unable to complete the transfer. Please try again.'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+
+    </script>
+}
