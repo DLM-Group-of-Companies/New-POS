@@ -33,7 +33,6 @@ namespace NLI_POS.Pages.Inventory.Warehouse
                 return NotFound();
             }
             InventoryStock = inventorystock;
-            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
             ViewData["LocationId"] = new SelectList(_context.InventoryLocations
      .Include(l => l.Office), "Id", "Name");
             ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Id");
@@ -67,9 +66,9 @@ namespace NLI_POS.Pages.Inventory.Warehouse
             Console.WriteLine("Partial view exists: " + found);
 
             var location = await _context.InventoryLocations
-    .Where(l => l.Id == InventoryStock.LocationId)
-    .Select(l => l.Name)
-    .FirstOrDefaultAsync();
+            .Where(l => l.Id == InventoryStock.LocationId)
+            .Select(l => l.Name)
+            .FirstOrDefaultAsync();
 
             var vm = new InventoryStockEditViewModel
             {
@@ -140,6 +139,20 @@ namespace NLI_POS.Pages.Inventory.Warehouse
             var productName = product?.ProductName ?? "Unknown";
 
             await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated inventory stock: {original.StockQty} for: {productName} on {countryInfo?.Name}");
+
+            // Save transaction log
+            _context.InventoryTransactions.Add(new InventoryTransaction
+            {
+                ProductId = original.ProductId,
+                FromLocationId = original.Location.Id,
+                ToLocationId = null,
+                Quantity = original.StockQty,
+                TransactionType = "Modified stock quantity",
+                TransactionDate = DateTime.UtcNow,
+                EncodedBy = User.Identity?.Name ?? "SYSTEM"
+            });
+
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index", new { locationId = original.LocationId });
 

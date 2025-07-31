@@ -5,7 +5,7 @@
 @{
     ViewData["Title"] = "New Order";
 }
-<div class="container-fluid bg-white bg-gradient shadow p-3">
+<div class="container-fluid bg-white bg-gradient shadow p-3 small">
     <div class="d-flex justify-content-between align-items-center mb-1">
         <h4 class="mb-0 text-primary">
             <i class="fas fa-cart-plus me-2"></i> New Order
@@ -121,7 +121,7 @@
                             <i class="fas fa-shopping-cart text-secondary"></i> Cart
                         </h5>
                         <div class="table-responsive">
-                            <table id="cartTable" class="table table-bordered table-sm small align-middle">
+                            <table id="cartTable" class="table table-bordered table-sm  align-middle">
                                 <thead class="table-secondary">
                                     <tr>
                                         <th>Product Items</th>
@@ -167,7 +167,7 @@
                                         <td class="text-end">
                                             <strong><span id="grandTotal">0</span></strong>
                                             <input type="hidden" asp-for="Order.TotAmount" name="Order.TotAmount" id="GrandTotalInput" value="0" />
-                                            <input type="hidden" asp-for="ServiceChargeValue" name="ServiceChargeValue" id="ServiceChargeValue"  />
+                                            <input type="hidden" asp-for="ServiceChargeValue" name="ServiceChargeValue" id="ServiceChargeValue" />
                                         </td>
                                         <td></td>
                                     </tr>
@@ -342,6 +342,7 @@
                 },
                 success: function (availableStock) {
                     if (qty > availableStock) {
+                        hideLoader();
                         toastr.error(`Not enough stock for ${selectedProductText}. Available: ${availableStock}, Requested: ${qty}`);
                         return;
                     }
@@ -395,14 +396,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                                        <tr>
-                                                            <td>${item.productName}</td>
-                                                            <td>${item.comboName}</td>
-                                                            <td class="text-end">${formattedPrice}</td>
-                                                            <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                                    <td>${formattedTotalItem}</td>
-                                                            <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                        </tr>`);
+                                                                        <tr>
+                                                                            <td>${item.productName}</td>
+                                                                            <td>${item.comboName}</td>
+                                                                            <td class="text-end">${formattedPrice}</td>
+                                                                            <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                                    <td>${formattedTotalItem}</td>
+                                                                            <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                                        </tr>`);
                 });
             }
 
@@ -526,10 +527,12 @@
         }
 
         function loadProductDetails(productId) {
+            // alert('loadProductDetails');
             showLoader();
             const custclasstxt = $('#CustClassDisplay').text();
             const officeid = $('#OfficeId').val();
             $("#ComboId").empty();
+
 
             $.getJSON(`?handler=ProductComboList&ProdId=${productId}`, function (data) {
                 $.each(data, function (i, item) {
@@ -538,6 +541,19 @@
                 loadTracker.productCombo = true;
                 checkAllLoaded();
             });
+
+            let category = $('#ProductCategory').val();
+            if (category === 'Freebie') {
+                amount = 0;
+                $("#Price").val(amount);
+                let qty = parseFloat($("#Qty").val()) || 0;
+                let tot = qty * amount;
+                let formattedTotal = tot.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                $('#Amount').val(formattedTotal);
+                hideLoader();
+                return;
+            }
+
 
             $.ajax({
                 cache: false,
@@ -659,19 +675,19 @@
 
                 data.forEach(customer => {
                     tbody.append(`
-                                                                                        <tr>
-                                                                                            <td>${customer.custcode}</td>
-                                                                                            <td>${customer.name}</td>
-                                                                                            <td>${customer.email}</td>
-                                                                                            <td>${customer.phone}</td>
-                                                                                            <td>
-                                                                                                <button class="btn btn-sm btn-success" title="Select"
-                                                                                                        onclick='selectCustomer(${JSON.stringify(customer)})'>
-                                                                                                    <i class="fas fa-check"></i>
-                                                                                                </button>
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    `);
+                                                                                                        <tr>
+                                                                                                            <td>${customer.custcode}</td>
+                                                                                                            <td>${customer.name}</td>
+                                                                                                            <td>${customer.email}</td>
+                                                                                                            <td>${customer.phone}</td>
+                                                                                                            <td>
+                                                                                                                <button class="btn btn-sm btn-success" title="Select"
+                                                                                                                        onclick='selectCustomer(${JSON.stringify(customer)})'>
+                                                                                                                    <i class="fas fa-check"></i>
+                                                                                                                </button>
+                                                                                                            </td>
+                                                                                                        </tr>
+                                                                                                    `);
                 });
             });
         });
@@ -692,92 +708,92 @@
     }
 
     <script>
-    $(document).ready(function () {
-        bindPaymentEvents();
-        reindexPaymentRows(); // ensure initial rows are indexed
-        updateChargesPerRow();
-    });
-
-    function addPaymentRow() {
-        const options = $('#paymentOptionsSource').html();
-
-        const row = `
-            <tr>
-                <td>
-                    <select class="form-control form-control-sm form-select form-select-sm payment-method">
-                        ${options}
-                    </select>
-                </td>
-                <td>
-                    <input type="number" class="form-control form-control-sm payment-amount" />
-                </td>
-                <td>
-                    <input type="text" class="form-control form-control-sm payment-charge" readonly />
-                </td>
-                <td>
-                    <input type="text" class="form-control form-control-sm payment-ref" />
-                </td>
-                <td>
-                <input type="hidden" class="payment-percent" />
-                    <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </td>
-            </tr>`;
-
-        $('#paymentTableBody').append(row);
-        reindexPaymentRows();
-        updateChargesPerRow();
-    }
-
-    function removePaymentRow(btn) {
-        $(btn).closest('tr').remove();
-        reindexPaymentRows();
-        updateChargesPerRow();
-    }
-
-    function bindPaymentEvents() {
-        $('#paymentTableBody').on('change', '.payment-method, .payment-amount', function () {
+        $(document).ready(function () {
+            bindPaymentEvents();
+            reindexPaymentRows(); // ensure initial rows are indexed
             updateChargesPerRow();
         });
-    }
 
-    function updateChargesPerRow() {
-        $('#paymentTableBody tr').each(function () {
-            const $row = $(this);
-            const $selectedOption = $row.find('.payment-method option:selected');
-            const selectedText = $selectedOption.text().trim();
-            const serviceChargeRate = parseFloat($selectedOption.data('charge')) || 0;
-            const amount = parseFloat($row.find('.payment-amount').val()) || 0;
+        function addPaymentRow() {
+            const options = $('#paymentOptionsSource').html();
 
-            if (selectedText === 'Credit Card' && amount > 0) {
-                const charge = amount * serviceChargeRate;
-                $row.find('.payment-charge').val(charge.toFixed(2));
-                $row.find('.payment-percent').val(serviceChargeRate.toFixed(4));
-                updateServiceCharge(charge, serviceChargeRate);
-            } else {
-                $row.find('.payment-charge').val('');
-                $row.find('.payment-percent').val('');
-            }
-        });
-    }
+            const row = `
+                            <tr>
+                                <td>
+                                    <select class="form-control form-control-sm form-select form-select-sm payment-method">
+                                        ${options}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm payment-amount" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm payment-charge" readonly />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm payment-ref" />
+                                </td>
+                                <td>
+                                <input type="hidden" class="payment-percent" />
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
 
-    function updateServiceCharge(charge, rate) {
-        $('#ServiceChargeValue').val(charge.toFixed(2));
-        $('#serviceChargePercent').val(rate.toFixed(4)); // 4 decimals now
-    }
+            $('#paymentTableBody').append(row);
+            reindexPaymentRows();
+            updateChargesPerRow();
+        }
 
-    function reindexPaymentRows() {
-        $('#paymentTableBody tr').each(function (i) {
-            $(this).find('select.payment-method').attr('name', `Payments[${i}].PayMethod`);
-            $(this).find('input.payment-amount').attr('name', `Payments[${i}].Amount`);
-            $(this).find('input.payment-charge').attr('name', `Payments[${i}].ServiceChargeAmount`);
-            $(this).find('input.payment-ref').attr('name', `Payments[${i}].RefNo`);
-            $(this).find('input.payment-percent').attr('name', `Payments[${i}].ServiceChargePercent`);
+        function removePaymentRow(btn) {
+            $(btn).closest('tr').remove();
+            reindexPaymentRows();
+            updateChargesPerRow();
+        }
 
-        });
-    }
-</script>
+        function bindPaymentEvents() {
+            $('#paymentTableBody').on('change', '.payment-method, .payment-amount', function () {
+                updateChargesPerRow();
+            });
+        }
+
+        function updateChargesPerRow() {
+            $('#paymentTableBody tr').each(function () {
+                const $row = $(this);
+                const $selectedOption = $row.find('.payment-method option:selected');
+                const selectedText = $selectedOption.text().trim();
+                const serviceChargeRate = parseFloat($selectedOption.data('charge')) || 0;
+                const amount = parseFloat($row.find('.payment-amount').val()) || 0;
+
+                if (selectedText === 'Credit Card' && amount > 0) {
+                    const charge = amount * serviceChargeRate;
+                    $row.find('.payment-charge').val(charge.toFixed(2));
+                    $row.find('.payment-percent').val(serviceChargeRate.toFixed(4));
+                    updateServiceCharge(charge, serviceChargeRate);
+                } else {
+                    $row.find('.payment-charge').val('');
+                    $row.find('.payment-percent').val('');
+                }
+            });
+        }
+
+        function updateServiceCharge(charge, rate) {
+            $('#ServiceChargeValue').val(charge.toFixed(2));
+            $('#serviceChargePercent').val(rate.toFixed(4)); // 4 decimals now
+        }
+
+        function reindexPaymentRows() {
+            $('#paymentTableBody tr').each(function (i) {
+                $(this).find('select.payment-method').attr('name', `Payments[${i}].PayMethod`);
+                $(this).find('input.payment-amount').attr('name', `Payments[${i}].Amount`);
+                $(this).find('input.payment-charge').attr('name', `Payments[${i}].ServiceChargeAmount`);
+                $(this).find('input.payment-ref').attr('name', `Payments[${i}].RefNo`);
+                $(this).find('input.payment-percent').attr('name', `Payments[${i}].ServiceChargePercent`);
+
+            });
+        }
+    </script>
 
 
     @* //For Payment functionality *@
@@ -910,14 +926,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                                                            <tr>
-                                                                                <td>${item.productName}</td>
-                                                                                <td>${item.comboName}</td>
-                                                                                <td class="text-end">${formattedPrice}</td>
-                                                                                <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" style="max-width: 90px; width: 100%;" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                                                <td>${formattedTotalItem}</td>
-                                                                                <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                                            </tr>`);
+                                                                                            <tr>
+                                                                                                <td>${item.productName}</td>
+                                                                                                <td>${item.comboName}</td>
+                                                                                                <td class="text-end">${formattedPrice}</td>
+                                                                                                <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" style="max-width: 90px; width: 100%;" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                                                <td>${formattedTotalItem}</td>
+                                                                                                <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                                                            </tr>`);
                 });
             }
 

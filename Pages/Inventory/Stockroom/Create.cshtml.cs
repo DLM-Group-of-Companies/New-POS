@@ -62,7 +62,6 @@ namespace NLI_POS.Pages.Inventory.Stockroom
         [BindProperty]
         public InventoryStock InventoryStock { get; set; } = default!;
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync(int officeId)
         {
             //var userTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
@@ -86,6 +85,20 @@ namespace NLI_POS.Pages.Inventory.Stockroom
             var productName = product?.ProductName ?? "Unknown";
             await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added inventory product: {productName} with {InventoryStock.StockQty} stock(s) for {cntryOffice?.Country.Name}");
 
+
+            // Save transaction log
+            _context.InventoryTransactions.Add(new InventoryTransaction
+            {
+                ProductId = InventoryStock.ProductId,
+                FromLocationId = InventoryStock.LocationId,
+                ToLocationId = null,
+                Quantity = InventoryStock.StockQty,
+                TransactionType = "Product IN",
+                TransactionDate = DateTime.UtcNow,
+                EncodedBy = User.Identity?.Name ?? "SYSTEM"
+            });
+
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index", new { officeId = officeId });
         }

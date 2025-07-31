@@ -47,7 +47,7 @@ namespace NLI_POS.Pages.Customers
             var sortDirection = requestForm["order[0][dir]"].FirstOrDefault();
             var searchValue = requestForm["search[value]"].FirstOrDefault();
 
-            string[] columnNames = { "custCode", "fullName", "email", "mobile", "landline", "city", "className" };
+            string[] columnNames = { "custCode", "fullName", "mobile", "email", "city", "className" };
 
             var country = requestForm["country"].FirstOrDefault();
 

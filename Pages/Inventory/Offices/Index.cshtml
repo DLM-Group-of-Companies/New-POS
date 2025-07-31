@@ -318,6 +318,7 @@
                                 }).then(() => {
                                     $('#transferModal').modal('hide');
                                     $('#mainTable').DataTable().ajax.reload(null, false);
+                                    $('#collTable').DataTable().ajax.reload(null, false);
                                 });
                             } else {
                                 Swal.fire({

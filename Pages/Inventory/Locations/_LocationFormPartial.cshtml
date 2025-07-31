@@ -1,0 +1,24 @@
+﻿@model NLI_POS.Models.InventoryLocation
+
+<div class="mb-3">
+    <label asp-for="Name" class="form-label"></label>
+    <input asp-for="Name" class="form-control" />
+    <span asp-validation-for="Name" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="LocationType" class="form-label"></label>
+    <select asp-for="LocationType" class="form-select">
+        <option>Warehouse</option>
+        <option>Stockroom</option>
+        <option>Office</option>
+    </select>
+</div>
+
+<div class="mb-3">
+    <label asp-for="OfficeId" class="form-label">Office (Optional)</label>
+    <select asp-for="OfficeId" class="form-select"
+            asp-items="@(ViewData["Offices"] as SelectList)">
+        <option value="">-- None --</option>
+    </select>
+</div>

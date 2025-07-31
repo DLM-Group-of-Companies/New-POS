@@ -22,14 +22,13 @@
         <div class="col-md-10">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="text-primary fw-bold mb-3">Stockroom Inventory</h5>
                     <div class="row mb-3">
-                        @*                         <div class="col-lg-9">
-                        <a id="addNewBtn" class="btn btn-primary"><i class="far fa-plus-square"></i> Add New</a>
-                        </div> *@
-                        <div class="col-lg-3 d-none">
+                        <div class="col-lg-8">
+                            <h5 class="text-primary fw-bold mb-3">Stockroom Inventory</h5>
+                        </div>
+                        <div class="col-lg-4">
                             <label asp-for="locationId" class="form-label fw-bold"></label>
-                            <select id="locationId" asp-for="locationId" class="form-control form-select" asp-items="ViewBag.LocationId"></select>
+                            <select id="locationId" asp-for="locationId" class="form-control form-select" asp-items="ViewBag.LocationId" readonly></select>
                         </div>
                     </div>
 
@@ -144,20 +143,20 @@
                         orderable: false,
                         render: function (data, type, row) {
                             return `
-                            <button class="btn btn-success btn-sm m-1 edit-btn"
-                                    data-id="${data}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editModal"
-                                    title="Edit">
-                                <i class="far fa-edit"></i>
-                            </button>
-                            <button class="btn btn-info btn-sm transfer-btn text-white"
-                                    data-id="${data}"
-                                    data-product-id="${row.productId}"
-                                    data-location-id="${$('#locationId').val()}"
-                                    title="Transfer stock">
-                                <i class="fas fa-random me-1"></i>
-                            </button>`;
+                                            <button class="btn btn-success btn-sm m-1 edit-btn"
+                                                    data-id="${data}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editModal"
+                                                    title="Edit">
+                                                <i class="far fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-info btn-sm transfer-btn text-white"
+                                                    data-id="${data}"
+                                                    data-product-id="${row.productId}"
+                                                    data-location-id="${$('#locationId').val()}"
+                                                    title="Transfer stock">
+                                                <i class="fas fa-random me-1"></i>
+                                            </button>`;
                         }
                     }
                 ],
@@ -190,21 +189,21 @@
                         orderable: false,
                         render: function (data, type, row) {
                             return `
-                                <button class="btn btn-success btn-sm m-1 edit-btn"
-                                        data-id="${data}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editModal"
-                                        title="Edit">
-                                        <i class="far fa-edit"></i>
-                                </button>
-                                <button class="btn btn-info btn-sm transfer-btn text-white"
-                                        data-id="${data}"
-                                        data-product-id="${row.productId}"
-                                        data-location-id="${$('#locationId').val()}"
-                                        title="Transfer stock">
-                                        <i class="fas fa-random me-1"></i>
-                                </button>
-                                                                `;
+                                                <button class="btn btn-success btn-sm m-1 edit-btn"
+                                                        data-id="${data}"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editModal"
+                                                        title="Edit">
+                                                        <i class="far fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-info btn-sm transfer-btn text-white"
+                                                        data-id="${data}"
+                                                        data-product-id="${row.productId}"
+                                                        data-location-id="${$('#locationId').val()}"
+                                                        title="Transfer stock">
+                                                        <i class="fas fa-random me-1"></i>
+                                                </button>
+                                                                                `;
                         }
                     }
                 ],
@@ -232,7 +231,7 @@
     <script>
         $(document).on('click', '.edit-btn', function () {
             const id = $(this).data('id');
-            const url = `/Inventory/Edit?id=${id}&handler=Partial`;
+            const url = `/Inventory/Stockroom/Edit?id=${id}&handler=Partial`;
 
             $('#editInventoryModalLoader').show();                // show spinner
             $('#editInventoryModalContent').hide().empty();       // clear previous content
@@ -282,13 +281,13 @@
             Swal.fire({
                 title: 'Confirm Transfer',
                 html: `
-                                    <div class="row text-start">
-                                                <div class="col-3 p-2"><strong>Product:</strong></div><div class="col-9  p-2 text-start"> ${productName}</div>
-                                                <div class="col-3 p-2"><strong>From:</strong></div><div class="col-9 p-2 text-start">  ${$('#FromLocationId option:selected').text()}</div>
-                                                <div class="col-3 p-2"><strong>To:</strong></div><div class="col-9 p-2 text-start">  ${$('#ToLocationId option:selected').text()}</div>
-                                                <div class="col-3 p-2"><strong>Quantity:</strong></div><div class="col-9 p-2 text-start">  ${formData.Quantity}</div>
-                                    </div>
-                                `,
+                                                    <div class="row text-start">
+                                                                <div class="col-3 p-2"><strong>Product:</strong></div><div class="col-9  p-2 text-start"> ${productName}</div>
+                                                                <div class="col-3 p-2"><strong>From:</strong></div><div class="col-9 p-2 text-start">  ${$('#FromLocationId option:selected').text()}</div>
+                                                                <div class="col-3 p-2"><strong>To:</strong></div><div class="col-9 p-2 text-start">  ${$('#ToLocationId option:selected').text()}</div>
+                                                                <div class="col-3 p-2"><strong>Quantity:</strong></div><div class="col-9 p-2 text-start">  ${formData.Quantity}</div>
+                                                    </div>
+                                                `,
                 icon: 'question',
                 customClass: {
                     popup: 'border border-secondary shadow rounded',
@@ -323,6 +322,7 @@
                                 }).then(() => {
                                     $('#transferModal').modal('hide');
                                     $('#mainTable').DataTable().ajax.reload(null, false);
+                                    $('#collTable').DataTable().ajax.reload(null, false);
                                 });
                             } else {
                                 Swal.fire({

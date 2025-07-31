@@ -27,14 +27,14 @@ namespace NLI_POS.Pages.Inventory.Shared
                 .ToListAsync();
 
             var toLocations = await _context.InventoryLocations
-    .Where(l => l.IsActive && l.Id != fromLocationId)
-    .OrderBy(l => l.Name)
-    .Select(l => new SelectListItem
-    {
-        Value = l.Id.ToString(),
-        Text = l.Name
-    })
-    .ToListAsync();
+                .Where(l => l.IsActive && l.Id != fromLocationId)
+                .OrderBy(l => l.Name)
+                .Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.Name
+                })
+                .ToListAsync();
 
             List<SelectListItem> products;
             if (productId == null)

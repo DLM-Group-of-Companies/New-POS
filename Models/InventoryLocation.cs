@@ -21,7 +21,7 @@ namespace NLI_POS.Models
 
         [ValidateNever]
         public virtual OfficeCountry? Office { get; set; }
-
+        [ValidateNever]
         public virtual ICollection<InventoryStock> Stocks { get; set; }
     }
 

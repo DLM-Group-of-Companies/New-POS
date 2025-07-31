@@ -65,7 +65,7 @@
 
         $(document).ready(function () {
             const table = $('#customerTable').DataTable({
-                dom: 'Bfrtip', // We'll manually move the buttons and search box // 'B' for Buttons, 'f' for searching, 'r' for processing display, 't' for table, 'i' for information, 'p' for pagination
+                dom: 'Bfrtip', // Manually move the buttons and search box // 'B' for Buttons, 'f' for searching, 'r' for processing display, 't' for table, 'i' for information, 'p' for pagination
                 buttons: [
                     {
                         extend: 'excelHtml5',
@@ -113,7 +113,7 @@
                                                         `;
                         },
 
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     }
                 ],

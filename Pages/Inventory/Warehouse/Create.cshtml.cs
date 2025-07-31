@@ -95,6 +95,19 @@ namespace NLI_POS.Pages.Inventory.Warehouse
             var productName = product?.ProductName ?? "Unknown";
             await AuditHelpers.LogAsync(HttpContext, _context, User, $"Added inventory product: {productName} with {InventoryStock.StockQty} stock(s) for {cntryOffice.Name}");
 
+            // Save transaction log
+            _context.InventoryTransactions.Add(new InventoryTransaction
+            {
+                ProductId = InventoryStock.ProductId,
+                FromLocationId = InventoryStock.LocationId,
+                ToLocationId = null,
+                Quantity = InventoryStock.StockQty,
+                TransactionType = "Product IN",
+                TransactionDate = DateTime.UtcNow,
+                EncodedBy = User.Identity?.Name ?? "SYSTEM"
+            });
+
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index", new { locationId = locationId });
         }

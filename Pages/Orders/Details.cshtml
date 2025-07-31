@@ -334,26 +334,56 @@
 
         // Build email body
         const html = buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTotDisplay);
-        const email = prompt("Enter recipient email:");
-        if (!email) return;
+        // const email = prompt("Enter recipient email:");
+        // if (!email) return;
+        const bsModal = bootstrap.Modal.getInstance(document.getElementById('printReceipt'));
+        if (bsModal) bsModal.hide();
 
-        // Send to backend
-        fetch('?handler=EmailModal', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+        Swal.fire({
+            title: 'Send Receipt via Email',
+            input: 'email',
+            inputLabel: 'Recipient Email Address',
+            inputPlaceholder: 'example@email.com',
+            confirmButtonText: 'Send Email',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            inputAttributes: {
+                autocapitalize: 'off'
             },
-            body: JSON.stringify({ email, html })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    toastr.success("Email sent!");
-                } else {
-                    toastr.error("Failed to send: " + data.error);
-                }
-            });
+            allowOutsideClick: true, // important for modal contexts
+            stopKeydownPropagation: false,
+            inputValidator: (value) => {
+                if (!value) return 'Email is required!';
+            }
+        }).then(result => {
+            if (result.isConfirmed) {
+                showLoader();
+                const email = result.value;
+
+                fetch('?handler=EmailModal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify({ email, html })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            hideLoader();
+                            Swal.fire('Sent!', 'The email was successfully sent.', 'success');
+                        } else {
+                           hideLoader();
+                            Swal.fire('Error', data.error || 'Failed to send email.', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        hideLoader();
+                        Swal.fire('Error', 'Network or server error occurred.', 'error');
+                    });
+            }
+        });
     }
 
 

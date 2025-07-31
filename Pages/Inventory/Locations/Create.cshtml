@@ -1,0 +1,25 @@
+﻿@page
+@model CreateModel
+@{
+    ViewData["Title"] = "New Inventory Location";
+}
+
+<div class="container my-4">
+    <div class="bg-white shadow rounded-4 p-4 mx-auto" style="max-width: 600px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0 text-primary">
+                <i class="fas fa-compass me-2"></i> @ViewData["Title"]
+            </h4>
+            <a title="Close" class="text-danger fa-xl" role="button" onclick="window.location = './Index';">
+                <i class="fas fa-window-close"></i>
+            </a>
+        </div>
+
+        <hr />
+        <form method="post">
+            <partial name="_LocationFormPartial" model="Model.InventoryLocation" />
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>

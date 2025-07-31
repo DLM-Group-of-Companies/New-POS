@@ -104,15 +104,34 @@ namespace NLI_POS.Pages.Orders
 
         public IActionResult OnGetProductList(string ProdCat, string? custclass)
         {
-            ModelState.Clear();
+            //ModelState.Clear();
 
-            List<SelectListItem> SectionList = _context.Products
-                .Where(p => p.IsActive && p.ProductCategory == ProdCat &&
-                           (custclass == "Staff" ? p.isStaffAvailable : true))
-                .Select(d => new SelectListItem
+            bool isFreebieCat = ProdCat?.Trim() == "Freebie";
+            bool isStaff = custclass?.Trim() == "Staff";
+
+            var productsQuery = _context.Products.AsQueryable();
+
+            productsQuery = productsQuery.Where(p => p.IsActive);
+
+            if (isFreebieCat)
+            {
+                productsQuery = productsQuery.Where(p => p.isFreebieAvailable == true);
+            }
+            else
+            {
+                productsQuery = productsQuery.Where(p => p.ProductCategory == ProdCat);
+            }
+
+            if (isStaff)
+            {
+                productsQuery = productsQuery.Where(p => p.isStaffAvailable == true);
+            }
+
+            var SectionList = productsQuery
+                .Select(p => new SelectListItem
                 {
-                    Text = d.ProductName,
-                    Value = d.Id.ToString()
+                    Text = p.ProductName,
+                    Value = p.Id.ToString()
                 })
                 .ToList();
 
@@ -124,8 +143,10 @@ namespace NLI_POS.Pages.Orders
             {
                 SectionList.Insert(0, new SelectListItem { Text = "-- Select --", Value = "" });
             }
+
             return new JsonResult(SectionList);
         }
+
 
         public IActionResult OnGetProductComboList(int ProdId)
         {
@@ -405,12 +426,12 @@ namespace NLI_POS.Pages.Orders
                                 //Log Inventory Trans
                                 _context.InventoryTransactions.Add(new InventoryTransaction
                                 {
-                                    OrderNo = Order.OrderNo,
+                                    OrderNo = order.OrderNo,
                                     ProductId = componentProductId,
                                     FromLocationId = inventory.LocationId,
                                     ToLocationId = null,
                                     Quantity = requiredQty,
-                                    TransactionType = "Sale",
+                                    TransactionType = "Product OUT",
                                     TransactionDate = DateTime.UtcNow,
                                     EncodedBy = User.Identity?.Name ?? "SYSTEM"
                                 });
@@ -436,12 +457,12 @@ namespace NLI_POS.Pages.Orders
                         //Log Inventory Trans
                         _context.InventoryTransactions.Add(new InventoryTransaction
                         {
-                            OrderNo= Order.OrderNo,
+                            OrderNo= order.OrderNo,
                             ProductId = item.ProductId,
                             FromLocationId = inventory.LocationId,
                             ToLocationId = null,
                             Quantity = item.Quantity,
-                            TransactionType = "Sale",
+                            TransactionType = "Product OUT",
                             TransactionDate = DateTime.UtcNow,
                             EncodedBy = User.Identity?.Name ?? "SYSTEM"
                         });

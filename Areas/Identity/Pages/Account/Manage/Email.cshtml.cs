@@ -115,9 +115,10 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
-        public async Task<IActionResult> OnPostChangeEmailAsync()
+        public async Task<IActionResult> OnPostChangeEmailAsync(string? pEmail)
         {
-            var user = await _userManager.GetUserAsync(User);
+            //var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.FindByEmailAsync(pEmail);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -146,11 +147,11 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
                     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                 StatusMessage = "Confirmation link to change email sent. Please check your email.";
-                return RedirectToPage();
+                return RedirectToPage("", new { pEmail = pEmail, pNewEmail = Input.NewEmail });
             }
 
             StatusMessage = "Your email is unchanged.";
-            return RedirectToPage();
+            return RedirectToPage("", new { pEmail = pEmail, pNewEmail = Input.NewEmail });
         }
 
         public async Task<IActionResult> OnPostSendVerificationEmailAsync()

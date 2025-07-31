@@ -12,7 +12,6 @@ using static NLI_POS.Services.AuditHelpers;
 var builder = WebApplication.CreateBuilder(args);
 var localTimeZone = "UTC";
 
-// Add services to the container.
 
 //var connectionString = builder.Configuration.GetConnectionString("NLPOSLiveConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 var connectionString = builder.Configuration.GetConnectionString("NLPOSTestConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
