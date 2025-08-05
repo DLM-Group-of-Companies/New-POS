@@ -23,7 +23,7 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, 
+            SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context)
         {
@@ -71,15 +71,24 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync(string? pEmail)
         {
+            var user = (ApplicationUser)null;
+
             if (pEmail == null)
             {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null)
-                {
-                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-                }
+                user = await _userManager.GetUserAsync(User);
+            }
+            else
+            {
+                user = await _userManager.FindByEmailAsync(pEmail);
+            }
 
-                var userRoles = await _userManager.GetRolesAsync(user);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID or Email '{pEmail ?? _userManager.GetUserId(User)}'.");
+            }
+
+
+            var userRoles = await _userManager.GetRolesAsync(user);
                 SelectedRoles = userRoles.ToList();
 
                 AllRoles = _roleManager.Roles
@@ -91,25 +100,14 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
             }).ToList();
 
                 Fullname = user.FullName;
-                var roles = await _userManager.GetRolesAsync(user);                
-                await LoadAsync(user);
-            }
-            else
-            {
-                var sUser = await _userManager.FindByEmailAsync(pEmail);
-                if (sUser != null)
-                {
-                    Fullname = sUser.FullName;
-                    var userRoles = await _userManager.GetRolesAsync(sUser);
-                    SelectedRoles = userRoles.ToList();
-                    await LoadAsync(sUser);
-                }
-            }
+                var roles = await _userManager.GetRolesAsync(user);
+                await LoadAsync(user);         
+           
 
             return Page();
         }
 
-         public async Task<IActionResult> OnPostAsync(string? pEmail)
+        public async Task<IActionResult> OnPostAsync(string? pEmail)
         {
             ApplicationUser user;
             if (pEmail == null)
@@ -140,17 +138,17 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
 
             }
 
-            var oldRole = await _userManager.GetRolesAsync(user);
-            if (oldRole.Count > 0)
-            {
-                await _userManager.RemoveFromRoleAsync(user, oldRole[0]);
-            }
+            //var oldRole = await _userManager.GetRolesAsync(user);
+            //if (oldRole.Count > 0)
+            //{
+            //    await _userManager.RemoveFromRoleAsync(user, oldRole[0]);
+            //}
 
-            string strDDLRole = Request.Form["ddlRole"].ToString();
-            if (strDDLRole != null && strDDLRole != "")
-            {
-                await _userManager.AddToRoleAsync(user, strDDLRole);
-            }
+            //string strDDLRole = Request.Form["ddlRole"].ToString();
+            //if (strDDLRole != null && strDDLRole != "")
+            //{
+            //    await _userManager.AddToRoleAsync(user, strDDLRole);
+            //}
             user.FullName = Fullname;
             await _userManager.UpdateAsync(user);
             //await _signInManager.RefreshSignInAsync(user);

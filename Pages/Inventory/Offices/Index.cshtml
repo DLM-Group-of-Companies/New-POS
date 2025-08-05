@@ -51,6 +51,7 @@
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
+                                        <th class="text-end">Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -64,6 +65,7 @@
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
+                                        <th class="text-end">Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -140,6 +142,25 @@
                             return data != null ? data.toLocaleString() : '0';
                         }
                     },
+{
+    data: null,
+    className: 'text-end',
+    orderable: false,
+    render: function (data, type, row) {
+        const stock = parseFloat(row.stockQty) || 0;
+        const min = parseFloat(row.warehouseMinLevel) || 0;
+
+        // alert(stock);alert(min);
+        if (stock === 0) {
+            return '<span class="text-danger fw-bold">Out of stock</span>';
+        } else if (stock <= min) {
+            return '<span class="text-warning fw-bold">Low stocks</span>';
+        } else {
+            return '<span class="text-success">Sufficient</span>';
+        }
+    }
+},
+
                     {
                         data: 'id',
                         orderable: false,
@@ -179,6 +200,24 @@
                             return data != null ? data.toLocaleString() : '0';
                         }
                     },
+    {
+        data: null,
+        className: 'text-end',
+        orderable: false,
+        render: function (data, type, row) {
+            const stock = parseFloat(row.stockQty) || 0;
+            const min = parseFloat(row.minLevel) || 0;
+
+            if (stock === 0) {
+                return '<span class="text-danger fw-bold">Out of stock</span>';
+            } else if (stock <= min) {
+                return '<span class="text-warning fw-bold">Low stocks</span>';
+            } else {
+                return '<span class="text-success">Sufficient</span>';
+            }
+        }
+    },
+
                     {
                         data: 'id',
                         orderable: false,

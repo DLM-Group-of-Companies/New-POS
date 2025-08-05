@@ -27,6 +27,7 @@ namespace NLI_POS.Pages.Orders
         [BindProperty]
         public Order Order { get; set; } = default!;
         public OrderSummaryViewModel OrderSummary { get; set; }
+        public string EncodedByFullName { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string? orderNo)
         {
@@ -76,6 +77,11 @@ namespace NLI_POS.Pages.Orders
                 ProductItems = productItems,
                 Payments = payments
             };
+
+            var encoder = await _context.Users
+    .FirstOrDefaultAsync(u => u.UserName == Order.EncodedBy);
+
+            EncodedByFullName = encoder != null ? encoder.FullName : "Unknown";
 
             //await AuditHelpers.LogAsync(HttpContext, _context, User, $"Viewed Order Details of {Order.OrderNo}");
             return Page();

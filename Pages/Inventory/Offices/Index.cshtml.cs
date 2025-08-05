@@ -48,6 +48,35 @@ namespace NLI_POS.Pages.Inventory.Office
             return Page();
         }
 
+        //public async Task<JsonResult> OnGetMain(int? LocationId)
+        //{
+        //    var query = _context.InventoryStocks
+        //        .Include(i => i.Location)
+        //        .Include(i => i.Product)
+        //        .Where(m => m.Product.ProductClass == "Main");
+
+        //    if (locationId.HasValue)
+        //    {
+        //        query = query.Where(m => m.Location.Id == LocationId);
+        //    }
+
+        //    var dtoList = await query
+        //        .Select(i => new InventoryStockDto
+        //        {
+        //            Id = i.Id,
+        //            ProductId = i.ProductId,
+        //            ProductName = i.Product.ProductName,
+        //            ProductDescription = i.Product.ProductDescription,
+        //            StockQty = i.StockQty,
+        //            LocationId = i.LocationId,
+        //            LocationName = i.Location.Name,
+        //            OfficeId = i.Location.OfficeId ?? 0
+        //        })
+        //        .ToListAsync();
+
+        //    return new JsonResult(new { data = dtoList });
+        //}
+
         public async Task<JsonResult> OnGetMain(int? LocationId)
         {
             var query = _context.InventoryStocks
@@ -55,7 +84,7 @@ namespace NLI_POS.Pages.Inventory.Office
                 .Include(i => i.Product)
                 .Where(m => m.Product.ProductClass == "Main");
 
-            if (locationId.HasValue)
+            if (LocationId.HasValue)
             {
                 query = query.Where(m => m.Location.Id == LocationId);
             }
@@ -74,8 +103,24 @@ namespace NLI_POS.Pages.Inventory.Office
                 })
                 .ToListAsync();
 
+            // Fetch all warehouse MinLevels once
+            var warehouseMinLevels = await _context.InventoryStocks
+                .Where(i => i.LocationId == 1) // Warehouse LocationId
+                .ToDictionaryAsync(i => i.ProductId, i => i.MinLevel);
+
+            // Enrich each DTO with its corresponding warehouse MinLevel
+            foreach (var dto in dtoList)
+            {
+                if (warehouseMinLevels.TryGetValue(dto.ProductId, out var minLevel))
+                {
+                    dto.WarehouseMinLevel = minLevel;
+                }
+            }
+
             return new JsonResult(new { data = dtoList });
         }
+
+
 
         public async Task<JsonResult> OnGetCollateral(int? LocationId)
         {

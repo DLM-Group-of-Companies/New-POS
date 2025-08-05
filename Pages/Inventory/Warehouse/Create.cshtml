@@ -30,10 +30,17 @@
                 <select asp-for="InventoryStock.ProductId" class="form-control form-select" asp-items="ViewBag.ProductId"></select>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="InventoryStock.StockQty" class="form-label"></label>
-                <input asp-for="InventoryStock.StockQty" class="form-control" />
-                <span asp-validation-for="InventoryStock.StockQty" class="text-danger small"></span>
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label asp-for="InventoryStock.StockQty" class="form-label">Stock Quantity</label>
+                    <input asp-for="InventoryStock.StockQty" class="form-control" />
+                    <span asp-validation-for="InventoryStock.StockQty" class="text-danger small"></span>
+                </div>
+                <div class="col-6 mb-3">
+                    <label asp-for="InventoryStock.MinLevel" class="form-label">Minimum Level</label>
+                    <input asp-for="InventoryStock.MinLevel" class="form-control" />
+                    <span asp-validation-for="InventoryStock.MinLevel" class="text-danger small"></span>
+                </div>
             </div>
 
             <div class="mb-3">

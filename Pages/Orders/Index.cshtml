@@ -70,7 +70,7 @@
                 stateLoadCallback: function (settings) {
                     return JSON.parse(sessionStorage.getItem('OrdersTableState'));
                 },
-
+                serverSide: true,
                 ajax: {
                     url: '@Url.Page("Index", "Orders")', // returns JSON
                     data: function (d) {
@@ -137,7 +137,7 @@
                     {
                         data: 'orderNo',
                         render: function (data) {
-                            return `<a class="btn btn-primary btn-sm" href="/Orders/Details?orderNo=${data}" title="Details"><i class="fas fa-info-circle"></i></a>`;
+                            return `<a class="btn btn-primary btn-sm" href="/Orders/Details?orderNo=${data}" onclick="showLoader()" title="Details"><i class="fas fa-info-circle"></i></a>`;
                         }
                     }
                 ],

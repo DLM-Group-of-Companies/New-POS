@@ -63,6 +63,7 @@ namespace NLI_POS.Pages.Inventory.Warehouse
                     ProductName = i.Product.ProductName,
                     ProductDescription = i.Product.ProductDescription,
                     StockQty = i.StockQty,
+                    WarehouseMinLevel = i.MinLevel,
                     LocationId = i.LocationId,
                     LocationName = i.Location.Name,
                     OfficeId = i.Location.OfficeId ?? 0
@@ -90,6 +91,7 @@ namespace NLI_POS.Pages.Inventory.Warehouse
                         ProductName = i.Product.ProductName,
                         ProductDescription = i.Product.ProductDescription,
                         StockQty = i.StockQty,
+                        WarehouseMinLevel = i.MinLevel,
                         LocationId = i.LocationId,
                         LocationName = i.Location.Name,
                         OfficeId = i.Location.OfficeId ?? 0

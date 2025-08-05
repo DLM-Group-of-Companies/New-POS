@@ -49,6 +49,7 @@
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
+                                        <th class="text-end">Minimum Level</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -62,6 +63,7 @@
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
+                                        <th class="text-end">Minimum Level</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -141,6 +143,14 @@
                         render: function (data) {
                             return data != null ? data.toLocaleString() : '0';
                         }
+                    },                    
+                    {
+                        data: 'warehouseMinLevel',
+                        className: 'text-end',
+                        orderable: false,
+                        render: function (data) {
+                            return data != null ? data.toLocaleString() : '0';
+                        }
                     },
                     {
                         data: 'id',
@@ -183,6 +193,14 @@
                     { data: 'productDescription' },
                     {
                         data: 'stockQty',
+                        className: 'text-end',
+                        orderable: false,
+                        render: function (data) {
+                            return data != null ? data.toLocaleString() : '0';
+                        }
+                    },
+                    {
+                        data: 'warehouseMinLevel',
                         className: 'text-end',
                         orderable: false,
                         render: function (data) {

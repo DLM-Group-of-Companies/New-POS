@@ -13,6 +13,8 @@
         public string LocationName { get; set; }
 
         public int StockQty { get; set; }
+        public int? MinLevel { get; set; }
+
         public string? Remarks { get; set; }
 
         public string EncodedBy { get; set; }

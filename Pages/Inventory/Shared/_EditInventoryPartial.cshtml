@@ -16,10 +16,17 @@
         <input asp-for="ProductName" class="form-control" readonly />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="StockQty" class="form-label"></label>
-        <input asp-for="StockQty" class="form-control" />
-        <span asp-validation-for="StockQty" class="text-danger"></span>
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label asp-for="StockQty" class="form-label">Stock Quantity</label>
+            <input asp-for="StockQty" class="form-control" />
+            <span asp-validation-for="StockQty" class="text-danger small"></span>
+        </div>
+        <div class="col-6 mb-3">
+            <label asp-for="MinLevel" class="form-label">Minimum Level</label>
+            <input asp-for="MinLevel" class="form-control" />
+            <span asp-validation-for="MinLevel" class="text-danger small"></span>
+        </div>
     </div>
 
     <div class="mb-3">
@@ -30,7 +37,7 @@
 
     <input asp-for="EncodedBy" type="hidden" />
     <input asp-for="EncodeDate" type="hidden" />
-    <input asp-for="UpdatedBy" type="hidden" value="@User.Identity.Name" />
+    <input asp-for="UpdatedBy" type="hidden" value="@User?.Identity.Name ?? 'SYSTEM'" />
     <input asp-for="UpdateDate" type="hidden" />
 
     <div class="modal-footer">

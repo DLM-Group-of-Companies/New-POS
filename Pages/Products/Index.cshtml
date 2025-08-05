@@ -25,7 +25,7 @@
                 <th>@Html.DisplayNameFor(model => model.Product[0].ProductType)</th>
                 <th>@Html.DisplayNameFor(model => model.Product[0].ProductCategory)</th>
                 <th>@Html.DisplayNameFor(model => model.Product[0].IsActive)</th>
-                <th></th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -51,10 +51,10 @@
                     <td class="align-middle">
                         <a href="javascript:;" class="btn btn-success btn-sm edit-product" data-id="@item.Id" title="Edit"><i class="far fa-edit"></i></a>
                         <a asp-page="./Details" class="btn btn-primary btn-sm" title="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a>
-                        @if (User.IsInRole("Admin"))
+@*                         @if (User.IsInRole("Admin"))
                         {
                             <a class="btn btn-danger btn-sm delete-product" href="javascript:;" title="Delete"><i class="fas fa-trash-alt"></i></a>
-                        }
+                        } *@
                     </td>
                 </tr>
             }

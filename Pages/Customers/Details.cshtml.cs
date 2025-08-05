@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using NLI_POS.Data;
 using NLI_POS.Models;
 using NLI_POS.Services;
@@ -47,41 +48,53 @@ namespace NLI_POS.Pages.Customers
                 return NotFound();
             }
 
-            var customer = await _context.Customer.Include(c => c.OfficeCountry).Include(c => c.CustClasses).FirstOrDefaultAsync(m => m.Id == id);
-            ViewData["Country"] = _context.Country.FirstOrDefault(c => c.Code == customer.Country).Name;
-            if (customer == null)
+            try
             {
-                return NotFound();
+                var customer = await _context.Customer.Include(c => c.OfficeCountry).Include(c => c.CustClasses).FirstOrDefaultAsync(m => m.Id == id);
+                ViewData["Country"] = _context.Country.FirstOrDefault(c => c.Code == customer.Country)?.Name ?? "";
+
+                if (customer == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+
+                    Customer = customer;
+                    Order = _context.Orders
+                        .Where(o => o.CustomerId == id)
+                              .Include(o => o.Customers)
+                              .Include(o => o.Office)
+                    //.Include(o => o.Product)
+                    .OrderByDescending(o => o.OrderDate)
+                    .Include(o => o.ProductItems)
+                              .AsEnumerable()
+                              .GroupBy(o => new
+                              {
+                                  o.OrderNo,
+                                  OrderDate = o.OrderDate.Date,
+                                  o.CustomerId,
+                                  o.OfficeId,
+                                  o.OrderType,
+                                  CustomerName = o.Customers.FirstName + " " + o.Customers.LastName,
+                                  OfficeName = o.Office.Name
+                              })
+                              .Select(g => new OrderSummary
+                              {
+                                  OrderNo = g.Key.OrderNo,
+                                  OrderDate = g.Key.OrderDate,
+                                  CustomerName = g.Key.CustomerName,
+                                  Office = g.Key.OfficeName,
+                                  TotAmount = (decimal)g.Sum(x => x.TotPaidAmount)
+                              })
+                              .ToList();
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                Customer = customer;
-                Order = _context.Orders
-                    .Where(o => o.CustomerId == id)
-                          .Include(o => o.Customers)
-                          .Include(o => o.Office)
-                //.Include(o => o.Product)
-                .Include(o => o.ProductItems)
-                          .AsEnumerable()
-                          .GroupBy(o => new
-                          {
-                              o.OrderNo,
-                              OrderDate = o.OrderDate.Date,
-                              o.CustomerId,
-                              o.OfficeId,
-                              o.OrderType,
-                              CustomerName = o.Customers.FirstName + " " + o.Customers.LastName,
-                              OfficeName = o.Office.Name
-                          })
-                          .Select(g => new OrderSummary
-                          {
-                              OrderNo = g.Key.OrderNo,
-                              OrderDate = g.Key.OrderDate,
-                              CustomerName = g.Key.CustomerName,
-                              Office = g.Key.OfficeName,
-                              TotAmount = (decimal)g.Sum(x => x.TotPaidAmount)
-                          })
-                          .ToList();
+                TempData["Error"] = "We’re having trouble connecting to the server. Please try again later.";
+                return RedirectToPage("/Error");
             }
             return Page();
         }

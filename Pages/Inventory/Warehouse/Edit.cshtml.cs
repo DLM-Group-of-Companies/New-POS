@@ -87,15 +87,86 @@ namespace NLI_POS.Pages.Inventory.Warehouse
         }
 
 
+        //public async Task<IActionResult> OnPostAsync()
+        //{
+        //    // Ensure only valid submission
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return Page();
+        //    }
+
+        //    // Get original record (for preserving EncodedBy, etc.)
+        //    var original = await _context.InventoryStocks
+        //        .AsNoTracking()
+        //        .Include(i => i.Location)
+        //        .ThenInclude(l => l.Office)
+        //        .FirstOrDefaultAsync(s => s.Id == InventoryStock.Id);
+
+        //    if (original == null)
+        //        return NotFound();
+
+        //    // Use OfficeId to find country & timezone
+        //    var countryInfo = await _context.OfficeCountry
+        //        .Include(o => o.Country)
+        //        .AsNoTracking()
+        //        .FirstOrDefaultAsync(o => o.Id == original.Location.OfficeId);
+
+        //    var localTime = AuditHelpers.GetLocalTime(countryInfo?.Country?.TimeZone ?? "Asia/Manila");
+
+        //    // Manually update only allowed fields
+        //    original.StockQty = InventoryStock.StockQty;
+        //    original.MinLevel = InventoryStock.MinLevel;
+        //    original.Remarks = InventoryStock.Remarks;
+        //    original.UpdateDate = localTime;
+        //    original.UpdatedBy = User?.Identity?.Name;
+
+        //    // Mark only modified fields
+        //    _context.InventoryStocks.Update(original);
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!InventoryStockExists(InventoryStock.Id))
+        //            return NotFound();
+        //        else
+        //            throw;
+        //    }
+
+        //    // Get product name for audit trail
+        //    var product = await _context.Products.FindAsync(original.ProductId);
+        //    var productName = product?.ProductName ?? "Unknown";
+
+        //    await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated inventory stock: {original.StockQty} for: {productName} on {countryInfo?.Name}");
+
+        //    // Save transaction log
+        //    _context.InventoryTransactions.Add(new InventoryTransaction
+        //    {
+        //        ProductId = original.ProductId,
+        //        FromLocationId = original.Location.Id,
+        //        ToLocationId = null,
+        //        Quantity = original.StockQty,
+
+        //        TransactionType = "Modified stock quantity",
+        //        TransactionDate = DateTime.UtcNow,
+        //        EncodedBy = User.Identity?.Name ?? "SYSTEM"
+        //    });
+
+        //    await _context.SaveChangesAsync();
+
+        //    return RedirectToPage("./Index", new { locationId = original.LocationId });
+
+        //}
+
         public async Task<IActionResult> OnPostAsync()
         {
-            // Ensure only valid submission
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            // Get original record (for preserving EncodedBy, etc.)
             var original = await _context.InventoryStocks
                 .AsNoTracking()
                 .Include(i => i.Location)
@@ -105,7 +176,6 @@ namespace NLI_POS.Pages.Inventory.Warehouse
             if (original == null)
                 return NotFound();
 
-            // Use OfficeId to find country & timezone
             var countryInfo = await _context.OfficeCountry
                 .Include(o => o.Country)
                 .AsNoTracking()
@@ -113,13 +183,18 @@ namespace NLI_POS.Pages.Inventory.Warehouse
 
             var localTime = AuditHelpers.GetLocalTime(countryInfo?.Country?.TimeZone ?? "Asia/Manila");
 
-            // Manually update only allowed fields
+            // Check what changed
+            bool minLevelChanged = original.MinLevel != InventoryStock.MinLevel;
+            bool stockQtyChanged = original.StockQty != InventoryStock.StockQty;
+            bool remarksChanged = original.Remarks?.Trim() != InventoryStock.Remarks?.Trim();
+
+            // Apply updates
             original.StockQty = InventoryStock.StockQty;
+            original.MinLevel = InventoryStock.MinLevel;
             original.Remarks = InventoryStock.Remarks;
             original.UpdateDate = localTime;
             original.UpdatedBy = User?.Identity?.Name;
 
-            // Mark only modified fields
             _context.InventoryStocks.Update(original);
 
             try
@@ -134,28 +209,31 @@ namespace NLI_POS.Pages.Inventory.Warehouse
                     throw;
             }
 
-            // Get product name for audit trail
+            // Always log audit
             var product = await _context.Products.FindAsync(original.ProductId);
             var productName = product?.ProductName ?? "Unknown";
+            await AuditHelpers.LogAsync(HttpContext, _context, User,
+                $"Updated inventory stock for: {productName} on {countryInfo?.Name}. " +
+                $"Qty: {original.StockQty}, MinLevel: {original.MinLevel}");
 
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated inventory stock: {original.StockQty} for: {productName} on {countryInfo?.Name}");
-
-            // Save transaction log
-            _context.InventoryTransactions.Add(new InventoryTransaction
+            // Only log inventory transaction if something else changed
+            if (stockQtyChanged || remarksChanged)
             {
-                ProductId = original.ProductId,
-                FromLocationId = original.Location.Id,
-                ToLocationId = null,
-                Quantity = original.StockQty,
-                TransactionType = "Modified stock quantity",
-                TransactionDate = DateTime.UtcNow,
-                EncodedBy = User.Identity?.Name ?? "SYSTEM"
-            });
+                _context.InventoryTransactions.Add(new InventoryTransaction
+                {
+                    ProductId = original.ProductId,
+                    FromLocationId = original.Location.Id,
+                    ToLocationId = null,
+                    Quantity = original.StockQty,
+                    TransactionType = "Modified stock quantity",
+                    TransactionDate = DateTime.UtcNow,
+                    EncodedBy = User.Identity?.Name ?? "SYSTEM"
+                });
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToPage("./Index", new { locationId = original.LocationId });
-
         }
 
         private bool InventoryStockExists(int id)

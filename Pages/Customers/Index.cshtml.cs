@@ -47,7 +47,7 @@ namespace NLI_POS.Pages.Customers
             var sortDirection = requestForm["order[0][dir]"].FirstOrDefault();
             var searchValue = requestForm["search[value]"].FirstOrDefault();
 
-            string[] columnNames = { "custCode", "fullName", "mobile", "email", "city", "className" };
+            string[] columnNames = { "custCode", "fullName", "mobile", "email", "city", "className","Id" };
 
             var country = requestForm["country"].FirstOrDefault();
 
@@ -70,13 +70,13 @@ namespace NLI_POS.Pages.Customers
             if (!string.IsNullOrWhiteSpace(searchValue))
             {
                 query = query.Where(c =>
-                c.custCode.Contains(searchValue) ||
-                    c.fullName.Contains(searchValue) ||
-                    c.email.Contains(searchValue) ||
-                    c.mobile.Contains(searchValue) ||
-                    c.landline.Contains(searchValue) ||
-                    c.city.Contains(searchValue) ||
-                    c.className.Contains(searchValue));
+                c.custCode.Contains(searchValue.Trim()) ||
+                    c.fullName.Contains(searchValue.Trim()) ||
+                    c.email.Contains(searchValue.Trim()) ||
+                    c.mobile.Contains(searchValue.Trim()) ||
+                    c.landline.Contains(searchValue.Trim()) ||
+                    c.city.Contains(searchValue.Trim()) ||
+                    c.className.Contains(searchValue.Trim()));
             }
 
             if (!string.IsNullOrWhiteSpace(country))

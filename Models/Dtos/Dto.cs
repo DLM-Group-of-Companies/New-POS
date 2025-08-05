@@ -10,6 +10,9 @@
         public int LocationId { get; set; }
         public string LocationName { get; set; }
         public int OfficeId { get; set; }
+
+        // For checking low stock based on warehouse min level
+        public decimal WarehouseMinLevel { get; set; }
     }
 
     public class CustomerDto

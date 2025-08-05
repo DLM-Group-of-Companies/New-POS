@@ -18,10 +18,17 @@
                 <select asp-for="InventoryStock.ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
                 <span asp-validation-for="InventoryStock.ProductId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="InventoryStock.StockQty" class="control-label"></label>
-                <input asp-for="InventoryStock.StockQty" class="form-control" />
-                <span asp-validation-for="InventoryStock.StockQty" class="text-danger"></span>
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label asp-for="InventoryStock.StockQty" class="form-label">Stock Quantity</label>
+                    <input asp-for="InventoryStock.StockQty" class="form-control" />
+                    <span asp-validation-for="InventoryStock.StockQty" class="text-danger small"></span>
+                </div>
+                <div class="col-6 mb-3">
+                    <label asp-for="InventoryStock.MinLevel" class="form-label">Minimum Level</label>
+                    <input asp-for="InventoryStock.MinLevel" class="form-control" />
+                    <span asp-validation-for="InventoryStock.MinLevel" class="text-danger small"></span>
+                </div>
             </div>
             <div class="form-group">
                 <label asp-for="InventoryStock.LocationId" class="control-label"></label>

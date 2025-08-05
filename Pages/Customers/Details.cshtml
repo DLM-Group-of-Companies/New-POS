@@ -5,7 +5,7 @@
     ViewData["Title"] = "Details";
 }
 
-<div class="container bg-light p-3 rounded border shadow">
+<div class="container bg-light p-3 border shadow">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0 text-primary">
             <i class="fas fa-address-card me-2"></i> Details
@@ -55,17 +55,17 @@
                 <div class="row">
                     <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
                         <label class="control-label">First Name</label>
-                        <label class="form-control">@Html.DisplayFor(model => model.Customer.FirstName)</label>
+                        <label class="form-control">@Html.DisplayFor(model => model.Customer.FirstName) &nbsp;</label>
                     </div>
 
                     <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
                         <label class="control-label">Middle Name</label>
-                        <label class="form-control">@Html.DisplayFor(model => model.Customer.MiddleName)&nbsp;</label>
+                        <label class="form-control">@Html.DisplayFor(model => model.Customer.MiddleName) &nbsp;</label>
                     </div>
 
                     <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
                         <label class="control-label">Last Name</label>
-                        <label class="form-control">@Html.DisplayFor(model => model.Customer.LastName)</label>
+                        <label class="form-control">@Html.DisplayFor(model => model.Customer.LastName)  &nbsp;</label>
                     </div>
 
                 </div>
@@ -86,7 +86,7 @@
                 <div class="row">
                     <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
                         @Html.DisplayNameFor(model => model.Customer.Gender)
-                        <label class="form-control">@Html.DisplayFor(model => model.Customer.Gender)</label>
+                        <label class="form-control">@Html.DisplayFor(model => model.Customer.Gender)  &nbsp;</label>
                     </div>
 
                     <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
@@ -96,19 +96,19 @@
 
                     <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
                         <label class="control-label">Civil Status</label>
-                        <label class="form-control">@Html.DisplayFor(model => model.Customer.CivilStat)</label>
+                        <label class="form-control">@Html.DisplayFor(model => model.Customer.CivilStat) &nbsp;</label>
                     </div>
 
                     <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3">
                         @Html.DisplayNameFor(model => model.Customer.Nationality)
-                        <label class="form-control">@Html.DisplayFor(model => model.Customer.Nationality)&nbsp;</label>
+                        <label class="form-control">@Html.DisplayFor(model => model.Customer.Nationality) &nbsp;</label>
                     </div>
 
                 </div>
                 <div class="row">
                     <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
                         @Html.DisplayNameFor(model => model.Customer.Country)
-                        <label class="form-control">@ViewData["Country"]</label>
+                        <label class="form-control">@ViewData["Country"] &nbsp;</label>
                     </div>
 
                     <div class="pt-2 col-12 col-sm-4 col-md-4 col-lg-4 col-xl-4">
@@ -143,20 +143,21 @@
 
                 @if (User.IsInRole("Admin"))
                 {
+                    <hr />
                     <div class="row">
-                        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+                        <div class="col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
                             Encoded Date
                             <label class="form-control">@Html.DisplayFor(model => model.Customer.EncodeDate)</label>
                         </div>
-                        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+                        <div class="col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
                             Encoded By
                             <label class="form-control">@Html.DisplayFor(model => model.Customer.EncodedBy)</label>
                         </div>
-                        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+                        <div class="col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
                             Updated Date
                             <label class="form-control">@Html.DisplayFor(model => model.Customer.UpdateDate)&nbsp;</label>
                         </div>
-                        <div class="pt-2 col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+                        <div class="col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
                             Updated By
                             <label class="form-control">@Html.DisplayFor(model => model.Customer.UpdatedBy)&nbsp;</label>
                         </div>
@@ -175,13 +176,13 @@
             <div class="card card-body">
 
                 <!-- Example table, you can replace this with a loop or DataTable -->
-                <table class="table table-striped table-bordered">
-                    <thead>
+                <table id="orderDetTable" class="table table-striped table-bordered">
+                    <thead class="table-secondary">
                         <tr>
                             <th>Order No</th>
                             <th>Date</th>
                             <th>Amount</th>
-                            <th></th>
+                            <th>Detail</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -192,7 +193,7 @@
                                 <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
                                 <td>@order.TotAmount.ToString("N2")</td>
                                 <td>
-                                    <a asp-page="/Orders/Details" asp-route-orderNo="@order.OrderNo">Details</a>
+                                    <a asp-page="/Orders/Details" asp-route-orderNo="@order.OrderNo" class="btn btn-primary btn-sm btn-icon" title="Details"><i class="fas fa-info-circle"></i></a>
                                 </td>
                             </tr>
                         }
@@ -203,3 +204,19 @@
     </div>
 
 </div>
+
+@section Scripts {
+    <script>
+                $(document).ready(function () {
+            $('#orderDetTable').DataTable({
+                "pageLength": 25,
+                "order": [[1, "desc"]] // Optional: sort by date descending
+            });
+        });
+
+        $(document).ready(function () {
+            hideLoader();
+        });
+    </script>
+
+}

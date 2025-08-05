@@ -18,8 +18,11 @@ namespace NLI_POS.Models
 
         public int StockQty { get; set; }
 
+        public int MinLevel { get; set; }
+
         [StringLength(300)]
         public string? Remarks { get; set; }
+
 
         [ValidateNever]
         public virtual Product Product { get; set; }
