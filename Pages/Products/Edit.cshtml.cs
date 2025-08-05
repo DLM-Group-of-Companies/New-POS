@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
+using NLI_POS.Models.ViewModels;
 using NLI_POS.Services;
 using System.Text;
 
@@ -40,6 +41,9 @@ namespace NLI_POS.Pages.Products
         [BindProperty(SupportsGet = true)]
         public int? PageNumber { get; set; }
 
+        [BindProperty]
+        public PromoSetting PromoSetting { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             Console.WriteLine("Page Number: " + PageNumber);
@@ -62,6 +66,10 @@ namespace NLI_POS.Pages.Products
             Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
 
             ProductPrice = await _context.ProductPrices.FirstOrDefaultAsync(p => p.ProductId == id );
+
+            PromoSetting = await _context.PromoSettings
+                .FirstOrDefaultAsync(p => p.ProductId == id)
+                ?? new PromoSetting { ProductId = id.Value };
 
             return Page();
         }
@@ -180,38 +188,180 @@ namespace NLI_POS.Pages.Products
             }
         }
 
+        //public async Task<IActionResult> OnPostAsync()
+        //{
+        //    Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
+
+        //    if (!ModelState.IsValid)
+        //    {
+        //        TempData["ErrorMessage"] = "Promo date range is required if not On Going.";
+        //        //ModelState.AddModelError("PromoSetting", "Date range is required.");
+        //        return Page();
+        //    }
+
+        //    if (!ProductWithPromoViewModel.PromoSetting.IsOngoing)
+        //    {
+        //        if (!ProductWithPromoViewModel.PromoSetting.StartDate.HasValue)
+        //            ModelState.AddModelError("ProductWithPromoViewModel.PromoSetting.StartDate", "Start Date is required when promo is not ongoing.");
+
+        //        if (!ProductWithPromoViewModel.PromoSetting.EndDate.HasValue)
+        //            ModelState.AddModelError("ProductWithPromoViewModel.PromoSetting.EndDate", "End Date is required when promo is not ongoing.");
+        //    }
+
+        //    if (!ModelState.IsValid)
+        //        return Page();
+
+        //    var selectedCountry = Countries.FirstOrDefault(c => c.Id == ProductPrice.CountryId);
+        //    string selectedCountryName = selectedCountry?.Name;
+
+        //    var originalProduct = await _context.Products.AsNoTracking()
+        //        .FirstOrDefaultAsync(p => p.Id == Products.Id);
+
+        //    if (originalProduct == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    AuditHelpers.TryGetChanges(originalProduct, Products, out var productChanges, "UpdateDate", "UpdatedBy");
+
+        //    bool isProductModified = productChanges.Any();
+
+        //    if (isProductModified)
+        //    {
+        //        Products.UpdateDate = DateTime.UtcNow;
+        //        Products.UpdatedBy = User.Identity?.Name;
+        //        _context.Attach(Products).State = EntityState.Modified;
+        //        await _context.SaveChangesAsync();
+        //    }
+
+        //    ProductPrice.ProductId = Products.Id;
+        //    ProductPrice.EncodeDate = DateTime.UtcNow;
+        //    ProductPrice.EncodedBy = User.Identity?.Name ?? "System";
+
+        //    var existingPrice = await _context.ProductPrices
+        //        .FirstOrDefaultAsync(p => p.ProductId == Products.Id && p.CountryId == ProductPrice.CountryId);
+
+        //    List<string> priceChanges;
+
+        //    if (existingPrice == null)
+        //    {
+        //        _context.ProductPrices.Add(ProductPrice);
+        //        priceChanges = new List<string> { $"New pricing added for {selectedCountryName}." };
+        //    }
+        //    else
+        //    {
+        //        priceChanges = AuditHelpers.CompareProductPrice(existingPrice, ProductPrice);
+
+        //        // Apply the changes
+        //        existingPrice.UnitCost = ProductPrice.UnitCost;
+        //        existingPrice.RegPrice = ProductPrice.RegPrice;
+        //        existingPrice.DistPrice = ProductPrice.DistPrice;
+        //        existingPrice.StaffPrice = ProductPrice.StaffPrice;
+        //        existingPrice.BPPPrice = ProductPrice.BPPPrice;
+        //        existingPrice.MedPackPrice = ProductPrice.MedPackPrice;
+        //        existingPrice.CorpAccPrice = ProductPrice.CorpAccPrice;
+        //        existingPrice.NaturoPrice = ProductPrice.NaturoPrice;
+        //        existingPrice.EncodedBy = ProductPrice.EncodedBy;
+        //        existingPrice.EncodeDate = ProductPrice.EncodeDate;
+        //    }
+
+        //    var promo = ProductWithPromoViewModel.PromoSetting;
+
+        //    if (promo != null)
+        //    {
+        //        // Update existing or add new
+        //        var existingPromo = await _context.PromoSettings
+        //            .FirstOrDefaultAsync(p => p.ProductId == ProductWithPromoViewModel.Product.Id);
+
+        //        if (existingPromo != null)
+        //        {
+        //            existingPromo.StartDate = promo.StartDate;
+        //            existingPromo.EndDate = promo.EndDate;
+        //            existingPromo.IsOngoing = promo.IsOngoing;
+        //            existingPromo.IsVoucherBased = promo.IsVoucherBased;
+        //            //existingPromo.IsActive = promo.IsActive;
+        //            // No need to call Update() if tracked
+        //        }
+        //        else
+        //        {
+        //            promo.ProductId = ProductWithPromoViewModel.Product.Id;
+        //            _context.PromoSettings.Add(promo);
+        //        }
+        //    }
+
+        //    await _context.SaveChangesAsync();
+
+        //    //await _context.SaveChangesAsync();
+
+        //    var fullAuditMessage = new StringBuilder();
+        //    fullAuditMessage.AppendLine($"Edited Product: {originalProduct.ProductName}");
+
+        //    if (productChanges.Any())
+        //    {
+        //        fullAuditMessage.AppendLine("Product detail changes:");
+        //        foreach (var change in productChanges)
+        //            fullAuditMessage.AppendLine($" - {change}");
+        //    }
+
+        //    if (priceChanges.Any())
+        //    {
+        //        fullAuditMessage.AppendLine($"Product price changes for {selectedCountryName}:");
+        //        foreach (var change in priceChanges)
+        //            fullAuditMessage.AppendLine($" - {change}");
+        //    }
+
+        //    await AuditHelpers.LogAsync(HttpContext, _context, User, fullAuditMessage.ToString());
+
+        //    return RedirectToPage("./Index");
+        //}
+
         public async Task<IActionResult> OnPostAsync()
         {
             Countries = await _context.Country.Where(c => c.IsActive).ToListAsync();
 
+            if (PromoSetting == null)
+            {
+                PromoSetting = new PromoSetting();
+            }
+
+            if (!PromoSetting.IsOngoing)
+            {
+                if (!PromoSetting.StartDate.HasValue)
+                    ModelState.AddModelError("PromoSetting.StartDate", "Start Date is required when promo is not ongoing.");
+
+                if (!PromoSetting.EndDate.HasValue)
+                    ModelState.AddModelError("PromoSetting.EndDate", "End Date is required when promo is not ongoing.");
+            }
+
             if (!ModelState.IsValid)
             {
+                TempData["ErrorMessage"] = "Promo date range is required if not On Going.";
                 return Page();
             }
 
             var selectedCountry = Countries.FirstOrDefault(c => c.Id == ProductPrice.CountryId);
             string selectedCountryName = selectedCountry?.Name;
 
-            var originalProduct = await _context.Products.AsNoTracking()
+            var originalProduct = await _context.Products
+                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == Products.Id);
 
             if (originalProduct == null)
-            {
                 return NotFound();
-            }
 
             AuditHelpers.TryGetChanges(originalProduct, Products, out var productChanges, "UpdateDate", "UpdatedBy");
 
-            bool isProductModified = productChanges.Any();
+            var priceChanges = new List<string>();
 
-            if (isProductModified)
+            // TRACK MODIFIED PRODUCT
+            if (productChanges.Any())
             {
                 Products.UpdateDate = DateTime.UtcNow;
                 Products.UpdatedBy = User.Identity?.Name;
                 _context.Attach(Products).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
             }
 
+            // HANDLE PRICING
             ProductPrice.ProductId = Products.Id;
             ProductPrice.EncodeDate = DateTime.UtcNow;
             ProductPrice.EncodedBy = User.Identity?.Name ?? "System";
@@ -219,18 +369,16 @@ namespace NLI_POS.Pages.Products
             var existingPrice = await _context.ProductPrices
                 .FirstOrDefaultAsync(p => p.ProductId == Products.Id && p.CountryId == ProductPrice.CountryId);
 
-            List<string> priceChanges;
-
             if (existingPrice == null)
             {
                 _context.ProductPrices.Add(ProductPrice);
-                priceChanges = new List<string> { $"New pricing added for {selectedCountryName}." };
+                priceChanges.Add($"New pricing added for {selectedCountryName}.");
             }
             else
             {
                 priceChanges = AuditHelpers.CompareProductPrice(existingPrice, ProductPrice);
 
-                // Apply the changes
+                // Apply changes manually (EF is tracking existingPrice)
                 existingPrice.UnitCost = ProductPrice.UnitCost;
                 existingPrice.RegPrice = ProductPrice.RegPrice;
                 existingPrice.DistPrice = ProductPrice.DistPrice;
@@ -239,12 +387,34 @@ namespace NLI_POS.Pages.Products
                 existingPrice.MedPackPrice = ProductPrice.MedPackPrice;
                 existingPrice.CorpAccPrice = ProductPrice.CorpAccPrice;
                 existingPrice.NaturoPrice = ProductPrice.NaturoPrice;
-                existingPrice.EncodedBy = ProductPrice.EncodedBy;
                 existingPrice.EncodeDate = ProductPrice.EncodeDate;
+                existingPrice.EncodedBy = ProductPrice.EncodedBy;
             }
 
+            // HANDLE PROMO SETTINGS
+            if (PromoSetting != null)
+            {
+                var existingPromo = await _context.PromoSettings
+                    .FirstOrDefaultAsync(p => p.ProductId == Products.Id);
+
+                if (existingPromo != null)
+                {
+                    existingPromo.StartDate = PromoSetting.StartDate;
+                    existingPromo.EndDate = PromoSetting.EndDate;
+                    existingPromo.IsOngoing = PromoSetting.IsOngoing;
+                    existingPromo.IsVoucherBased = PromoSetting.IsVoucherBased;
+                }
+                else
+                {
+                    PromoSetting.ProductId = Products.Id;
+                    _context.PromoSettings.Add(PromoSetting);
+                }
+            }
+
+            // SINGLE SAVE CALL
             await _context.SaveChangesAsync();
 
+            // AUDIT LOGGING
             var fullAuditMessage = new StringBuilder();
             fullAuditMessage.AppendLine($"Edited Product: {originalProduct.ProductName}");
 
@@ -263,6 +433,8 @@ namespace NLI_POS.Pages.Products
             }
 
             await AuditHelpers.LogAsync(HttpContext, _context, User, fullAuditMessage.ToString());
+
+            TempData["SuccessMessage"] = "Product was updated successfully!";
 
             return RedirectToPage("./Index");
         }

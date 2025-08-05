@@ -21,7 +21,7 @@
                 @Html.DisplayFor(model => model.Order.Customers.CustCode) |
                 @Html.DisplayFor(model => model.Order.Customers.FirstName) @Html.DisplayFor(model => model.Order.Customers.LastName)
                 (@Html.DisplayFor(model => model.Order.Customers.CustClasses.Name))
-                </span>
+            </span>
         </div>
         <div class="col-sm-2 form-group">
             @Html.DisplayNameFor(model => model.Order.OrderDate)
@@ -32,31 +32,20 @@
             <span class="form-control fw-bold">@Html.DisplayFor(model => model.Order.Office.Name)</span>
         </div>
     </div>
-@*     <div class="row">
-        <div class="col-sm-3">
-            Customer
-            <span class="form-control">@Html.DisplayFor(model => model.Order.Customers.CustCode) | @Html.DisplayFor(model => model.Order.Customers.FirstName) @Html.DisplayFor(model => model.Order.Customers.LastName)</span>
-        </div>
-        <div class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Order.Customers.CustClass)
-            <span class="form-control">@Html.DisplayFor(model => model.Order.Customers.CustClasses.Name) </span>
-        </div>
-    </div> *@
 
     <div>
         <br />
-        @* <partial name="_OrderDetailsPartial" model="Model.OrderList"></partial> *@
         @{
             ViewData["IdPrefix"] = "main";
         }
         <partial name="_OrderDetailsPartial" model="Model.OrderSummary" />
-
     </div>
 
     <div class="row p-3 pt-1">
         @Html.DisplayNameFor(model => model.Order.Notes)
         <textarea class="form-control" asp-for="Order.Notes" rows="2" readonly></textarea>
     </div>
+
     <div class="row d-flex justify-content-between align-items-center">
         <div class="col-auto">
             <a class="btn btn-primary bg-gradient" asp-page="./Index">
@@ -82,12 +71,24 @@
             }
         </div>
     </div>
+
     @if (User.IsInRole("Admin"))
-    {<hr />
+    {
+        <hr />
         <div class="row small">
             <div class="col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
                 Encoded Date
-                <label class="form-control form-control-sm">@Html.DisplayFor(model => model.Order.EncodeDate)</label>
+                @{
+                    string timeZoneId = Model.OfficeTimeZoneId ?? "UTC"; // Fallback if null
+                    var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                    var localDate = Model.Order.EncodeDate.HasValue
+                    ? TimeZoneInfo.ConvertTimeFromUtc(Model.Order.EncodeDate.Value, timeZone).ToString("yyyy-MM-dd HH:mm:ss")
+                    : "N/A";
+                }
+                @* <label class="form-control form-control-sm">@Html.DisplayFor(model => model.Order.EncodeDate)</label> *@
+                <label class="form-control form-control-sm">
+                    @localDate
+                </label>
             </div>
             <div class="col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
                 Encoded By
@@ -103,6 +104,7 @@
             </div>
         </div>
     }
+
 </div>
 
 <form id="voidForm" method="post" asp-page-handler="Void">
@@ -154,7 +156,6 @@
 
                 <div class="row">
                     <div class="col-8 small"><span class="small fst-italic">NOTE: This is a computer generated purchase order, hence no signature is required.</span></div>
-                    @* <div class="col-4 text-end">CASHIER: @User.FindFirst("FullName")?.Value</div> *@
                     <div class="col-4 text-end">CASHIER: @Model.EncodedByFullName</div>
                 </div>
 
@@ -162,7 +163,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-chevron-left"></i> Close</button>
                 <button type="button" class="btn btn-info" onclick="printModal();"><i class="fas fa-print"></i> Print</button>
-                @* <button type="button" class="btn btn-success" onclick="emailModal()"><i class="fas fa-paper-plane"></i> Email</button> *@
                 <button type="button" data-orderno="@Model.Order.OrderNo" data-customer="@Model.Order.Customers.FirstName @Model.Order.Customers.LastName"
                         class="btn btn-success" onclick="sendEmail(this)">
                     <i class="fas fa-paper-plane"></i> Email
@@ -194,59 +194,59 @@
 </script>
 
 <script>
- 
+
     function buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTot) {
         let html = `
-                <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="width: 100%;">
-                        <tr>
-                            <!-- Logo block -->
-                            <td style="width: 50%; vertical-align: top;">
-                                <img src="https://pos.ournoblelife.com/images/nli-logo.png" style="width: 200px;" alt="Logo" />
-                                <p style="margin: 5px 0 0; font-style: italic;">We care for you <strong>naturally</strong>!</p>
-                            </td>
+                    <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="width: 100%;">
+                            <tr>
+                                <!-- Logo block -->
+                                <td style="width: 50%; vertical-align: top;">
+                                    <img src="https://pos.ournoblelife.com/images/nli-logo.png" style="width: 200px;" alt="Logo" />
+                                    <p style="margin: 5px 0 0; font-style: italic;">We care for you <strong>naturally</strong>!</p>
+                                </td>
 
-                            <!-- Address block -->
-                            <td style="width: 50%; vertical-align: top; text-align: right; font-size: 12px; line-height: 1.5;">
-                                <p style="margin: 0;">Bay 9 St. Anthony Bldg.</p>
-                                <p style="margin: 0;">891 Aurora Blvd. Cubao, Quezon City 1109</p>
-                                <p style="margin: 0;">Email: <a href="mailto:wecare@ournoblelife.com">wecare@ournoblelife.com</a></p>
-                                <p style="margin: 0;">+63 917 828 0696</p>
-                            </td>
-                        </tr>
-                    </table>
+                                <!-- Address block -->
+                                <td style="width: 50%; vertical-align: top; text-align: right; font-size: 12px; line-height: 1.5;">
+                                    <p style="margin: 0;">Bay 9 St. Anthony Bldg.</p>
+                                    <p style="margin: 0;">891 Aurora Blvd. Cubao, Quezon City 1109</p>
+                                    <p style="margin: 0;">Email: <a href="mailto:wecare@ournoblelife.com">wecare@ournoblelife.com</a></p>
+                                    <p style="margin: 0;">+63 917 828 0696</p>
+                                </td>
+                            </tr>
+                        </table>
 
 
-                <h2 style="margin-top: 20px;">Purchase Order Receipt</h2>
-                <p><strong>Order No:</strong> ${orderNo}<br>
-                <strong>Date:</strong> ${date}<br>
-                <strong>Customer:</strong> ${customerName}</p>
+                    <h2 style="margin-top: 20px;">Purchase Order Receipt</h2>
+                    <p><strong>Order No:</strong> ${orderNo}<br>
+                    <strong>Date:</strong> ${date}<br>
+                    <strong>Customer:</strong> ${customerName}</p>
 
-                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                    <thead style="background-color: #f2f2f2;">
-                        <tr>
-                            <th style="border: 1px solid #ccc; padding: 8px;">#</th>
-                            <th style="border: 1px solid #ccc; padding: 8px;">Category</th>
-                            <th style="border: 1px solid #ccc; padding: 8px;">Item</th>
-                            <th style="border: 1px solid #ccc; padding: 8px;">Combo</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Price</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Qty</th>
-                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                        <thead style="background-color: #f2f2f2;">
+                            <tr>
+                                <th style="border: 1px solid #ccc; padding: 8px;">#</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Category</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Item</th>
+                                <th style="border: 1px solid #ccc; padding: 8px;">Combo</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Price</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Qty</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
 
         items.forEach((item, i) => {
             html += `
-                                                    <tr>
-                                                        <td style="border: 1px solid #ccc; padding: 8px;">${i + 1}</td>
-                                                        <td style="border: 1px solid #ccc; padding: 8px;">${item.category}</td>
-                                                        <td style="border: 1px solid #ccc; padding: 8px;">${item.name}</td>
-                                                        <td style="border: 1px solid #ccc; padding: 8px;">${item.combo}</td>
-                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.price}</td>
-                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.qty}</td>
-                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.amount}</td>
-                                                    </tr>`;
+                                                        <tr>
+                                                            <td style="border: 1px solid #ccc; padding: 8px;">${i + 1}</td>
+                                                            <td style="border: 1px solid #ccc; padding: 8px;">${item.category}</td>
+                                                            <td style="border: 1px solid #ccc; padding: 8px;">${item.name}</td>
+                                                            <td style="border: 1px solid #ccc; padding: 8px;">${item.combo}</td>
+                                                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.price}</td>
+                                                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.qty}</td>
+                                                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.amount}</td>
+                                                        </tr>`;
         });
 
         html += `</tbody></table>`;
@@ -257,59 +257,58 @@
         let grandTotDisp = parseFloat(grandTot).toLocaleString('en-US', { minimumFractionDigits: 2 });
 
         html += `
-        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <tr>
-                <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Subtotal:</td>
-                    <td style="text-align: right; padding: 8px;">${subtotalDisp}</td>
-            </tr>
-            <tr>
-                <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Discount:</td>
-                    <td style="text-align: right; padding: 8px;">${discountDisp}</td>
-            </tr>
-            <tr>
-                <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Grand Total:</td>
-                    <td style="text-align: right; padding: 8px; font-weight: bold;">${grandTotDisp}</td>
-            </tr>
-        </table>`;
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <tr>
+                    <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Subtotal:</td>
+                        <td style="text-align: right; padding: 8px;">${subtotalDisp}</td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Discount:</td>
+                        <td style="text-align: right; padding: 8px;">${discountDisp}</td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Grand Total:</td>
+                        <td style="text-align: right; padding: 8px; font-weight: bold;">${grandTotDisp}</td>
+                </tr>
+            </table>`;
 
 
         // Payments section
         html += `<h3 style="margin-top: 30px;">Payment Summary</h3>
-                                            <table style="width: 100%; border-collapse: collapse;">
-                                                <thead style="background-color: #f2f2f2;">
-                                                    <tr>
-                                                        <th style="border: 1px solid #ccc; padding: 8px;">Payment Method</th>
-                                                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>`;
+                                                <table style="width: 100%; border-collapse: collapse;">
+                                                    <thead style="background-color: #f2f2f2;">
+                                                        <tr>
+                                                            <th style="border: 1px solid #ccc; padding: 8px;">Payment Method</th>
+                                                            <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>`;
 
         payments.forEach(p => {
             html += `
-                                                    <tr>
-                                                        <td style="border: 1px solid #ccc; padding: 8px;">${p.method}</td>
-                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${p.amount}</td>
-                                                    </tr>`;
+                                                        <tr>
+                                                            <td style="border: 1px solid #ccc; padding: 8px;">${p.method}</td>
+                                                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${p.amount}</td>
+                                                        </tr>`;
         });
 
         html += `
-                                                    <tr>
-                                                        <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">Change</td>
-                                                        <td style="border: 1px solid #ccc; padding: 8px; text-align: right; font-weight: bold;">${change}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                        <tr>
+                                                            <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">Change</td>
+                                                            <td style="border: 1px solid #ccc; padding: 8px; text-align: right; font-weight: bold;">${change}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
 
-                                            <p style="font-size: 12px; margin-top: 30px; font-style: italic; color: #666;">
-                                                NOTE: This is a computer-generated receipt. No signature is required.
-                                            </p>
+                                                <p style="font-size: 12px; margin-top: 30px; font-style: italic; color: #666;">
+                                                    NOTE: This is a computer-generated receipt. No signature is required.
+                                                </p>
 
-                                            <p style="text-align: right; font-weight: bold;">Cashier: System Admin</p>
-                                        </div>`;
+                                                <p style="text-align: right; font-weight: bold;">Cashier: System Admin</p>
+                                            </div>`;
 
         return html;
     }
-
 
     function sendEmail(button) {
         const orderNo = button.getAttribute('data-orderno');
@@ -343,13 +342,11 @@
             }
         });
 
-
-
         // Get grand total and total paid to calculate change
         const grandText = document.getElementById("grandTotal")?.textContent?.replace(/[^\d.-]/g, '') || "0";
         let grandTotal = parseFloat(grandText);
 
-        const discount = 0;          
+        const discount = 0;
 
         let paidTotal = 0;
         payments.forEach(p => {
@@ -403,7 +400,7 @@
                             hideLoader();
                             Swal.fire('Sent!', 'The email was successfully sent.', 'success');
                         } else {
-                           hideLoader();
+                            hideLoader();
                             Swal.fire('Error', data.error || 'Failed to send email.', 'error');
                         }
                     })

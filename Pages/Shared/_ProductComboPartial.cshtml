@@ -1,13 +1,15 @@
 ﻿@using NLI_POS.Models
 @model IList<ProductCombo>
 
-<p>
-    @* <a asp-page="Create">Create New</a> *@
-    <!-- Button trigger modal -->
+<div class="d-flex justify-content-between align-items-center pb-2">
+    <h5 class="text-secondary m-0">
+        <i class="fas fa-puzzle-piece me-2"></i> Product Combinations
+    </h5>
     <button type="button" class="btn btn-primary btn-gradient bg-opacity-50 text-white" data-bs-toggle="modal" data-bs-target="#myListModal">
         <i class="fas fa-plus me-2"></i> Add Combination
     </button>
-</p>
+</div>
+
 <table id="ComboTable" class="table">
     <thead>
         <tr>

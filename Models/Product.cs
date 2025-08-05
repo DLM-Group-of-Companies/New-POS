@@ -44,5 +44,6 @@ namespace NLI_POS.Models
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
+        public virtual PromoSetting? PromoSetting { get; set; }
     }
 }

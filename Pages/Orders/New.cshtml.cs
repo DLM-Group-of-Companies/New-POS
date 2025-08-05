@@ -109,9 +109,12 @@ namespace NLI_POS.Pages.Orders
             bool isFreebieCat = ProdCat?.Trim() == "Freebie";
             bool isStaff = custclass?.Trim() == "Staff";
 
-            var productsQuery = _context.Products.AsQueryable();
+            //var productsQuery = _context.Products.AsQueryable();
+            var productsQuery = _context.Products
+    .Include(p => p.PromoSetting) // To check if Promo/Package is on going or by date
+    .Where(p => p.IsActive);
 
-            productsQuery = productsQuery.Where(p => p.IsActive);
+            //productsQuery = productsQuery.Where(p => p.IsActive);
 
             if (isFreebieCat)
             {
@@ -125,6 +128,18 @@ namespace NLI_POS.Pages.Orders
             if (isStaff)
             {
                 productsQuery = productsQuery.Where(p => p.isStaffAvailable == true);
+            }
+
+            var now = DateTime.UtcNow;
+            // ✅ Filter Promo Packages if applicable
+            if (ProdCat?.Trim() == "Package")
+            {
+                productsQuery = productsQuery.Where(p =>
+                    p.PromoSetting == null || (
+                        (p.PromoSetting.IsOngoing) ||
+                        (p.PromoSetting.StartDate <= now && p.PromoSetting.EndDate >= now)
+                    )
+                );
             }
 
             var SectionList = productsQuery
@@ -363,7 +378,7 @@ namespace NLI_POS.Pages.Orders
                 ComboName = item.ComboName,
                 Price = item.Price,
                 Quantity = item.Quantity,
-                Amount = item.Price * item.Quantity,  
+                Amount = item.Price * item.Quantity,
                 ServiceChargeAmount = item.ServiceChargeAmount,
                 ServiceChargePct = item.ServiceChargePct,
                 ItemNo = itemNo++
@@ -457,7 +472,7 @@ namespace NLI_POS.Pages.Orders
                         //Log Inventory Trans
                         _context.InventoryTransactions.Add(new InventoryTransaction
                         {
-                            OrderNo= order.OrderNo,
+                            OrderNo = order.OrderNo,
                             ProductId = item.ProductId,
                             FromLocationId = inventory.LocationId,
                             ToLocationId = null,
@@ -481,30 +496,110 @@ namespace NLI_POS.Pages.Orders
         }
 
         //Verify Stocks
-        public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId)
+        //public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId)
+        //{
+        //    // Get the product to determine if it's Package or Regular
+        //    var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
+
+        //    if (product == null)
+        //    {
+        //        return new JsonResult(0);
+        //    }
+
+        //    if (product.ProductCategory == "Package")
+        //    {
+        //        // It's a Package item — find the corresponding combo
+        //        var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == productId);
+
+        //        if (combo == null)
+        //        {
+        //            return new JsonResult(0); // No combo found
+        //        }
+
+        //        var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
+        //        var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
+
+        //        int minBundles = int.MaxValue;
+
+        //        for (int i = 0; i < productIds.Count; i++)
+        //        {
+        //            int componentId = productIds[i];
+        //            int requiredQtyPerBundle = qtyList[i];
+
+        //            var stock = await _context.InventoryStocks
+        //                .FirstOrDefaultAsync(s => s.ProductId == componentId && s.Location.OfficeId == officeId);
+
+        //            int available = stock?.StockQty ?? 0;
+
+        //            // Determine how many full bundles can be made based on this component
+        //            int bundles = available / requiredQtyPerBundle;
+
+        //            if (bundles < minBundles)
+        //                minBundles = bundles;
+        //        }
+
+        //        return new JsonResult(minBundles);
+        //    }
+        //    else
+        //    {
+        //        // Regular product
+        //        var stock = await _context.InventoryStocks
+        //            .FirstOrDefaultAsync(s => s.ProductId == productId && s.Location.OfficeId == officeId);
+
+        //        return new JsonResult(stock?.StockQty ?? 0);
+        //    }
+        //}
+        public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId, int qty)
         {
-            // Get the product to determine if it's Package or Regular
             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
             if (product == null)
             {
-                return new JsonResult(0);
+                return new JsonResult(new { success = false, message = "Product not found" });
             }
 
             if (product.ProductCategory == "Package")
             {
-                // It's a Package item — find the corresponding combo
                 var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == productId);
 
                 if (combo == null)
                 {
-                    return new JsonResult(0); // No combo found
+                    return new JsonResult(new { success = false, message = "No combo found for this package." });
                 }
 
                 var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
                 var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
 
+                var insufficientItems = new List<object>();
                 int minBundles = int.MaxValue;
+
+                //for (int i = 0; i < productIds.Count; i++)
+                //{
+                //    int componentId = productIds[i];
+                //    int requiredQtyPerBundle = qtyList[i];
+                //    int totalRequired = requiredQtyPerBundle * qty;
+
+                //    var stock = await _context.InventoryStocks
+                //        .Include(s => s.Product)
+                //        .FirstOrDefaultAsync(s => s.ProductId == componentId && s.Location.OfficeId == officeId);
+
+                //    int available = stock?.StockQty ?? 0;
+
+                //    if (available < totalRequired)
+                //    {
+                //        insufficientItems.Add(new
+                //        {
+                //            name = stock?.Product?.ProductName ?? $"Product ID {componentId}",
+                //            available,
+                //            required = totalRequired
+                //        });
+                //    }
+
+                //    // Optional: Compute how many bundles can be made from this item
+                //    int bundles = available / requiredQtyPerBundle;
+                //    if (bundles < minBundles)
+                //        minBundles = bundles;
+                //}
 
                 for (int i = 0; i < productIds.Count; i++)
                 {
@@ -512,18 +607,42 @@ namespace NLI_POS.Pages.Orders
                     int requiredQtyPerBundle = qtyList[i];
 
                     var stock = await _context.InventoryStocks
+                        .Include(s => s.Product)
                         .FirstOrDefaultAsync(s => s.ProductId == componentId && s.Location.OfficeId == officeId);
 
                     int available = stock?.StockQty ?? 0;
-
-                    // Determine how many full bundles can be made based on this component
                     int bundles = available / requiredQtyPerBundle;
 
                     if (bundles < minBundles)
                         minBundles = bundles;
+
+                    if (available < requiredQtyPerBundle)
+                    {
+                        string productName = stock?.Product?.ProductName;
+
+                        if (string.IsNullOrEmpty(productName))
+                        {
+                            var prod = await _context.Products.FindAsync(componentId);
+                            productName = prod?.ProductName ?? $"Product ID {componentId}";
+                        }
+
+                        insufficientItems.Add(new
+                        {
+                            name = productName,
+                            available,
+                            required = requiredQtyPerBundle
+                        });
+                    }
                 }
 
-                return new JsonResult(minBundles);
+
+                return new JsonResult(new
+                {
+                    success = insufficientItems.Count == 0,
+                    isPackage = true,
+                    availableBundles = minBundles,
+                    insufficientItems
+                });
             }
             else
             {
@@ -531,7 +650,14 @@ namespace NLI_POS.Pages.Orders
                 var stock = await _context.InventoryStocks
                     .FirstOrDefaultAsync(s => s.ProductId == productId && s.Location.OfficeId == officeId);
 
-                return new JsonResult(stock?.StockQty ?? 0);
+                int available = stock?.StockQty ?? 0;
+
+                return new JsonResult(new
+                {
+                    success = available >= qty,
+                    isPackage = false,
+                    available
+                });
             }
         }
 

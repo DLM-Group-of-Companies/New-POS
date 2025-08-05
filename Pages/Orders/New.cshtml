@@ -310,6 +310,7 @@
             const selectedProductText = $('#ProductId option:selected').text();
             const comboId = $('#ComboId').val();
             const comboText = $('#ComboId option:selected').text();
+
             if (prodCat === "Package") {
                 if (comboId === "" || comboId === null) {
                     toastr.warning('Please select a combination.');
@@ -338,12 +339,21 @@
                 type: 'GET',
                 data: {
                     productId: selectedProductId,
-                    officeId: officeId
+                    officeId: officeId,
+                    qty: qty
                 },
-                success: function (availableStock) {
-                    if (qty > availableStock) {
-                        hideLoader();
-                        toastr.error(`Not enough stock for ${selectedProductText}. Available: ${availableStock}, Requested: ${qty}`);
+                success: function (result) {
+                    hideLoader();
+                    if (!result.success) {
+                        if (result.isPackage && result.insufficientItems?.length) {
+                            let msg = `Not enough stock for some items in the package:<br/>`;
+                            result.insufficientItems.forEach(item => {
+                                msg += `- ${item.name}: Available ${item.available}, Required ${item.required}<br/>`;
+                            });
+                            toastr.error(msg);
+                        } else {
+                            toastr.error(`Not enough stock. Available: ${result.available}, Requested: ${qty}`);
+                        }
                         return;
                     }
 

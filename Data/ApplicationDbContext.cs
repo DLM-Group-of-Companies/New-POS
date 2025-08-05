@@ -79,6 +79,7 @@ namespace NLI_POS.Data
         public DbSet<ProductPrice> ProductPrices { get; set; }
         public DbSet<OrderPayment> OrderPayments { get; set; }
         public DbSet<ProductItem> ProductItems { get; set; }
+        public DbSet<PromoSetting> PromoSettings { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<SysParam> SysParams { get; set; }

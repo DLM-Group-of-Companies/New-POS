@@ -1,14 +1,12 @@
-﻿using MailKit.Security;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MimeKit;
 using NLI_POS.Models;
-using MailKit.Net.Smtp;
-using MimeKit.Text;
-using NLI_POS.Services;
 using NLI_POS.Models.ViewModels;
+using NLI_POS.Services;
 using static NLI_POS.Pages.Orders.NewModel;
 
 namespace NLI_POS.Pages.Orders
@@ -28,6 +26,7 @@ namespace NLI_POS.Pages.Orders
         public Order Order { get; set; } = default!;
         public OrderSummaryViewModel OrderSummary { get; set; }
         public string EncodedByFullName { get; set; }
+        public string? OfficeTimeZoneId { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string? orderNo)
         {
@@ -77,6 +76,13 @@ namespace NLI_POS.Pages.Orders
                 ProductItems = productItems,
                 Payments = payments
             };
+
+            var office = await _context.OfficeCountry
+    .Include(o => o.Country)
+    .FirstOrDefaultAsync(o => o.Id == Order.OfficeId);
+
+            OfficeTimeZoneId = office?.Country?.TimeZone;
+
 
             var encoder = await _context.Users
     .FirstOrDefaultAsync(u => u.UserName == Order.EncodedBy);
