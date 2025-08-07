@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 using System.ComponentModel.DataAnnotations;
@@ -54,9 +55,6 @@ namespace NLI_POS.Areas.Identity.Pages.Account
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        [BindProperty]
-        public string Role { get; set; }
-
         public class InputModel
         {
             [Required]
@@ -74,8 +72,7 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             [Display(Name = "Full Name")]
             public string FullName { get; set; }
 
-            [Display(Name = "Contat Number")]
-            public string PhoneNumber { get; set; }
+            public string Designation { get; set; }
 
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
@@ -91,6 +88,10 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "Office Branch")]
             public int OfficeId { get; set; }
+
+            [Required]
+            [BindProperty]
+            public string Role { get; set; }
         }
 
 
@@ -99,6 +100,7 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry.Where(b => b.isActive == true).OrderBy(b => b.Name), "Id", "Name");
+            ViewData["Roles"] = new SelectList(await _roleManager.Roles.OrderBy(r=>r.Name).ToListAsync(), "Name", "Name");
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -127,21 +129,30 @@ namespace NLI_POS.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
-                    if (!await _roleManager.RoleExistsAsync("ADMIN"))
+                    if (!string.IsNullOrEmpty(Input.Role))
                     {
-                        await _roleManager.CreateAsync(new IdentityRole("ADMIN"));
-                    }
-
-                    if (!await _roleManager.RoleExistsAsync("USER"))
-                    {
-                        await _roleManager.CreateAsync(new IdentityRole("USER"));
+                        await _userManager.AddToRoleAsync(user, Input.Role);
                     }
 
                     //await _userManager.AddToRoleAsync(user, Role);
-                    await _userManager.AddToRoleAsync(user, "USER");
+                    //await _userManager.AddToRoleAsync(user, "USER");
 
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("User created a new account with password.");                    
                     //var result = await _userManager.CreateAsync(user, Input.Password);
+
+                    //Add to UserOfficeAccess 
+                    var userOfficeAccess = new UserOfficeAccess
+                    {
+                        UserId = user.Id, // or user.IdentityUserId if applicable
+                        OfficeId = Input.OfficeId,
+                        EncodeDate = DateTime.UtcNow, 
+                        EncodedBy = User.Identity.Name
+                    };
+
+                    _context.UserOfficesAccess.Add(userOfficeAccess);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "New User has been added.";
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

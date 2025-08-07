@@ -1,0 +1,102 @@
+﻿@page
+@model NLI_POS.Pages.Report.SalesPerProductModel
+@{
+    ViewData["Title"] = "Sales Per Product";
+}
+
+<div class="card shadow-sm p-4">
+    <h4 class="mb-4 text-primary"><i class="fas fa-chart-bar me-2"></i>Sales Per Product</h4>
+
+    <div class="row g-3 align-items-end mb-3">
+        <div class="col-md-4">
+            <label for="startDate" class="form-label">Start Date</label>
+            <input type="date" id="startDate" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="endDate" class="form-label">End Date</label>
+            <input type="date" id="endDate" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="officeSelect" class="form-label">Office</label>
+            <select id="officeSelect" class="form-select">
+                @* <option value="">All Offices</option> *@
+                @foreach (var office in Model.OfficeList)
+                {
+                    <option value="@office.Value">@office.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <button class="btn btn-primary" id="generateReportBtn">
+            <i class="fas fa-chart-line me-1"></i> Generate Report
+        </button>
+    </div>
+
+    <div class="border p-3 bg-light rounded">
+        <canvas id="salesPerProductChart" height="100"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    
+    <script>
+        let chart;
+
+        async function loadSalesChart() {
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+            const officeId = document.getElementById("officeSelect").value;
+
+            const params = new URLSearchParams();
+            if (startDate) params.append("startDate", startDate);
+            if (endDate) params.append("endDate", endDate);
+            if (officeId) params.append("officeId", officeId);
+
+            const response = await fetch('?handler=SalesChart&' + params.toString());
+
+            const data = await response.json();
+
+            const labels = data.map(x => x.productName);
+            const sales = data.map(x => x.totalSales);
+
+            const ctx = document.getElementById('salesPerProductChart').getContext('2d');
+
+            if (chart) {
+                chart.destroy(); // Remove old chart
+            }
+
+            chart = new Chart(ctx, {
+                type: 'line', // Line chart
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Sales',
+                        data: sales,  // <- this was also wrong earlier (you were using `data`)
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("generateReportBtn").addEventListener("click", loadSalesChart);
+        });
+    </script>
+
+}

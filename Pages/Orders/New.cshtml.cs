@@ -47,6 +47,8 @@ namespace NLI_POS.Pages.Orders
         [BindProperty]
         public decimal ServiceChargeValue { get; set; }
 
+        public List<SelectListItem> SalesPersons { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
             //Reset cart
@@ -76,6 +78,13 @@ namespace NLI_POS.Pages.Orders
                 })
                 .ToList();
 
+            var usersInSales = await _userManager.GetUsersInRoleAsync("Sales");
+
+            SalesPersons = usersInSales.Select(u => new SelectListItem
+            {
+                Value = u.UserName,
+                Text = u.FullName ?? u.UserName
+            }).ToList();
             return Page();
         }
 
@@ -364,7 +373,8 @@ namespace NLI_POS.Pages.Orders
                 EncodedBy = User.Identity.Name,
                 TotAmount = Order.TotAmount,
                 TotPaidAmount = Payments.Sum(p => p.Amount) + ServiceChargeValue,
-                Notes = Order.Notes
+                Notes = Order.Notes,
+                SalesBy = Order.SalesBy
             };
 
             // Attach Product Items

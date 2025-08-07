@@ -1,8 +1,7 @@
 ﻿@model NLI_POS.Models.PromoSetting
 
-<fieldset class="border p-3 mb-3">
-    <h5 class="w-auto text-secondary"><i class="fas fa-sliders-h me-2"></i> Promo Settings</h5>
-
+<fieldset >
+    <h6 class="w-auto text-success fw-bold text-opacity-75 pb-3"><i class="fas fa-bullhorn me-2"></i> Promo Settings</h6>
 @*     <div class="row pt-2">
     <div class="mb-3 col-6">
         <label asp-for="StartDate" class="form-label"></label>
@@ -29,12 +28,13 @@
 </div>
 <div id="dateRangeFields">
     <div class="row mb-2">
-        <div class="col-md-6">
+        <hr />
+        <div class="col-6">
             <label asp-for="StartDate" class="form-label">Start Date</label>
             <input id="StartDateInput" asp-for="StartDate" class="form-control" type="date" />
             <span asp-validation-for="StartDate" class="text-danger"></span>
         </div>
-        <div class="col-md-6">
+        <div class="col-6">
             <label asp-for="EndDate" class="form-label">End Date</label>
             <input id="EndDateInput" asp-for="EndDate" class="form-control" type="date" />
             <span asp-validation-for="EndDate" class="text-danger"></span>

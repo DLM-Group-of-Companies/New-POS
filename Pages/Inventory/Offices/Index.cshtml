@@ -2,7 +2,7 @@
 @model NLI_POS.Pages.Inventory.Office.IndexModel
 
 @{
-    ViewData["Title"] = "Inventory";
+    ViewData["Title"] = "Inventory Offices";
 }
 
 <div class="container-fluid bg-white bg-gradient shadow p-3">
@@ -15,20 +15,20 @@
     <hr />
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-2 mb-2">
+        <div class="col-md-3 mb-2">
             <partial name="_InventorySubNavPartial" />
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-10">
+        <div class="col-md-9">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="text-primary fw-bold mb-3">Offices Inventory</h5>
+                    
                     <div class="row mb-3">
-                        <div class="col-lg-9">
-                             @* <a id="addNewBtn" class="btn btn-primary"><i class="far fa-plus-square"></i> Add New</a> *@
+                        <div class="col-lg-8 col-md-6">
+                            <h5 class="text-primary fw-bold mb-3">Offices Inventory</h5>
                         </div>
-                        <div class="col-lg-3 ">
+                        <div class="col-lg-4 col-md-6 ">
                             <label asp-for="locationId" class="form-label fw-bold"></label>
                             <select id="locationId" asp-for="locationId" class="form-control form-select" asp-items="ViewBag.LocationId"></select>
                         </div>
@@ -46,12 +46,12 @@
                     <div class="tab-content p-3 border border-1 border-secondary" id="inventoryTabsContent">
                         <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="main-tab">
                             <table id="mainTable" class="table table-primary table-striped align-middle">
-                                <thead>
+                                <thead class="table-dark">
                                     <tr>
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
-                                        <th class="text-end">Status</th>
+                                        <th >Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -60,12 +60,12 @@
 
                         <div class="tab-pane fade" id="coll" role="tabpanel" aria-labelledby="coll-tab">
                             <table id="collTable" class="table table-primary  table-striped align-middle">
-                                <thead>
+                                <thead class="table-dark">
                                     <tr>
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
-                                        <th class="text-end">Status</th>
+                                        <th >Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -144,7 +144,6 @@
                     },
 {
     data: null,
-    className: 'text-end',
     orderable: false,
     render: function (data, type, row) {
         const stock = parseFloat(row.stockQty) || 0;
@@ -152,11 +151,11 @@
 
         // alert(stock);alert(min);
         if (stock === 0) {
-            return '<span class="text-danger fw-bold">Out of stock</span>';
+            return '<span class="badge bg-danger fw-bold">Out of stock</span>';
         } else if (stock <= min) {
-            return '<span class="text-warning fw-bold">Low stocks</span>';
+            return '<span class="badge bg-warning fw-bold">Low stocks</span>';
         } else {
-            return '<span class="text-success">Sufficient</span>';
+            return '<span class="badge bg-success">Sufficient</span>';
         }
     }
 },
@@ -202,18 +201,17 @@
                     },
     {
         data: null,
-        className: 'text-end',
         orderable: false,
         render: function (data, type, row) {
             const stock = parseFloat(row.stockQty) || 0;
             const min = parseFloat(row.minLevel) || 0;
 
             if (stock === 0) {
-                return '<span class="text-danger fw-bold">Out of stock</span>';
+                                return '<span class="badge bg-danger fw-bold">Out of stock</span>';
             } else if (stock <= min) {
-                return '<span class="text-warning fw-bold">Low stocks</span>';
+                                return '<span class="badge bg-warning fw-bold">Low stocks</span>';
             } else {
-                return '<span class="text-success">Sufficient</span>';
+                                return '<span class="badge bg-success">Sufficient</span>';
             }
         }
     },

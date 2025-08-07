@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NLI_POS.Data;
 
@@ -11,9 +12,11 @@ using NLI_POS.Data;
 namespace NLI_POS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250807035357_ChangeFieldlengthAudit")]
+    partial class ChangeFieldlengthAudit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -331,11 +334,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -433,11 +436,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -541,11 +544,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -694,11 +697,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("varchar(500)");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("isActive")
                         .HasColumnType("tinyint(1)");
@@ -764,11 +767,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("VoidReason")
                         .HasMaxLength(300)
@@ -941,11 +944,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("isFreebieAvailable")
                         .HasColumnType("tinyint(1)");
@@ -1040,11 +1043,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1084,11 +1087,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1166,11 +1169,11 @@ namespace NLI_POS.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasMaxLength(30)
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UpdatedBy")
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UserId")
                         .IsRequired()

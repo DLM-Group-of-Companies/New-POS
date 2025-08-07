@@ -1,14 +1,14 @@
 ﻿@page
 @model RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Register User";
 }
-<div class="container-fluid bg-white bg-gradient  shadow p-2">
+<div class="container-fluid bg-white bg-gradient  shadow p-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0 text-primary">
             <i class="fas fa-user-plus me-2"></i> @ViewData["Title"]
         </h4>
-        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '/';"></i>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '/Users';"></i>
     </div>
 
     <hr />
@@ -18,38 +18,47 @@
             <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
 
                 <div asp-validation-summary="ModelOnly" class="text-white small bg-danger p-2 rounded" role="alert"></div>
-                <div class="form-floating m-3">
+                <div class="form-floating m-2">
                     <input asp-for="Input.Username" class="form-control" autocomplete="username" aria-required="true" />
                     <label asp-for="Input.Username"></label>
                     <small><span asp-validation-for="Input.Username" class="text-danger small"></span></small>
                 </div>
-                <div class="form-floating m-3">
+                <div class="form-floating m-2">
                     <input asp-for="Input.FullName" class="form-control" />
                     <label asp-for="Input.FullName"></label>
                     <small><span asp-validation-for="Input.FullName" class="text-danger small"></span></small></small>
                 </div>
-                <div class="form-floating m-3">
+                <div class="form-floating m-2">
                     <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-required="true" />
                     <label asp-for="Input.Email"></label>
                     <small><span asp-validation-for="Input.Email" class="text-danger small"></span></small>
                 </div>
-                <div class="form-floating m-3">
-                    <input asp-for="Input.PhoneNumber" class="form-control" />
-                    <label asp-for="Input.PhoneNumber"></label>
+                <div class="form-floating m-2">
+                    <input asp-for="Input.Designation" class="form-control" />
+                    <label asp-for="Input.Designation"></label>
                 </div>
-                <div class="form-floating m-3">
-                    <select asp-for="Input.OfficeId" class="form-control" asp-items="ViewBag.OfficeId"></select>
+                <div class="form-floating m-2">
+                    <select asp-for="Input.OfficeId" class="form-control" asp-items="ViewBag.OfficeId">
+                        <option value="">-- Select Default Office --</option>
+                    </select>
                     <label asp-for="Input.OfficeId"></label>
                 </div>
-                <div class="form-floating m-3">
+                <div class="form-floating m-2">
                     <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" />
                     <label asp-for="Input.Password"></label>
                     <small><span asp-validation-for="Input.Password" class="text-danger small"></span></small>
                 </div>
-                <div class="form-floating m-3">
+                <div class="form-floating m-2">
                     <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
                     <label asp-for="Input.ConfirmPassword"></label>
                     <small><span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span></small>
+                </div>
+                <div class="form-floating m-2">
+                    <select asp-for="Input.Role" class="form-control" asp-items="ViewBag.Roles">
+                        <option value="">-- Select Role --</option>
+                    </select>
+                    <label asp-for="Input.Role"></label>
+                    <small><span asp-validation-for="Input.Role" class="text-danger small"></span></small>
                 </div>
                 <br />
                 <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>

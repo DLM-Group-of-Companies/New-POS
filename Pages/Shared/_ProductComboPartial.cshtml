@@ -1,17 +1,17 @@
 ﻿@using NLI_POS.Models
 @model IList<ProductCombo>
 
-<div class="d-flex justify-content-between align-items-center pb-2">
-    <h5 class="text-secondary m-0">
-        <i class="fas fa-puzzle-piece me-2"></i> Product Combinations
-    </h5>
+<div class="d-flex justify-content-between align-items-center pb-3 ">
+    <h6 class="text-success fw-bold text-opacity-75 m-0">
+        <i class="fas fa-cubes me-2"></i> Product Combinations
+    </h6>
     <button type="button" class="btn btn-primary btn-gradient bg-opacity-50 text-white" data-bs-toggle="modal" data-bs-target="#myListModal">
         <i class="fas fa-plus me-2"></i> Add Combination
     </button>
 </div>
 
-<table id="ComboTable" class="table">
-    <thead>
+<table id="ComboTable" class="table table-striped table-sm">
+    <thead class="table-secondary">
         <tr>
             <th hidden>
                 @Html.DisplayNameFor(model => model[0].Id)
@@ -30,7 +30,7 @@
                 <td hidden>
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
-                <td>
+                <td class="align-middle">
                     @Html.DisplayFor(modelItem => item.ProductsDesc)
                 </td>
 

@@ -54,11 +54,16 @@ namespace NLI_POS.Data
     .IsUnique();
 
             modelBuilder.Entity<InventoryLocation>().HasData(
-    new InventoryLocation { Id = 1, Name = "Main Warehouse", LocationType = "Warehouse", IsActive = true },
-    new InventoryLocation { Id = 2, Name = "Central Stockroom", LocationType = "Stockroom", IsActive = true },
-    new InventoryLocation { Id = 3, Name = "Manila HQ", LocationType = "Office", OfficeId = 1, IsActive = true },
-    new InventoryLocation { Id = 4, Name = "Singapore Office", LocationType = "Office", OfficeId = 2, IsActive = true }
-);
+            new InventoryLocation { Id = 1, Name = "Main Warehouse", LocationType = "Warehouse", IsActive = true },
+            new InventoryLocation { Id = 2, Name = "Central Stockroom", LocationType = "Stockroom", IsActive = true },
+            new InventoryLocation { Id = 3, Name = "Manila HQ", LocationType = "Office", OfficeId = 1, IsActive = true },
+            new InventoryLocation { Id = 4, Name = "Singapore Office", LocationType = "Office", OfficeId = 2, IsActive = true }
+        );
+
+            modelBuilder.Entity<PromoSetting>()
+            .HasIndex(p => p.ProductId)
+            .IsUnique(); // Optional: only if you want it unique.
+
 
         }
 

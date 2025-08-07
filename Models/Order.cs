@@ -30,18 +30,24 @@ namespace NLI_POS.Models
         public int OfficeId { get; set; }
 
         [Display(Name = "Order Type")]
+        [StringLength(40)]
         public string OrderType { get; set; }
 
         public decimal TotAmount { get; set; } //Total Amount of Transaction
         public decimal TotPaidAmount { get; set; } //Total payment of Customer. Maybe higher than TotAmount
         
-
         [StringLength(500)]
         public string? Notes { get; set; }
 
+        [StringLength(30)]
+        [Required]
+        public string SalesBy { get; set; } = "";
+
         public bool IsVoided { get; set; }
         public DateTime? VoidedDate { get; set; }
+        [StringLength(30)]
         public string? VoidedBy { get; set; }
+        [StringLength(300)]
         public string? VoidReason { get; set; }
 
         public virtual ICollection<ProductItem> ProductItems { get; set; } = new List<ProductItem>();

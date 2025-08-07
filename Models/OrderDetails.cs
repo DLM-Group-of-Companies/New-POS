@@ -9,6 +9,10 @@ namespace NLI_POS.Models
         public int Id { get; set; }
         public int OrderId { get; set; } //Liink to Orders 
 
+        [ForeignKey("OrderId")]
+        [ValidateNever]
+        public virtual Order Order { get; set; }
+
         [Display(Name = "Product Category")]
         [StringLength(20)]
         public string? ProductCategory { get; set; }

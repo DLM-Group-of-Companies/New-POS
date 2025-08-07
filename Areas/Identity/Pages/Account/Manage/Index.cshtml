@@ -5,7 +5,7 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 <div class="container-fluid bg-white bg-gradient  shadow p-2">
-    <h3>@ViewData["Title"]</h3>
+    <h4>@ViewData["Title"]</h4>
     <partial name="_StatusMessage" for="StatusMessage" />
     <hr />
     <div class="row">
@@ -26,13 +26,18 @@
                     <label asp-for="Input.PhoneNumber" class="form-label"></label>
                     <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                 </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Designation" class="form-control" placeholder="Please enter your phone number." />
+                    <label asp-for="Input.Designation" class="form-label"></label>
+                    <span asp-validation-for="Input.Designation" class="text-danger"></span>
+                </div>
                 <div class="form-group">
                     <label>Role</label>
                     <select asp-for="@Model.SelectedRoles" asp-items="Model.AllRoles" name="ddlRole" class="form-select text-black-50" multiple size="5" disabled>
                     </select>
 
                 </div>
-                <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary mt-3">Save</button>
+                <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary mt-3"><i class="fa-solid fa-floppy-disk me-2"></i> Save</button>
             </form>
         </div>
     </div>

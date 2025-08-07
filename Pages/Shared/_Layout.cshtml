@@ -71,6 +71,8 @@
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <! -- Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 <body class="@((User.Identity?.IsAuthenticated ?? false) ? "with-sidebar" : "no-sidebar")">
@@ -169,7 +171,7 @@
             @if (User.Identity?.IsAuthenticated ?? false)
             {
                 <div id="customContextMenu" class="position-absolute bg-white border rounded shadow p-2 d-none" style="z-index: 9999; min-width: 220px;">
-                    <small>
+                    <div class="small">
                         <a href="#" class="dropdown-item menu-item pb-2 d-flex align-items-center" onclick="location.reload();">
                             <i class="fas fa-sync"></i>
                             <span>Refresh</span>
@@ -209,7 +211,7 @@
                         <a href="~/Identity/Account/Logout?returnUrl=@Url.Page("/Index", new { area = "" })" class="dropdown-item menu-item pb-2 text-danger d-flex align-items-center">
                             <i class="fas fa-sign-out-alt me-2"></i> Logout
                         </a>
-                    </small>
+                    </div>
                 </div>
             }
 

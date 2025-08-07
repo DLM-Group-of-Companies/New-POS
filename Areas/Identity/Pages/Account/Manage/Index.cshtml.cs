@@ -49,6 +49,8 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            public string Designation { get; set; }
         }
 
         [BindProperty]
@@ -65,7 +67,8 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Designation = user.Designation ?? string.Empty
             };
         }
 
@@ -89,20 +92,21 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
 
 
             var userRoles = await _userManager.GetRolesAsync(user);
-                SelectedRoles = userRoles.ToList();
+            SelectedRoles = userRoles.ToList();
 
-                AllRoles = _roleManager.Roles
-            .Select(r => new SelectListItem
-            {
-                Value = r.Name,
-                Text = r.Name,
-                Selected = userRoles.Contains(r.Name) // ✅ Preselect here too
-            }).ToList();
+            AllRoles = _roleManager.Roles
+        .Select(r => new SelectListItem
+        {
+            Value = r.Name,
+            Text = r.Name,
+            Selected = userRoles.Contains(r.Name) // ✅ Preselect here too
+        }).ToList();
 
-                Fullname = user.FullName;
-                var roles = await _userManager.GetRolesAsync(user);
-                await LoadAsync(user);         
-           
+            Fullname = user.FullName;
+
+            var roles = await _userManager.GetRolesAsync(user);
+            await LoadAsync(user);
+
 
             return Page();
         }
@@ -150,6 +154,8 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
             //    await _userManager.AddToRoleAsync(user, strDDLRole);
             //}
             user.FullName = Fullname;
+            user.Designation = Input.Designation;
+
             await _userManager.UpdateAsync(user);
             //await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";

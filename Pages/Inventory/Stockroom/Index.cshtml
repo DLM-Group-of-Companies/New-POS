@@ -2,7 +2,7 @@
 @model NLI_POS.Pages.Inventory.Stockroom.IndexModel
 
 @{
-    ViewData["Title"] = "Inventory";
+    ViewData["Title"] = "Inventory Stockroom";
 }
 <div class="container-fluid bg-white bg-gradient shadow p-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -14,19 +14,19 @@
     <hr />
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-2 mb-2">
+        <div class="col-md-3 mb-2">
             <partial name="_InventorySubNavPartial" />
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-10">
+        <div class="col-md-9">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-lg-8">
+                        <div class="col-lg-8 col-md-6">
                             <h5 class="text-primary fw-bold mb-3">Stockroom Inventory</h5>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 col-md-6">
                             <label asp-for="locationId" class="form-label fw-bold"></label>
                             <select id="locationId" asp-for="locationId" class="form-control form-select" asp-items="ViewBag.LocationId" readonly></select>
                         </div>
@@ -43,8 +43,8 @@
 
                     <div class="tab-content p-3 border border-1 border-secondary" id="inventoryTabsContent">
                         <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="main-tab">
-                            <table id="mainTable" class="table table-info table-striped align-middle">
-                                <thead>
+                            <table id="mainTable" class="table table-info table-striped table-sm align-middle">
+                                <thead class="table-dark">
                                     <tr>
                                         <th>Product</th>
                                         <th>Description</th>
@@ -56,8 +56,8 @@
                         </div>
 
                         <div class="tab-pane fade" id="coll" role="tabpanel" aria-labelledby="coll-tab">
-                            <table id="collTable" class="table table-info table-striped align-middle">
-                                <thead>
+                            <table id="collTable" class="table table-info table-striped table-sm align-middle">
+                                <thead class="table-dark">
                                     <tr>
                                         <th>Product</th>
                                         <th>Description</th>
