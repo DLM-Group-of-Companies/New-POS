@@ -8,7 +8,7 @@
 <div class="container-fluid bg-white bg-gradient shadow p-2">
     <div class="d-flex justify-content-between align-items-center mb-3 pt-2 ps-2">
         <h4 class="mb-0 text-primary">
-            <i class="fas fa-th-list"></i> Orders
+            <i class="fas fa-th-list me-2"></i> Orders
         </h4>
         <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
     </div>
@@ -18,6 +18,7 @@
         <p>
             <a class="btn btn-primary btn-gradient" asp-page="New"><i class="fas fa-cart-plus me-2"></i> New Order</a>
         </p>
+
         <div class="mb-3">
             <select id="officeFilter" class="form-control form-select ms-2" style="width: auto;" title="Filter by Office">
                 @foreach (var office in Model.OfficeList)
@@ -149,12 +150,57 @@
                 responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
-                    { extend: 'copy', className: 'btn btn-outline-primary' },
-                    { extend: 'csv', className: 'btn btn-outline-success' },
-                    { extend: 'excel', className: 'btn btn-outline-success' },
-                    { extend: 'pdfHtml5', orientation: 'portrait', className: 'btn btn-outline-danger' },
-                    { extend: 'print', className: 'btn btn-outline-secondary' }
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-outline-success',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)',
+                            orthogonal: 'export' // ensures renderers run
+                        },
+                        text: 'Export Excel',
+                        action: function (e, dt, button, config) {
+                            exportAll(e, dt, button, config, 'excelHtml5');
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-outline-success',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)',
+                            orthogonal: 'export' // ensures renderers run
+                        },
+                        text: 'Export CSV',
+                        action: function (e, dt, button, config) {
+                            exportAll(e, dt, button, config, 'csvHtml5');
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: 'Export PDF',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)',
+                            orthogonal: 'export'
+                        },
+                        customize: function (doc) {
+                            // Reduce font size so columns fit better
+                            doc.defaultStyle.fontSize = 9;
+
+                            // Make table full width
+                            doc.content[1].table.widths =
+                                Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+
+                            // Add some margins
+                            doc.pageMargins = [20, 20, 20, 20];
+
+                            // Optional: align header text to center
+                            doc.styles.tableHeader.alignment = 'center';
+                        }
+                    }
+
                 ]
+
             });
 
             // Wrap search input and dropdown nicely
@@ -186,6 +232,41 @@
                 table.ajax.reload();
             });
         });
+
+        function exportAll(e, dt, button, config, exportType) {
+            var self = dt.button(button); // ✅ this will have .processing()
+
+            var oldStart = dt.settings()[0]._iDisplayStart;
+
+            dt.one('preXhr', function (e, s, data) {
+                // Request all data for current search/filter
+                data.start = 0;
+                data.length = 2147483647;
+
+                dt.one('preDraw', function (e, settings) {
+                    // ✅ Pass correct context into original export action
+                    $.fn.dataTable.ext.buttons[exportType].action.call(self, e, dt, button, config);
+
+                    // Restore original paging
+                    dt.one('preXhr', function (e, s, data) {
+                        data.start = oldStart;
+                    });
+
+                    setTimeout(function () {
+                        dt.ajax.reload(null, false);
+                    }, 0);
+
+                    return false;
+                });
+            });
+
+            // Kick off the Ajax request
+            dt.ajax.reload();
+        }
+
+
+
+
     </script>
 
 }

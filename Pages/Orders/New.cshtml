@@ -24,9 +24,9 @@
                 <div class="col-lg-4">
                     <!-- Office Info -->
                     <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                        <h5 class="text-secondary border-bottom pb-1 mb-2">
-                            <i class="fas fa-building text-primary"></i> Office Info
-                        </h5>
+                        <h6 class="text-secondary border-bottom pb-1 mb-2 fw-bold">
+                            <i class="fas fa-building text-primary me-2"></i> Office Info
+                        </h6>
                         <input type="hidden" asp-for="Order.OrderNo" />
                         <div class="row gx-2">
                             <div class="col-6 mb-2">
@@ -52,9 +52,9 @@
 
                     <!-- Customer Info -->
                     <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                        <h5 class="text-secondary border-bottom pb-1 mb-2">
-                            <i class="fas fa-user text-success"></i> Customer Info
-                        </h5>
+                        <h6 class="text-secondary border-bottom pb-1 mb-2 fw-bold">
+                            <i class="fas fa-user text-success me-2"></i> Customer Info
+                        </h6>
                         <label asp-for="Order.CustomerId" class="form-label"></label>
                         <div class="input-group mb-2">
                             <!-- Visible input (for searching by name) -->
@@ -73,9 +73,9 @@
 
                     <!-- Product Selection -->
                     <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                        <h5 class="text-secondary border-bottom pb-1 mb-2">
-                            <i class="fas fa-box text-info"></i> Product Selection
-                        </h5>
+                        <h6 class="text-secondary border-bottom pb-1 mb-2 fw-bold">
+                            <i class="fas fa-box text-info me-2"></i> Product Selection
+                        </h6>
                         <div class="row gx-2">
                             <div class="col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
                                 <label class="form-label">Category</label>
@@ -117,9 +117,9 @@
                 <div class="col-lg-8">
                     <!-- Cart Section -->
                     <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                        <h5 class="text-dark border-bottom pb-1 mb-2">
-                            <i class="fas fa-shopping-cart text-secondary"></i> Cart
-                        </h5>
+                        <h6 class="text-secondary border-bottom pb-1 mb-2 fw-bold">
+                            <i class="fas fa-shopping-cart text-dark fw-bold me-2"></i> Cart
+                        </h6>
                         <div class="table-responsive">
                             <table id="cartTable" class="table table-bordered table-sm  align-middle">
                                 <thead class="table-secondary">
@@ -179,9 +179,9 @@
 
                     <!-- Payment Section -->
                     <div class="p-3 bg-light border rounded shadow-sm mb-2">
-                        <h5 class="text-secondary border-bottom pb-1 mb-2">
-                            <i class="fas fa-credit-card text-warning"></i> Payment
-                        </h5>
+                        <h6 class="text-secondary border-bottom pb-1 mb-2 fw-bold">
+                            <i class="fas fa-credit-card text-warning me-2"></i> Payment
+                        </h6>
                         <select id="paymentOptionsSource" class="d-none">
                             @foreach (var method in ViewBag.PaymentMethod)
                             {

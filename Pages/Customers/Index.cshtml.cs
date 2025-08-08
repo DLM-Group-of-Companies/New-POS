@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
 using NLI_POS.Services;
 using System.Linq.Dynamic.Core;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.InkML;
 
 namespace NLI_POS.Pages.Customers
 {
@@ -47,7 +49,7 @@ namespace NLI_POS.Pages.Customers
             var sortDirection = requestForm["order[0][dir]"].FirstOrDefault();
             var searchValue = requestForm["search[value]"].FirstOrDefault();
 
-            string[] columnNames = { "custCode", "fullName", "mobile", "email", "city", "className","Id" };
+            string[] columnNames = { "custCode", "fullName", "mobile", "email", "city", "className", "Id" };
 
             var country = requestForm["country"].FirstOrDefault();
 
@@ -62,7 +64,7 @@ namespace NLI_POS.Pages.Customers
                     email = c.Email,
                     mobile = c.MobileNo,
                     landline = c.LandlineNo,
-                    city = c.City,           
+                    city = c.City,
                     country = c.Country ?? "",
                     className = c.CustClasses != null ? c.CustClasses.Name : ""
                 });
@@ -138,6 +140,45 @@ namespace NLI_POS.Pages.Customers
 
             return new JsonResult(new { success = true, message = "Customer deleted successfully." });
         }
+
+        public IActionResult OnGetExportAllCustomers(string country)
+        {
+            var query = _context.Customer.AsQueryable();
+
+            if (!string.IsNullOrEmpty(country))
+                query = query.Where(c => c.Country == country);
+
+            var customers = query
+                .OrderByDescending(c => c.Id)
+                .Select(c => new
+                {
+                    c.CustCode,
+                    FullName = c.FirstName + " " + c.LastName,
+                    c.MobileNo,
+                    c.Email,
+                    c.City,
+                    ClassName = c.CustClasses.Name
+                })
+                .ToList();
+
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Customers");
+
+            ws.Cell(1, 1).InsertTable(customers, "Customers", true);
+
+            // ✅ Do NOT dispose the stream here
+            var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            var fileName = $"Customers_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            return File(stream,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
+
+
+
 
     }
 }

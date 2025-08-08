@@ -1,0 +1,129 @@
+﻿@page
+@model SalesQuotaModel
+@{
+    ViewData["Title"] = "Sales Quotas";
+}
+
+<div class="container-fluid bg-white bg-gradient shadow p-2">
+    <div class="d-flex justify-content-between align-items-center mb-3 pt-2 ps-2">
+        <h4 class="mb-0 text-primary">
+            <i class="fas fa-bullseye me-2"></i> @ViewData["Title"]
+        </h4>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
+    </div>
+    <hr />
+    <!-- Button to trigger modal -->
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#quotaModal">
+        <i class="fas fa-plus"></i> Add Sales Quota
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="quotaModal" tabindex="-1" aria-labelledby="quotaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <form method="post" asp-page-handler="Save" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="quotaModalLabel">Add / Edit Sales Quota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Input.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Salesperson</label>
+                        <select asp-for="Input.SalesPersonId" class="form-control">
+                            <option value="">-- Select --</option>
+                            @foreach (var sp in Model.SalesPeople)
+                            {
+                                <option value="@sp.Id" data-username="@sp.UserName">@sp.FullName (@sp.UserName)</option>
+                            }
+                        </select>
+                        <input type="hidden" asp-for="Input.SalesPersonUserName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Year and Month</label>
+                        <input asp-for="Input.QuotaDate" type="month" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Quota Amount</label>
+                        <input asp-for="Input.QuotaAmount" class="form-control" step="0.01" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Quota</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <hr />
+
+    <table class="table table-striped">
+        <thead class="table-warning">
+            <tr>
+                <th>Sales Staff</th>
+                <th>Month</th>
+                <th>Quota Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var quota in Model.Quotas)
+            {
+                <tr>
+                    <td>@quota.SalesPerson?.FullName (@quota.SalesPerson?.UserName)</td>
+                    <td>@quota.QuotaDate.ToString("MMMM yyyy")</td>
+                    <td>@quota.QuotaAmount.ToString("N2")</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-success"
+                                onclick="editQuota(@quota.Id, '@quota.SalesPersonId', @quota.QuotaDate,  @quota.QuotaAmount)">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+
+                        <form method="post" asp-page-handler="Delete" style="display:inline">
+                            <input type="hidden" name="id" value="@quota.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        function editQuota(id, salesPersonId, quotaDate, amount) {
+            const modal = new bootstrap.Modal(document.getElementById('quotaModal'));
+            modal.show();
+
+            document.querySelector('[name="Input.Id"]').value = id;
+            document.querySelector('[name="Input.SalesPersonId"]').value = salesPersonId;
+            document.querySelector('[name="Input.QuotaDate"]').value = quotaDate.substring(0, 7); // yyyy-MM
+            document.querySelector('[name="Input.QuotaAmount"]').value = amount;
+        }
+
+        const quotaModal = document.getElementById('quotaModal');
+        quotaModal.addEventListener('hidden.bs.modal', () => {
+            document.querySelector('form.modal-content').reset();
+            document.querySelector('[name="Input.Id"]').value = "";
+        });
+
+
+
+        const select = document.querySelector('select[name="Input.SalesPersonId"]');
+        const hiddenInput = document.querySelector('input[name="Input.SalesPersonUserName"]');
+
+        function updateUserName() {
+            const selectedOption = select.options[select.selectedIndex];
+            hiddenInput.value = selectedOption?.getAttribute('data-username') || '';
+        }
+
+        select.addEventListener('change', updateUserName);
+        document.addEventListener('DOMContentLoaded', updateUserName);
+
+    </script>
+}

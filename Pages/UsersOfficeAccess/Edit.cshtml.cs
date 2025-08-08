@@ -37,7 +37,7 @@ namespace NLI_POS.Pages.UsersOfficeAccess
             }
             UserOfficeAccess = userofficeaccess;
            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
-           ViewData["UserId"] = new SelectList(_context.AppUsers, "Id", "Id");
+           ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return Page();
         }
 

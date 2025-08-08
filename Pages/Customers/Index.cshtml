@@ -69,13 +69,17 @@
                 dom: 'Bfrtip', // Manually move the buttons and search box // 'B' for Buttons, 'f' for searching, 'r' for processing display, 't' for table, 'i' for information, 'p' for pagination
                 buttons: [
                     {
-                        extend: 'excelHtml5',
-                        text: '<i class="fas fa-file-excel me-2"></i>  Export to Excel ', // Custom button text
-                        title: 'Customers', // Title for the Excel file
-                        exportOptions: {
-                            columns: ':visible' // Only export visible columns
+                        text: '<i class="fas fa-file-excel me-2"></i> Export All to Excel',
+                        className: 'btn btn-outline-success btn-gradient me-2',
+                        action: function () {
+                            let country = $('#countrySelect').val() || '';
+                            window.location.href = '@Url.Page("Index")?handler=ExportAllCustomers&country='
+                                + encodeURIComponent(country);
+
                         }
-                    }],
+                    }
+
+                ],
                 stateSave: true,
                 stateSaveCallback: function (settings, data) {
                     sessionStorage.setItem('CustomerTableState', JSON.stringify(data));

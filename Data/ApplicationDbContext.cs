@@ -78,7 +78,7 @@ namespace NLI_POS.Data
         public DbSet<InventoryStockAuditTrail> InventoryStockAuditTrails { get; set; }
         public DbSet<ProductCombo> ProductCombos { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<ApplicationUser> AppUsers { get; set; }
+        //public DbSet<ApplicationUser> AppUsers { get; set; }
         public DbSet<UserOfficeAccess> UserOfficesAccess { get; set; }
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<ProductPrice> ProductPrices { get; set; }
@@ -90,5 +90,6 @@ namespace NLI_POS.Data
         public DbSet<SysParam> SysParams { get; set; }
         public DbSet<InventoryLocation> InventoryLocations { get; set; }
         public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
+        public DbSet<SalesQuota> SalesQuotas { get; set; }
     }
 }

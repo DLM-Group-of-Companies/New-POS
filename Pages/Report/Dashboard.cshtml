@@ -3,17 +3,17 @@
 @{
     ViewData["Title"] = "Sales Dashboard";
 }
-<div class="container-fluid bg-white bg-gradient  shadow p-4">
+<div class="container-fluid bg-dark bg-gradient  shadow p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-primary mb-0">
+        <h3 class="text-light mb-0">
             <i class="fas fa-tachometer-alt me-2"></i> Dashboard
         </h3>
         <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
     </div>
-    <hr />
+    <hr class="text-light" />
     <div class="row mb-4" id="topKpis">
         <div class="col-md-4">
-            <div class="card text-white bg-success shadow">
+            <div class="card text-white bg-success bg-gradient shadow">
                 <div class="card-body">
                     <h5>Total Sales Today</h5>
                     <h3 id="totalSalesToday">₱0.00</h3>
@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-primary shadow">
+            <div class="card text-white bg-primary bg-gradient shadow">
                 <div class="card-body">
                     <h5>Orders Today</h5>
                     <h3 id="orderCountToday">0</h3>
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-warning shadow">
+            <div class="card text-white bg-warning bg-gradient shadow">
                 <div class="card-body">
                     <h5>Average Order Value</h5>
                     <h3 id="avgOrderValueToday">₱0.00</h3>
@@ -37,9 +37,12 @@
             </div>
         </div>
     </div>
+
+    <hr class="text-light" />
+
     <form id="filtersForm" class="row mb-4">
         <div class="col-md-3">
-            <label for="officeSelect">Office</label>
+            <label for="officeSelect" class="form-label text-light">Office</label>
             <select id="officeSelect" name="officeId" class="form-select form-select-sm">
                 <option value="">All Offices</option>
                 @foreach (var office in Model.OfficeList)
@@ -50,12 +53,12 @@
         </div>
 
         <div class="col-md-3">
-            <label for="startDate">Start Date</label>
+            <label for="startDate" class="form-label text-light">Start Date</label>
             <input type="date" id="startDate" name="startDate" class="form-control form-control-sm" />
         </div>
 
         <div class="col-md-3">
-            <label for="endDate">End Date</label>
+            <label for="endDate" class="form-label text-light">End Date</label>
             <input type="date" id="endDate" name="endDate" class="form-control form-control-sm" />
         </div>
 
@@ -63,6 +66,7 @@
             <button type="button" id="generateReportBtn" class="btn btn-sm btn-primary w-100">Apply Filters</button>
         </div>
     </form>
+
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm p-3">
@@ -70,12 +74,18 @@
                 <canvas id="salesPerProductChart" height="100"></canvas>
             </div>
         </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm p-3">
+                <h2 class="h5 mb-3">Top Sales People</h2>
+                <canvas id="topSalespeopleChart" style="max-height: 400px;"></canvas>
+            </div>
+        </div>
     </div>
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm p-3">
                 <h2 class="h5 mb-3">Top Customers</h2>
-                <canvas id="topCustomersChart" height="300"></canvas>
+                <canvas id="topCustomersChart" height="425"></canvas>
             </div>
         </div>
 
@@ -135,7 +145,9 @@
                         data: values,
                         backgroundColor: 'rgba(54, 162, 235, 0.6)',
                         borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        barPercentage: 0.7,   // 🔹 Make bars take up 70% of category space
+                        categoryPercentage: 0.8 // 🔹 Adjust space between groups
                     }]
                 },
                 options: {
@@ -179,7 +191,7 @@
 
             $('#repeatCustomersTable').DataTable({
                 order: [[1, 'desc']],
-                pageLength: 8,
+                pageLength: 10,
                 lengthChange: false,
                 searching: false,
                 info: false
@@ -271,5 +283,49 @@
         });
     </script>
 
+    <script>
+        async function loadTopSalespeopleChart() {
+            const response = await fetch('?handler=TopSalespeople');
+            const data = await response.json();
 
+            const labels = data.map(x => x.salesperson);
+            const values = data.map(x => x.totalSales);
+
+            const ctx = document.getElementById('topSalespeopleChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Sales',
+                        data: values,
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1,
+                        barThickness: 25 // <-- makes bars thicker
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // horizontal bar chart
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `₱${ctx.raw.toLocaleString()}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load on page start
+        loadTopSalespeopleChart();
+    </script>
 }

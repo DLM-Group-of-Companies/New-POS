@@ -183,6 +183,21 @@ namespace NLI_POS.Pages.Report
             return new JsonResult(data);
         }
 
+        public JsonResult OnGetTopSalespeople()
+        {
+            var topSalespeople = _context.Orders
+                .GroupBy(o => o.SalesBy)
+                .Select(g => new
+                {
+                    Salesperson = g.Key,
+                    TotalSales = g.Sum(o => o.TotAmount)
+                })
+                .OrderByDescending(x => x.TotalSales)
+                .Take(10) // Top 10 performers
+                .ToList();
+
+            return new JsonResult(topSalespeople);
+        }
 
     }
 }

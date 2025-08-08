@@ -13,8 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 var localTimeZone = "UTC";
 
 
-var connectionString = builder.Configuration.GetConnectionString("NLPOSLiveConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-//var connectionString = builder.Configuration.GetConnectionString("NLPOSTestConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+//var connectionString = builder.Configuration.GetConnectionString("NLPOSLiveConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("NLPOSTestConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36)))
@@ -133,7 +133,6 @@ using (var scope = app.Services.CreateScope())
         context.SaveChanges();
     }
 }
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

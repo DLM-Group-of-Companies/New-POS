@@ -21,7 +21,7 @@ namespace NLI_POS.Pages.UsersOfficeAccess
         {
             if (string.IsNullOrEmpty(userId)) return BadRequest();
 
-            User = await _context.AppUsers.FindAsync(userId);
+            User = await _context.Users.FindAsync(userId);
             if (User == null) return NotFound();
 
             AccessList = await _context.UserOfficesAccess

@@ -18,7 +18,7 @@ namespace NLI_POS.Pages.UsersOfficeAccess
         {
             ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
 
-            ViewData["UserId"] = new SelectList(_context.AppUsers.Where(u=>u.Id== userId)
+            ViewData["UserId"] = new SelectList(_context.Users.Where(u=>u.Id== userId)
                 .Select(u => new
                 {
                     u.Id,
