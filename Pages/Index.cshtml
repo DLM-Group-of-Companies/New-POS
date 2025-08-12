@@ -103,7 +103,7 @@
 
 <!-- Reports Modal -->
 <div class="modal fade" id="reportsModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title text-primary"><i class="fas fa-file-invoice-dollar fa-xl me-2"></i> Reports</h5>
@@ -112,29 +112,35 @@
             <div class="modal-body" id="reportsModalModalContainer">
                 <div class="container">
                     <div class="icon-wrapper">
-                        <div class="draggable-icon pos-countries " title="Daily Sales">
+                        <div class="draggable-icon pos-dailysales " title="Daily Sales">
                             <a asp-page="/Report/DailySales" class="text-dark">
                                 <img src="/images/icons/daily.png" alt="Daily Sales" class="shadow-lg hover-border" />
                             </a>
                             <span class="bg-transparent text-white "><a asp-page="/Reports/DailySales" class="text-dark text-decoration-none">Daily Sales</a></span>
                         </div>
-                        <div class="draggable-icon pos-paymentmethods " title="Weekly Sales">
+                        <div class="draggable-icon pos-salesdaterange" title="Weekly Sales">
                             <a asp-page="/Report/SalesByDateRange" class="text-dark">
                                 <img src="/images/icons/weekly.png" alt="Weekly Sales" class="shadow-lg hover-border" />
                             </a>
                             <span class="bg-transparent text-white "><a asp-page="/Reports/SalesByDateRange" class="text-dark text-decoration-none">Sales by Date Range</a></span>
                         </div>
-                        <div class="draggable-icon pos-custclass " title="Monthly Sales">
+                        <div class="draggable-icon pos-monthlysales" title="Monthly Sales">
                             <a asp-page="/Report/MonthlySales" class="text-dark">
                                 <img src="/images/icons/monthly.png" alt="Monthly Sales" class="shadow-lg hover-border" />
                             </a>
                             <span class="bg-transparent text-white "><a asp-page="/Reports/MonthlySales" class="text-dark text-decoration-none">Monthly Sales</a></span>
                         </div>
-                        <div class="draggable-icon pos-producttypes " title="Yearly Sales">
+                        <div class="draggable-icon pos-yearlysales" title="Yearly Sales">
                             <a asp-page="/Report/YearlySales" class="text-dark">
                                 <img src="/images/icons/yearly.png" alt="Yearly Sales" class="shadow-lg hover-border" />
                             </a>
                             <span class="bg-transparent text-white "><a asp-page="/Reports/YearlySales" class="text-dark text-decoration-none">Yearly Sales</a></span>
+                        </div>                        
+                        <div class="draggable-icon pos-salesquota" title="Sales Quota">
+                            <a asp-page="/Report/SalesQuota" class="text-dark">
+                                <img src="/images/icons/quota.png" alt="Sales Quota" class="shadow-lg hover-border" />
+                            </a>
+                            <span class="bg-transparent text-white "><a asp-page="/Reports/SalesQuota" class="text-dark text-decoration-none">Sales Quota</a></span>
                         </div>
                     </div>
                 </div>

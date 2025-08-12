@@ -2,6 +2,7 @@
 using MailKit.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using NLI_POS.Models;
@@ -84,13 +85,53 @@ namespace NLI_POS.Pages.Orders
             OfficeTimeZoneId = office?.Country?.TimeZone;
 
 
-            var encoder = await _context.Users
-    .FirstOrDefaultAsync(u => u.UserName == Order.EncodedBy);
+            // Get only users in the 'Sales' role
+            var salesUsers = await (
+                from u in _context.Users
+                join ur in _context.UserRoles on u.Id equals ur.UserId
+                join r in _context.Roles on ur.RoleId equals r.Id
+                where r.Name == "Sales" && u.IsActive
+                select u
+            ).ToListAsync();
+
+            var encoder = salesUsers.FirstOrDefault(u => u.UserName == Order.EncodedBy);
 
             EncodedByFullName = encoder != null ? encoder.FullName : "Unknown";
 
+            ViewData["SalesPersonList"] = new SelectList(
+                salesUsers,
+                "UserName",
+                "FullName",
+                Order.SalesBy
+            );
+
+
+            EncodedByFullName = encoder != null ? encoder.FullName : "Unknown";
+
+
             //await AuditHelpers.LogAsync(HttpContext, _context, User, $"Viewed Order Details of {Order.OrderNo}");
             return Page();
+        }
+
+        public async Task<JsonResult> OnPostUpdateSalesPersonAsync(int OrderId, string SalesPersonUserName)
+        {
+            var order = await _context.Orders.FindAsync(OrderId);
+            if (order == null)
+                return new JsonResult(new { success = false, message = "Order not found" });
+
+            var oldSalesPersonUserName = order.SalesBy; //For Audit
+
+            var salesPerson = await _context.Users
+    .FirstOrDefaultAsync(u => u.UserName.ToLower() == SalesPersonUserName.ToLower());
+
+            if (salesPerson == null)
+                return new JsonResult(new { success = false, message = "Sales Person not found" });
+
+            order.SalesBy = salesPerson.UserName;
+            //TempData["SuccessMessage"] = "Sales Person has been updated.";
+            await _context.SaveChangesAsync();
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated Order {Order.OrderNo} Sales Person from '{oldSalesPersonUserName}' to '{salesPerson.UserName}'.");
+            return new JsonResult(new { success = true, newName = salesPerson.UserName });
         }
 
 
@@ -99,66 +140,66 @@ namespace NLI_POS.Pages.Orders
         //    if (Order == null || string.IsNullOrEmpty(Order.OrderNo))
         //        return NotFound();
 
-        //    var order = await _context.Orders
-        //        .Include(o => o.ProductItems)
-        //        .FirstOrDefaultAsync(o => o.OrderNo == Order.OrderNo);
+            //    var order = await _context.Orders
+            //        .Include(o => o.ProductItems)
+            //        .FirstOrDefaultAsync(o => o.OrderNo == Order.OrderNo);
 
-        //    if (order == null)
-        //        return NotFound();
+            //    if (order == null)
+            //        return NotFound();
 
-        //    if (order.IsVoided)
-        //        return RedirectToPage(new { orderNo = order.OrderNo });
+            //    if (order.IsVoided)
+            //        return RedirectToPage(new { orderNo = order.OrderNo });
 
-        //    // Flag as void
-        //    order.IsVoided = true;
-        //    order.VoidedDate = DateTime.Now;
-        //    order.VoidedBy = User.Identity?.Name ?? "System";
+            //    // Flag as void
+            //    order.IsVoided = true;
+            //    order.VoidedDate = DateTime.Now;
+            //    order.VoidedBy = User.Identity?.Name ?? "System";
 
-        //    // Restock items
-        //    // ✅ Reverse the inventory
-        //    if (order.Products != null && order.Products.ProductCategory == "Package")
-        //    {
-        //        // Package: unpack the combo
-        //        var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == order.ComboId);
-        //        if (combo != null)
-        //        {
-        //            var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
-        //            var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
+            //    // Restock items
+            //    // ✅ Reverse the inventory
+            //    if (order.Products != null && order.Products.ProductCategory == "Package")
+            //    {
+            //        // Package: unpack the combo
+            //        var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.Id == order.ComboId);
+            //        if (combo != null)
+            //        {
+            //            var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();
+            //            var qtyList = combo.QuantityList.Split(',').Select(int.Parse).ToList();
 
-        //            for (int i = 0; i < productIds.Count; i++)
-        //            {
-        //                int componentProductId = productIds[i];
-        //                int restockQty = qtyList[i] * order.Qty.Value;
+            //            for (int i = 0; i < productIds.Count; i++)
+            //            {
+            //                int componentProductId = productIds[i];
+            //                int restockQty = qtyList[i] * order.Qty.Value;
 
-        //                var inventory = await _context.InventoryStocks
-        //                    .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == order.OfficeId);
+            //                var inventory = await _context.InventoryStocks
+            //                    .FirstOrDefaultAsync(i => i.ProductId == componentProductId && i.OfficeId == order.OfficeId);
 
-        //                if (inventory != null)
-        //                {
-        //                    inventory.StockQty += restockQty;
-        //                    _context.InventoryStocks.Update(inventory);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // Regular product
-        //        var inventory = await _context.InventoryStocks
-        //            .FirstOrDefaultAsync(i => i.ProductId == order.ProductId && i.OfficeId == order.OfficeId);
+            //                if (inventory != null)
+            //                {
+            //                    inventory.StockQty += restockQty;
+            //                    _context.InventoryStocks.Update(inventory);
+            //                }
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        // Regular product
+            //        var inventory = await _context.InventoryStocks
+            //            .FirstOrDefaultAsync(i => i.ProductId == order.ProductId && i.OfficeId == order.OfficeId);
 
-        //        if (inventory != null)
-        //        {
-        //            inventory.StockQty += order.Qty.Value;
-        //            _context.InventoryStocks.Update(inventory);
-        //        }
-        //    }
+            //        if (inventory != null)
+            //        {
+            //            inventory.StockQty += order.Qty.Value;
+            //            _context.InventoryStocks.Update(inventory);
+            //        }
+            //    }
 
-        //     await _context.SaveChangesAsync();
+            //     await _context.SaveChangesAsync();
 
-        //    TempData["SuccessMessage"] = "Order has been successfully voided.";
-        //    return RedirectToPage(new { orderNo = order.OrderNo });
-        //}
+            //    TempData["SuccessMessage"] = "Order has been successfully voided.";
+            //    return RedirectToPage(new { orderNo = order.OrderNo });
+            //}
 
         public async Task<IActionResult> OnPostVoidAsync()
         {

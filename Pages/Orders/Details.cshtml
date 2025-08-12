@@ -76,12 +76,24 @@
     {
         <hr />
         <div class="row small">
-            <div class="col-12 col-sm-2 col-md-2 col-lg-2 col-xl2">
+            <div class="col-sm-4 col-md-4 col-lg-4">
                 Sales By
-                <label class="form-control form-control-sm">@(Model.Order.SalesBy ?? "Not Yet Specified")</label>
+                <div class="input-group input-group-sm">
+                    <input type="text"
+                           class="form-control"
+                           value="@(Model.Order.SalesBy ?? "Not Yet Specified")"
+                           readonly />
+                    <button class="btn btn-warning"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#updateSalesPersonModal"
+                            title="Change Sales Person">
+                        <i class="fa-regular fa-user me-2"></i> Change
+                    </button>
+                </div>
             </div>
 
-            <div class="col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+            <div class="col-12 col-sm-2 col-md-2 col-lg-2 col-xl2">
                 Encoded Date
                 @{
                     string timeZoneId = Model.OfficeTimeZoneId ?? "UTC"; // Fallback if null
@@ -99,7 +111,7 @@
                 Encoded By
                 <label class="form-control form-control-sm">@Html.DisplayFor(model => model.Order.EncodedBy)</label>
             </div>
-            <div class="col-12 col-sm-3 col-md-3 col-lg-3 col-xl3">
+            <div class="col-12 col-sm-2 col-md-2 col-lg-2 col-xl2">
                 Updated Date
                 <label class="form-control form-control-sm">@Html.DisplayFor(model => model.Order.UpdateDate)&nbsp;</label>
             </div>
@@ -178,253 +190,353 @@
 
 </div>
 
-<script>
-    function confirmVoid(orderNo) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: `You are about to void Order No: ${orderNo}`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, void it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('voidOrderNoInput').value = orderNo;
-                document.getElementById('voidForm').submit();
-            }
-        });
-    }
-</script>
+<!-- Update Sales Person Modal -->
+<div class="modal fade" id="updateSalesPersonModal" tabindex="-1" aria-labelledby="updateSalesPersonLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <form id="updateSalesPersonForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-success" id="updateSalesPersonLabel">Update Sales Person</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-<script>
+                <div class="modal-body">
+                    <input type="hidden" id="orderId" name="OrderId" value="@Model.Order.Id" />
 
-    function buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTot) {
-        let html = `
-                        <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">
-                            <table width="100%" cellpadding="0" cellspacing="0" style="width: 100%;">
-                                <tr>
-                                    <!-- Logo block -->
-                                    <td style="width: 50%; vertical-align: top;">
-                                        <img src="https://pos.ournoblelife.com/images/nli-logo.png" style="width: 200px;" alt="Logo" />
-                                        <p style="margin: 5px 0 0; font-style: italic;">We care for you <strong>naturally</strong>!</p>
-                                    </td>
+                    <div class="mb-3">
+                        <label for="salesPersonSelect" class="form-label">Sales Person</label>
+                        <select id="salesPersonSelect" name="SalesPersonId" class="form-select" asp-for="Order.SalesBy" asp-items="ViewBag.SalesPersonList">
+                            <option value="">-- Select Sales Person --</option>
+                        </select>
 
-                                    <!-- Address block -->
-                                    <td style="width: 50%; vertical-align: top; text-align: right; font-size: 12px; line-height: 1.5;">
-                                        <p style="margin: 0;">Bay 9 St. Anthony Bldg.</p>
-                                        <p style="margin: 0;">891 Aurora Blvd. Cubao, Quezon City 1109</p>
-                                        <p style="margin: 0;">Email: <a href="mailto:wecare@ournoblelife.com">wecare@ournoblelife.com</a></p>
-                                        <p style="margin: 0;">+63 917 828 0696</p>
-                                    </td>
-                                </tr>
-                            </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-arrow-left me-2"></i> Cancel</button>
+                    <button type="submit" class="btn btn-success"><i class="fa-regular fa-floppy-disk me-2"></i> Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmVoid(orderNo) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to void Order No: ${orderNo}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, void it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('voidOrderNoInput').value = orderNo;
+                    document.getElementById('voidForm').submit();
+                }
+            });
+        }
+    </script>
+
+    <script>
+
+        function buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTot) {
+            let html = `
+                                            <div style="font-family: Arial, sans-serif; color: #333; max-width: 700px; margin: auto; border: 1px solid #ccc; padding: 20px;">
+                                                <table width="100%" cellpadding="0" cellspacing="0" style="width: 100%;">
+                                                    <tr>
+                                                        <!-- Logo block -->
+                                                        <td style="width: 50%; vertical-align: top;">
+                                                            <img src="https://pos.ournoblelife.com/images/nli-logo.png" style="width: 200px;" alt="Logo" />
+                                                            <p style="margin: 5px 0 0; font-style: italic;">We care for you <strong>naturally</strong>!</p>
+                                                        </td>
+
+                                                        <!-- Address block -->
+                                                        <td style="width: 50%; vertical-align: top; text-align: right; font-size: 12px; line-height: 1.5;">
+                                                            <p style="margin: 0;">Bay 9 St. Anthony Bldg.</p>
+                                                            <p style="margin: 0;">891 Aurora Blvd. Cubao, Quezon City 1109</p>
+                                                            <p style="margin: 0;">Email: <a href="mailto:wecare@ournoblelife.com">wecare@ournoblelife.com</a></p>
+                                                            <p style="margin: 0;">+63 917 828 0696</p>
+                                                        </td>
+                                                    </tr>
+                                                </table>
 
 
-                        <h2 style="margin-top: 20px;">Purchase Order Receipt</h2>
-                        <p><strong>Order No:</strong> ${orderNo}<br>
-                        <strong>Date:</strong> ${date}<br>
-                        <strong>Customer:</strong> ${customerName}</p>
+                                            <h2 style="margin-top: 20px;">Purchase Order Receipt</h2>
+                                            <p><strong>Order No:</strong> ${orderNo}<br>
+                                            <strong>Date:</strong> ${date}<br>
+                                            <strong>Customer:</strong> ${customerName}</p>
 
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                            <thead style="background-color: #f2f2f2;">
-                                <tr>
-                                    <th style="border: 1px solid #ccc; padding: 8px;">#</th>
-                                    <th style="border: 1px solid #ccc; padding: 8px;">Category</th>
-                                    <th style="border: 1px solid #ccc; padding: 8px;">Item</th>
-                                    <th style="border: 1px solid #ccc; padding: 8px;">Combo</th>
-                                    <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Price</th>
-                                    <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Qty</th>
-                                    <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
+                                            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                                                <thead style="background-color: #f2f2f2;">
+                                                    <tr>
+                                                        <th style="border: 1px solid #ccc; padding: 8px;">#</th>
+                                                        <th style="border: 1px solid #ccc; padding: 8px;">Category</th>
+                                                        <th style="border: 1px solid #ccc; padding: 8px;">Item</th>
+                                                        <th style="border: 1px solid #ccc; padding: 8px;">Combo</th>
+                                                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Price</th>
+                                                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Qty</th>
+                                                        <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>`;
 
-        items.forEach((item, i) => {
+            items.forEach((item, i) => {
+                html += `
+                                                                                <tr>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px;">${i + 1}</td>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px;">${item.category}</td>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px;">${item.name}</td>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px;">${item.combo}</td>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.price}</td>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.qty}</td>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.amount}</td>
+                                                                                </tr>`;
+            });
+
+            html += `</tbody></table>`;
+
+            //Totals section
+            let subtotalDisp = parseFloat(subtotal).toLocaleString('en-US', { minimumFractionDigits: 2 });
+            let discountDisp = parseFloat(discount).toLocaleString('en-US', { minimumFractionDigits: 2 });
+            let grandTotDisp = parseFloat(grandTot).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
             html += `
-                                                            <tr>
-                                                                <td style="border: 1px solid #ccc; padding: 8px;">${i + 1}</td>
-                                                                <td style="border: 1px solid #ccc; padding: 8px;">${item.category}</td>
-                                                                <td style="border: 1px solid #ccc; padding: 8px;">${item.name}</td>
-                                                                <td style="border: 1px solid #ccc; padding: 8px;">${item.combo}</td>
-                                                                <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.price}</td>
-                                                                <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.qty}</td>
-                                                                <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${item.amount}</td>
-                                                            </tr>`;
-        });
-
-        html += `</tbody></table>`;
-
-        //Totals section
-        let subtotalDisp = parseFloat(subtotal).toLocaleString('en-US', { minimumFractionDigits: 2 });
-        let discountDisp = parseFloat(discount).toLocaleString('en-US', { minimumFractionDigits: 2 });
-        let grandTotDisp = parseFloat(grandTot).toLocaleString('en-US', { minimumFractionDigits: 2 });
-
-        html += `
-                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                    <tr>
-                        <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Subtotal:</td>
-                            <td style="text-align: right; padding: 8px;">${subtotalDisp}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Discount:</td>
-                            <td style="text-align: right; padding: 8px;">${discountDisp}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Grand Total:</td>
-                            <td style="text-align: right; padding: 8px; font-weight: bold;">${grandTotDisp}</td>
-                    </tr>
-                </table>`;
+                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                        <tr>
+                                            <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Subtotal:</td>
+                                                <td style="text-align: right; padding: 8px;">${subtotalDisp}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Discount:</td>
+                                                <td style="text-align: right; padding: 8px;">${discountDisp}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="text-align: right; padding: 8px; font-weight: bold;">Grand Total:</td>
+                                                <td style="text-align: right; padding: 8px; font-weight: bold;">${grandTotDisp}</td>
+                                        </tr>
+                                    </table>`;
 
 
-        // Payments section
-        html += `<h3 style="margin-top: 30px;">Payment Summary</h3>
-                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                        <thead style="background-color: #f2f2f2;">
-                                                            <tr>
-                                                                <th style="border: 1px solid #ccc; padding: 8px;">Payment Method</th>
-                                                                <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>`;
+            // Payments section
+            html += `<h3 style="margin-top: 30px;">Payment Summary</h3>
+                                                                        <table style="width: 100%; border-collapse: collapse;">
+                                                                            <thead style="background-color: #f2f2f2;">
+                                                                                <tr>
+                                                                                    <th style="border: 1px solid #ccc; padding: 8px;">Payment Method</th>
+                                                                                    <th style="border: 1px solid #ccc; padding: 8px; text-align: right;">Amount</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>`;
 
-        payments.forEach(p => {
+            payments.forEach(p => {
+                html += `
+                                                                                <tr>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px;">${p.method}</td>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${p.amount}</td>
+                                                                                </tr>`;
+            });
+
             html += `
-                                                            <tr>
-                                                                <td style="border: 1px solid #ccc; padding: 8px;">${p.method}</td>
-                                                                <td style="border: 1px solid #ccc; padding: 8px; text-align: right;">${p.amount}</td>
-                                                            </tr>`;
-        });
+                                                                                <tr>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">Change</td>
+                                                                                    <td style="border: 1px solid #ccc; padding: 8px; text-align: right; font-weight: bold;">${change}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
 
-        html += `
-                                                            <tr>
-                                                                <td style="border: 1px solid #ccc; padding: 8px; font-weight: bold;">Change</td>
-                                                                <td style="border: 1px solid #ccc; padding: 8px; text-align: right; font-weight: bold;">${change}</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                                        <p style="font-size: 12px; margin-top: 30px; font-style: italic; color: #666;">
+                                                                            NOTE: This is a computer-generated receipt. No signature is required.
+                                                                        </p>
 
-                                                    <p style="font-size: 12px; margin-top: 30px; font-style: italic; color: #666;">
-                                                        NOTE: This is a computer-generated receipt. No signature is required.
-                                                    </p>
+                                                                        <p style="text-align: right; font-weight: bold;">Cashier: System Admin</p>
+                                                                    </div>`;
 
-                                                    <p style="text-align: right; font-weight: bold;">Cashier: System Admin</p>
-                                                </div>`;
+            return html;
+        }
 
-        return html;
-    }
+        function sendEmail(button) {
+            const orderNo = button.getAttribute('data-orderno');
+            const customerName = button.getAttribute('data-customer');
+            const date = new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    function sendEmail(button) {
-        const orderNo = button.getAttribute('data-orderno');
-        const customerName = button.getAttribute('data-customer');
-        const date = new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+            // Extract product rows
+            const items = [];
+            document.querySelectorAll('#main_cartTable tbody tr').forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 7) {
+                    items.push({
+                        category: cols[1].textContent.trim(),
+                        name: cols[2].textContent.trim(),
+                        combo: cols[3].textContent.trim(),
+                        price: cols[4].textContent.trim(),
+                        qty: cols[5].textContent.trim(),
+                        amount: cols[6].textContent.trim()
+                    });
+                }
+            });
 
-        // Extract product rows
-        const items = [];
-        document.querySelectorAll('#main_cartTable tbody tr').forEach(row => {
-            const cols = row.querySelectorAll('td');
-            if (cols.length >= 7) {
-                items.push({
-                    category: cols[1].textContent.trim(),
-                    name: cols[2].textContent.trim(),
-                    combo: cols[3].textContent.trim(),
-                    price: cols[4].textContent.trim(),
-                    qty: cols[5].textContent.trim(),
-                    amount: cols[6].textContent.trim()
-                });
-            }
-        });
+            // Extract payment rows (text-based)
+            const payments = [];
+            document.querySelectorAll('#main_paymentTableBody tr[data-payment]').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const method = cells[1]?.textContent.trim() || '';
+                const amount = cells[2]?.textContent.trim() || '';
+                if (method && amount) {
+                    payments.push({ method, amount });
+                }
+            });
 
-        // Extract payment rows (text-based)
-        const payments = [];
-        document.querySelectorAll('#main_paymentTableBody tr[data-payment]').forEach(row => {
-            const cells = row.querySelectorAll('td');
-            const method = cells[1]?.textContent.trim() || '';
-            const amount = cells[2]?.textContent.trim() || '';
-            if (method && amount) {
-                payments.push({ method, amount });
-            }
-        });
+            // Get grand total and total paid to calculate change
+            const grandText = document.getElementById("grandTotal")?.textContent?.replace(/[^\d.-]/g, '') || "0";
+            let grandTotal = parseFloat(grandText);
 
-        // Get grand total and total paid to calculate change
-        const grandText = document.getElementById("grandTotal")?.textContent?.replace(/[^\d.-]/g, '') || "0";
-        let grandTotal = parseFloat(grandText);
+            const discount = 0;
 
-        const discount = 0;
+            let paidTotal = 0;
+            payments.forEach(p => {
+                const amt = parseFloat(p.amount.replace(/,/g, '')) || 0;
+                paidTotal += amt;
+            });
 
-        let paidTotal = 0;
-        payments.forEach(p => {
-            const amt = parseFloat(p.amount.replace(/,/g, '')) || 0;
-            paidTotal += amt;
-        });
+            let grandTotDisplay = grandTotal.toFixed(2);
+            let subtotal = grandTotDisplay; //For now while discount is not yet functional
+            const change = (paidTotal - grandTotal).toFixed(2);
 
-        let grandTotDisplay = grandTotal.toFixed(2);
-        let subtotal = grandTotDisplay; //For now while discount is not yet functional
-        const change = (paidTotal - grandTotal).toFixed(2);
+            // Build email body
+            const html = buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTotDisplay);
+            // const email = prompt("Enter recipient email:");
+            // if (!email) return;
+            const bsModal = bootstrap.Modal.getInstance(document.getElementById('printReceipt'));
+            if (bsModal) bsModal.hide();
 
-        // Build email body
-        const html = buildEmailHtml(orderNo, date, customerName, items, payments, change, subtotal, discount, grandTotDisplay);
-        // const email = prompt("Enter recipient email:");
-        // if (!email) return;
-        const bsModal = bootstrap.Modal.getInstance(document.getElementById('printReceipt'));
-        if (bsModal) bsModal.hide();
+            Swal.fire({
+                title: 'Send Receipt via Email',
+                input: 'email',
+                inputLabel: 'Recipient Email Address',
+                inputPlaceholder: 'example@email.com',
+                confirmButtonText: 'Send Email',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                allowOutsideClick: true, // important for modal contexts
+                stopKeydownPropagation: false,
+                inputValidator: (value) => {
+                    if (!value) return 'Email is required!';
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    showLoader();
+                    const email = result.value;
 
-        Swal.fire({
-            title: 'Send Receipt via Email',
-            input: 'email',
-            inputLabel: 'Recipient Email Address',
-            inputPlaceholder: 'example@email.com',
-            confirmButtonText: 'Send Email',
-            showCancelButton: true,
-            cancelButtonText: 'Cancel',
-            inputAttributes: {
-                autocapitalize: 'off'
-            },
-            allowOutsideClick: true, // important for modal contexts
-            stopKeydownPropagation: false,
-            inputValidator: (value) => {
-                if (!value) return 'Email is required!';
-            }
-        }).then(result => {
-            if (result.isConfirmed) {
-                showLoader();
-                const email = result.value;
-
-                fetch('?handler=EmailModal', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    body: JSON.stringify({ email, html })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
+                    fetch('?handler=EmailModal', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        body: JSON.stringify({ email, html })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                hideLoader();
+                                Swal.fire('Sent!', 'The email was successfully sent.', 'success');
+                            } else {
+                                hideLoader();
+                                Swal.fire('Error', data.error || 'Failed to send email.', 'error');
+                            }
+                        })
+                        .catch(() => {
                             hideLoader();
-                            Swal.fire('Sent!', 'The email was successfully sent.', 'success');
+                            Swal.fire('Error', 'Network or server error occurred.', 'error');
+                        });
+                }
+            });
+        }
+
+    </script>
+
+    <script>
+        function goBack() {
+            let lastPage = sessionStorage.getItem("lastPage");
+            if (lastPage) {
+                window.location.href = lastPage;
+            } else {
+                window.location.href = '/Orders/Index';
+            }
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#updateSalesPersonForm').on('submit', function (e) {
+                showLoader();
+                e.preventDefault();
+
+                const orderId = $('#orderId').val();
+                const salesPersonUserName = $('#salesPersonSelect').val();
+                const token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: '?handler=UpdateSalesPerson',
+                    method: 'POST',
+                    data: {
+                        __RequestVerificationToken: token,
+                        OrderId: orderId,
+                        SalesPersonUserName: salesPersonUserName
+                    },
+                    success: function (res) {
+                        if (res.success) {
+                            // Update UI with new Sales Person name
+                            $('label[for="SalesBy"]').text(res.newName);
+
+                            // Close modal
+                            $('#updateSalesPersonModal').modal('hide');
+                            hideLoader();
+                            // Store last page before reload
+                            sessionStorage.setItem("lastPage", document.referrer);
+                            Swal.fire({
+                                icon: 'success',              // 'success', 'error', 'warning', 'info', or 'question'
+                                title: 'Sales Person updated successfully!',
+                                // text: 'Sales Person updated successfully!',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload(); // Reloads the page
+                                }
+                            });
+
+                            // alert("✅ Sales Person updated successfully!");
                         } else {
                             hideLoader();
-                            Swal.fire('Error', data.error || 'Failed to send email.', 'error');
+                            alert("❌ " + res.message);
                         }
-                    })
-                    .catch(() => {
+                    },
+                    error: function (err) {
                         hideLoader();
-                        Swal.fire('Error', 'Network or server error occurred.', 'error');
-                    });
-            }
+                        console.error('Error:', err);
+                        //alert("❌ An error occurred while updating.");
+                        Swal.fire({
+                            icon: 'error',              // 'success', 'error', 'warning', 'info', or 'question'
+                            title: 'No Sales Person Selected.',
+                            text: 'Please select a Sales Person.',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#3085d6'
+                        })
+                    }
+                });
+            });
         });
-    }
+    </script>
 
-</script>
 
-<script>
-    function goBack() {
-        if (document.referrer) {
-            window.location.href = document.referrer;
-        } else {
-            window.location.href = './Index';
-        }
-    }
-</script>
+}

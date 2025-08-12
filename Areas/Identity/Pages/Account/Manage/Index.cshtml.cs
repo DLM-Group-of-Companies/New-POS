@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 using NLI_POS.Data;
 using NLI_POS.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace NLI_POS.Areas.Identity.Pages.Account.Manage
 {
@@ -153,7 +154,11 @@ namespace NLI_POS.Areas.Identity.Pages.Account.Manage
             //{
             //    await _userManager.AddToRoleAsync(user, strDDLRole);
             //}
-            user.FullName = Fullname;
+
+            var textInfo = CultureInfo.CurrentCulture.TextInfo;
+            var fullNameTitleCase = textInfo.ToTitleCase(Fullname.Trim().ToLower());
+
+            user.FullName = fullNameTitleCase;
             user.Designation = Input.Designation;
 
             await _userManager.UpdateAsync(user);

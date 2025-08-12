@@ -21,6 +21,21 @@ namespace NLI_POS.Services
             }
         }
 
+        public static (DateTime StartUtc, DateTime EndUtc) GetUtcDayRange(string timeZoneId, DateTime? dateLocal = null)
+        {
+            var tzInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+
+            // If no date given, use today in that time zone
+            var localDate = dateLocal ?? TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tzInfo).Date;
+            var startLocal = localDate.Date;
+            var endLocal = startLocal.AddDays(1);
+
+            var startUtc = TimeZoneInfo.ConvertTimeToUtc(startLocal, tzInfo);
+            var endUtc = TimeZoneInfo.ConvertTimeToUtc(endLocal, tzInfo);
+
+            return (startUtc, endUtc);
+        }
+
         public static string GetUserId(this ClaimsPrincipal user)
         {
             return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;

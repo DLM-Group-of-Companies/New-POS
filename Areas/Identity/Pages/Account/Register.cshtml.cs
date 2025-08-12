@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using NLI_POS.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
 
@@ -109,7 +110,10 @@ namespace NLI_POS.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Username.Trim().ToUpper(), Email = Input.Email.ToLower().Trim(), FullName = Input.FullName.Trim(), OfficeId = Input.OfficeId };
+                var textInfo = CultureInfo.CurrentCulture.TextInfo;
+                var fullNameTitleCase = textInfo.ToTitleCase(Input.FullName.Trim().ToLower());
+
+                var user = new ApplicationUser { UserName = Input.Username.Trim().ToUpper(), Email = Input.Email.ToLower().Trim(), FullName = fullNameTitleCase, OfficeId = Input.OfficeId };
 
                 var isUserNameAlreadyExists = _userManager.Users.Any(x => x.UserName == user.UserName);
                 if (isUserNameAlreadyExists)

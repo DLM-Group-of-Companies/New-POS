@@ -14,7 +14,7 @@ namespace NLI_POS.Models
         public string FullName { get; set; } = "";
 
         [StringLength(100)]
-        public string Designation { get; set; } = "";
+        public string? Designation { get; set; } = "";
 
         [Display(Name = "Office")]
         [ForeignKey("OfficeCountry")]

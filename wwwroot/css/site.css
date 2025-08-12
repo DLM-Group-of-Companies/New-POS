@@ -29,6 +29,7 @@ main {
     padding: 1rem;
     transition: all 0.3s ease;
 }
+
 .main-content {
     padding-bottom: 40px; /* 👈 Same or slightly more than footer height */
 }
@@ -207,7 +208,6 @@ input[type="number"] {
         align-items: center;
         justify-content: center;
     }
-
 }
 
 
@@ -414,7 +414,37 @@ input[type="number"] {
         top: 200px;
         left: 300px;
     }
+
     /* for modal ulitites */
+    /*end*/
+
+    /* for modal reports */
+    /*start*/
+    .pos-dailysales {
+        top: 0;
+        left: 0;
+    }
+
+    .pos-salesdaterange {
+        top: 0;
+        left: 200px;
+    }
+
+    .pos-monthlysales {
+        top: 0;
+        left: 400px;
+    }
+
+    .pos-yearlysales {
+        top: 0;
+        left: 600px;
+    }
+
+    .pos-salesquota {
+        top: 200px;
+        left: 100px;
+    }
+    /* for modal reports */
     /*end*/
 }
 
@@ -503,7 +533,7 @@ input[type="number"] {
         flex-grow: 1;
     }
 
-    /*Fix datatable progress bar behind headers*/
+/*Fix datatable progress bar behind headers*/
 .dataTables_processing {
     z-index: 1050 !important; /* Higher than sticky headers (Bootstrap uses 1030–1040) */
     position: absolute !important;
@@ -525,3 +555,16 @@ input[type="number"] {
         box-shadow: 0 0 0 0.25rem rgba(173, 216, 230, 0.50); /* optional shadow */
     }
 
+/*Custom Background Colors*/
+.bg-butterscotch {
+    background-color: #E3963E !important; 
+}
+
+.bg-darkpurple {
+    background-color: #4b2c5e !important; /* dark purple */
+    color: white; /* ensure text is visible */
+}
+
+.bg-softgreen {
+    background-color: #e9f7ef !important; /* pale green */
+}

@@ -28,6 +28,13 @@ namespace NLI_POS.Pages.Orders
         public async Task<IActionResult> OnGetAsync()
         {
             OfficeList = await GetUserOfficesAsync();
+
+            Order = await _context.Orders
+    .Include(o => o.Customers)
+    .OrderByDescending(o => o.OrderDate)
+    .Take(10) // limit results for mobile
+    .ToListAsync();
+
             return Page();
         }
 
@@ -77,6 +84,7 @@ namespace NLI_POS.Pages.Orders
             var searchValue = requestForm["search[value]"].FirstOrDefault();
 
             var officeId = requestForm["officeId"].FirstOrDefault();
+            var timeZone = requestForm["timeZone"].FirstOrDefault();
 
             var query = _context.Orders
                 .Include(o => o.Customers)
@@ -128,6 +136,8 @@ namespace NLI_POS.Pages.Orders
                     break;
             }
 
+            var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+
             // Paging
             var data = await query
                 .Skip(start)
@@ -135,7 +145,10 @@ namespace NLI_POS.Pages.Orders
                 .Select(o => new
                 {
                     o.OrderNo,
-                    OrderDate = DateTime.SpecifyKind(o.OrderDate, DateTimeKind.Utc),
+                    //OrderDate = DateTime.SpecifyKind(o.OrderDate, DateTimeKind.Utc),
+                    OrderDate = TimeZoneInfo
+            .ConvertTimeFromUtc(DateTime.SpecifyKind(o.OrderDate, DateTimeKind.Utc), tz)
+            .ToString("yyyy-MM-dd HH:mm:ss"),
                     CustomerName = o.Customers.FirstName + " " + o.Customers.LastName,
                     Office = o.Office.Name,
                     o.IsVoided,

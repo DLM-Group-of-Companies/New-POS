@@ -49,6 +49,12 @@ namespace NLI_POS.Pages.Orders
 
         public List<SelectListItem> SalesPersons { get; set; }
 
+        [BindProperty]
+        public string OfficeTimeZone { get; set; } 
+        
+        [BindProperty]
+        public string OfficeLocale { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
             //Reset cart
@@ -111,7 +117,7 @@ namespace NLI_POS.Pages.Orders
             return new JsonResult(SectionList);
         }
 
-        public IActionResult OnGetProductList(string ProdCat, string? custclass)
+        public IActionResult OnGetProductList(string ProdCat, string? custclass, string? OfficeTimeZone)
         {
             //ModelState.Clear();
 
@@ -139,14 +145,16 @@ namespace NLI_POS.Pages.Orders
                 productsQuery = productsQuery.Where(p => p.isStaffAvailable == true);
             }
 
-            var now = DateTime.UtcNow;
+            var nowLocal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
+     TimeZoneInfo.FindSystemTimeZoneById(OfficeTimeZone)); // from office dropdown
+
             // ✅ Filter Promo Packages if applicable
             if (ProdCat?.Trim() == "Package")
             {
                 productsQuery = productsQuery.Where(p =>
                     p.PromoSetting == null || (
                         (p.PromoSetting.IsOngoing) ||
-                        (p.PromoSetting.StartDate <= now && p.PromoSetting.EndDate >= now)
+                        (p.PromoSetting.StartDate <= nowLocal && p.PromoSetting.EndDate >= nowLocal)
                     )
                 );
             }
@@ -282,6 +290,17 @@ namespace NLI_POS.Pages.Orders
 
         public async Task<IActionResult> OnPostAsync()
         {
+            OfficeList = await GetUserOfficesAsync();
+
+            ViewData["PaymentMethod"] = _context.PaymentMethods
+    .Where(p => p.IsActive)
+    .Select(p => new PaymentMethodVM
+    {
+        Id = p.Id,
+        Name = p.Name,
+        ServiceCharge = p.ServiceCharge
+    })
+    .ToList();
 
             var cart = HttpContext.Session.GetObject<List<ProductItem>>("Cart");
 
@@ -396,6 +415,11 @@ namespace NLI_POS.Pages.Orders
 
             // Attach Payments
             order.Payments = Payments;
+
+            //if (!ModelState.IsValid)
+            //{
+            //    return Page();
+            //}
 
             // Save entire order 
             _context.Orders.Add(order);
@@ -756,6 +780,7 @@ namespace NLI_POS.Pages.Orders
 
             if (!ModelState.IsValid)
             {
+                OfficeList = await GetUserOfficesAsync();
                 return Page();
             }
 

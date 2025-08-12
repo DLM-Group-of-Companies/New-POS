@@ -25,6 +25,7 @@
                 {
                     <option value="@office.Value"
                             data-timezone="@office.TimeZone"
+                            data-locale="@office.Locale"
                             data-currency="@office.CurrencyCode">
                         @office.Text
                     </option>
@@ -72,6 +73,30 @@
                     return JSON.parse(sessionStorage.getItem('OrdersTableState'));
                 },
                 serverSide: true,
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.childRowImmediate, // show expanded content immediately in mobile
+                        renderer: function (api, rowIdx, columns) {
+                            // Only render hidden columns to avoid duplication
+                            let data = columns.filter(col => col.hidden)
+                                .map(col => {
+                                    return `
+                                <div class="mb-2">
+                                    <strong>${col.title}:</strong> ${col.data}
+                                </div>
+                            `;
+                                }).join('');
+
+                            return data ?
+                                `<div class="card shadow-sm border-0">
+                            <div class="card-body p-3">
+                                ${data}
+                            </div>
+                        </div>` : false;
+                        }
+                    }
+                }
+                ,
                 ajax: {
                     url: '@Url.Page("Index", "Orders")', // returns JSON
                     data: function (d) {
@@ -93,10 +118,12 @@
                         data: 'orderDate',
                         render: {
                             display: function (data) {
-                                const timeZone = $('#officeFilter option:selected').data('timezone') || 'Asia/Manila';
+                                const selected = $('#officeFilter option:selected');
+                                const timeZone = selected.data('timezone') || 'Asia/Manila';
+                                const locale = selected.data('locale') || 'en-PH';
                                 try {
                                     const utcDate = new Date(data);
-                                    return utcDate.toLocaleString('en-PH', {
+                                    return utcDate.toLocaleString(locale, {
                                         timeZone: timeZone,
                                         year: 'numeric',
                                         month: 'short',
@@ -147,7 +174,7 @@
                     { targets: 6, orderable: false }
                 ],
                 order: [[1, 'desc']],
-                responsive: true,
+                // responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
                     {
