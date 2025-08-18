@@ -55,7 +55,10 @@ namespace NLI_POS.Pages.Orders
         [BindProperty]
         public string OfficeLocale { get; set; }
 
-        public async Task<IActionResult> OnGetAsync()
+        [BindProperty(SupportsGet = true)]
+        public int? SelectedOfficeId { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(int? officeId )
         {
             //Reset cart
             HttpContext.Session.Remove("Cart");
@@ -73,6 +76,7 @@ namespace NLI_POS.Pages.Orders
 
             OfficeList = await GetUserOfficesAsync(); //Filters office by Office Assignment
 
+            SelectedOfficeId = officeId;
 
             ViewData["PaymentMethod"] = _context.PaymentMethods
                 .Where(p => p.IsActive)
@@ -191,7 +195,7 @@ namespace NLI_POS.Pages.Orders
 
             if (SectionList.Count == 0)
             {
-                SectionList.Insert(0, new SelectListItem { Text = "No Combination Available", Value = "" });
+                SectionList.Insert(0, new SelectListItem { Text = "Not Available", Value = "" });
             }
             else
             {
@@ -286,6 +290,12 @@ namespace NLI_POS.Pages.Orders
                 })
                 .ToList();
 
+        }
+
+        public IActionResult OnPostClearCart()
+        {
+            HttpContext.Session.Remove("Cart");
+            return new JsonResult(new { success = true });
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -598,7 +608,7 @@ namespace NLI_POS.Pages.Orders
 
                 if (combo == null)
                 {
-                    return new JsonResult(new { success = false, message = "No combo found for this package." });
+                    return new JsonResult(new { success = false, message = "No product found for this package." });
                 }
 
                 var productIds = combo.ProductIdList.Split(',').Select(int.Parse).ToList();

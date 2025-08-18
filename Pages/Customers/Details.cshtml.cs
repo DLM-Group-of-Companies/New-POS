@@ -62,7 +62,7 @@ namespace NLI_POS.Pages.Customers
 
                     Customer = customer;
                     Order = _context.Orders
-                        .Where(o => o.CustomerId == id)
+                        .Where(o => o.CustomerId == id && !o.IsVoided)
                               .Include(o => o.Customers)
                               .Include(o => o.Office)
                     //.Include(o => o.Product)
@@ -85,7 +85,7 @@ namespace NLI_POS.Pages.Customers
                                   OrderDate = g.Key.OrderDate,
                                   CustomerName = g.Key.CustomerName,
                                   Office = g.Key.OfficeName,
-                                  TotAmount = (decimal)g.Sum(x => x.TotPaidAmount)
+                                  TotAmount = (decimal)g.Sum(x => x.TotAmount)
                               })
                               .ToList();
                 }

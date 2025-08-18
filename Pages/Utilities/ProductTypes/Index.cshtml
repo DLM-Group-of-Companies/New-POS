@@ -9,60 +9,154 @@
     <div class="card border-0 shadow rounded-4 p-4 mx-auto" style="max-width: 720px;">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="text-primary mb-0">
-                <i class="fas fa-user-friends me-2"></i> @ViewData["Title"]
+                <i class="fas fa-shapes me-2"></i> @ViewData["Title"]
             </h4>
             <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '/';"></i>
         </div>
 
         <p>
-            <a asp-page="Create" class="btn btn-primary"><i class="far fa-plus-square me-2"></i>Add New</a>
+            <button class="btn btn-success" onclick="openCreateModal()">
+                <i class="fas fa-plus"></i> Add Product Type
+            </button>
         </p>
-        <table id="productTypesTable" class="table table-striped table-hover nowrap" style="width:100%">
+        <table id="productTypeTable" class="table table-striped table-hover nowrap" style="width:100%">
             <thead class="table-light">
                 <tr>
-                    <th>@Html.DisplayNameFor(model => model.ProductType[0].Name)</th>
-                    <th>@Html.DisplayNameFor(model => model.ProductType[0].Description)</th>
-                    <th>@Html.DisplayNameFor(model => model.ProductType[0].IsActive)</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Active</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.ProductType)
-                {
-                    <tr>
-                        <td>@item.Name</td>
-                        <td>@item.Description</td>
-                        <td>
-                            @if (item.IsActive)
-                            {
-                                <span class="badge bg-success">Active</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Inactive</span>
-                            }
-                        </td>
-                        <td>
-                            <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-success btn-sm me-1" title="Edit">
-                                <i class="far fa-edit"></i>
-                            </a>
-                            <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm" title="Details">
-                                <i class="fas fa-info-circle"></i>
-                            </a>
-                        </td>
-                    </tr>
-                }
             </tbody>
         </table>
     </div>
 </div>
 
+<!-- Create/Edit Modal -->
+<div class="modal fade" id="productTypeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="productTypeForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Add Product Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="productTypeId">
+                    <div class="mb-3">
+                        <label>Name</label>
+                        <input type="text" id="name" class="form-control" required maxlength="50">
+                    </div>
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <input type="text" id="description" class="form-control" maxlength="100">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+    let table;
+
     $(document).ready(function () {
-        $('#productTypesTable').DataTable({
-            responsive: true,
-            pageLength: 10,
-            columnDefs: [{ targets: -1, orderable: false }]
+        table = $('#productTypeTable').DataTable({
+            ajax: {
+                url: '?handler=List',
+                type: 'GET'
+            },
+            columns: [
+                { data: 'name' },
+                { data: 'description' },
+                {
+                    data: 'isActive',
+                    render: data => data ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-danger">No</span>'
+                },
+                {
+                    data: 'id',
+                    render: function (data, type, row) {
+                        return `
+                                            <button class="btn btn-sm btn-warning" onclick="openEditModal(${data}, '${row.name}', '${row.description}')"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-danger" onclick="deactivate(${data})"><i class="fas fa-ban"></i></button>
+                                        `;
+                    }
+                }
+            ]
+        });
+
+        $('#productTypeForm').submit(function (e) {
+            e.preventDefault();
+            saveProductType();
         });
     });
+
+    function openCreateModal() {
+        $('#productTypeId').val('');
+        $('#name').val('');
+        $('#description').val('');
+        $('#modalTitle').text('Add Product Type');
+        $('#productTypeModal').modal('show');
+    }
+
+    function openEditModal(id, name, description) {
+        $('#productTypeId').val(id);
+        $('#name').val(name);
+        $('#description').val(description);
+        $('#modalTitle').text('Edit Product Type');
+        $('#productTypeModal').modal('show');
+    }
+
+    function saveProductType() {
+        const id = $('#productTypeId').val();
+        const payload = {
+            Id: id ? parseInt(id) : 0,
+            Name: $('#name').val(),
+            Description: $('#description').val()
+        };
+
+        const url = id ? '?handler=Edit' : '?handler=Create';
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    $('#productTypeModal').modal('hide');
+                    table.ajax.reload();
+                    Swal.fire('Success', 'Product Type saved successfully', 'success');
+                }
+            });
+    }
+
+    function deactivate(id) {
+        Swal.fire({
+            title: 'Deactivate this Product Type?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, deactivate',
+            cancelButtonText: 'Cancel'
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch(`?handler=Deactivate&id=${id}`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.success) {
+                            table.ajax.reload();
+                            Swal.fire('Deactivated', 'Product Type is now inactive', 'success');
+                        }
+                    });
+            }
+        });
+    }
 </script>

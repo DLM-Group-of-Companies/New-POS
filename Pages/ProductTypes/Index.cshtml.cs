@@ -1,31 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using NLI_POS.Data;
-using NLI_POS.Models;
-using NLI_POS.Services;
+using NLI_POS.Data; // adjust namespace
+using NLI_POS.Models; // adjust namespace
+using System.Threading.Tasks;
 
-namespace NLI_POS.Pages.Utilities.ProdutcTypes
+namespace NLI_POS.Pages.ProductTypes
 {
     public class IndexModel : PageModel
     {
-        private readonly NLI_POS.Data.ApplicationDbContext _context;
-
-        public IndexModel(NLI_POS.Data.ApplicationDbContext context)
+        private readonly ApplicationDbContext _context;
+        public IndexModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public IList<ProductType> ProductType { get;set; } = default!;
-
-        public async Task OnGetAsync()
+        public IActionResult OnGet()
         {
-            ProductType = await _context.ProductTypes.ToListAsync();
-            await AuditHelpers.LogAsync(HttpContext, _context, User, "Viewed Product Types List");
+            return Page();
         }
 
         public async Task<IActionResult> OnGetListAsync()
@@ -39,7 +31,6 @@ namespace NLI_POS.Pages.Utilities.ProdutcTypes
                     pt.IsActive
                 })
                 .ToListAsync();
-
 
             return new JsonResult(new { data });
         }

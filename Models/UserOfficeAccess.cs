@@ -18,11 +18,6 @@ namespace NLI_POS.Models
         [ForeignKey("OfficeCountry")]
         public int OfficeId {  get; set; }
 
-        //public DateTime EncodeDate { get; set; }
-        //public string EncodedBy { get; set; }
-        //public DateTime? UpdateDate { get; set; }
-        //public string? UpdateddBy { get; set; }
-
         [ValidateNever]
         public virtual ApplicationUser User { get; set; }
         [ValidateNever]

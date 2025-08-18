@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
 
 namespace NLI_POS.Pages.UsersOfficeAccess
@@ -14,11 +15,17 @@ namespace NLI_POS.Pages.UsersOfficeAccess
             _context = context;
         }
 
-        public IActionResult OnGet(string? userId)
+        public async Task<IActionResult> OnGetAsync(string? userId)
         {
-            ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            var availableOffices = await _context.OfficeCountry
+    .Where(o => !_context.UserOfficesAccess
+        .Any(uoa => uoa.UserId == userId && uoa.OfficeId == o.Id))
+    .ToListAsync();
 
-            ViewData["UserId"] = new SelectList(_context.Users.Where(u=>u.Id== userId)
+            //ViewData["OfficeId"] = new SelectList(_context.OfficeCountry, "Id", "Name");
+            ViewData["OfficeId"] = new SelectList(availableOffices, "Id", "Name");
+
+            ViewData["UserId"] = new SelectList(_context.Users.Where(u => u.Id == userId)
                 .Select(u => new
                 {
                     u.Id,

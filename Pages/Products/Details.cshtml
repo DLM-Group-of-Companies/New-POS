@@ -80,7 +80,9 @@
                                 <option value="">-- Select Country --</option>
                                 @foreach (var country in Model.Countries)
                                 {
-                                    <option value="@country.Id">@country.Name</option>
+                                    <option value="@country.Id"
+                                            data-locale="@country.Locale"
+                                            data-currency="@country.CurrencyCode">@country.Name</option>
                                 }
                             </select>
                         </div>
@@ -153,35 +155,48 @@
 
 @section Scripts {
     <script>
-        
+
         document.getElementById('countrySelector')?.addEventListener('change', function () {
             showLoader();
             const countryId = this.value;
             const productId = @Model.Products.Id;
 
             if (countryId) {
-                
+
                 fetch(`/Products/Edit?handler=Prices&countryId=${countryId}&id=${productId}`)
                     .then(res => res.json())
                     .then(data => {
-                        document.getElementById('unitCost').textContent = data.unitCost ?? '-';
-                        document.getElementById('regPrice').textContent = data.regPrice ?? '-';
-                        document.getElementById('distPrice').textContent = data.distPrice ?? '-';
-                        document.getElementById('staffPrice').textContent = data.staffPrice ?? '-';
-                        document.getElementById('bppPrice').textContent = data.bppPrice ?? '-';
-                        document.getElementById('medPackPrice').textContent = data.medPackPrice ?? '-';
-                        document.getElementById('corpAccPrice').textContent = data.corpAccPrice ?? '-';
-                        document.getElementById('naturoPrice').textContent = data.naturoPrice ?? '-';
+                        // Get the selected <option>
+                        const selectedOption = document.querySelector(`#countrySelector option[value="${countryId}"]`);
+                        const locale = selectedOption?.dataset.locale || undefined; // fallback: browser default
+                        const currency = selectedOption?.dataset.currency || "USD";
+
+                        const formatter = new Intl.NumberFormat(locale, {
+                            style: 'currency',
+                            currency: currency
+                        });
+
+                        const format = (val) => val != null ? formatter.format(val) : '-';
+
+                        document.getElementById('unitCost').textContent = format(data.unitCost);
+                        document.getElementById('regPrice').textContent = format(data.regPrice);
+                        document.getElementById('distPrice').textContent = format(data.distPrice);
+                        document.getElementById('staffPrice').textContent = format(data.staffPrice);
+                        document.getElementById('bppPrice').textContent = format(data.bppPrice);
+                        document.getElementById('medPackPrice').textContent = format(data.medPackPrice);
+                        document.getElementById('corpAccPrice').textContent = format(data.corpAccPrice);
+                        document.getElementById('naturoPrice').textContent = format(data.naturoPrice);
+
                         hideLoader();
                     });
- 
+
             } else {
                 // Clear fields
-                ['unitCost','regPrice','distPrice','staffPrice','bppPrice','medPackPrice','corpAccPrice','naturoPrice']
+                ['unitCost', 'regPrice', 'distPrice', 'staffPrice', 'bppPrice', 'medPackPrice', 'corpAccPrice', 'naturoPrice']
                     .forEach(id => document.getElementById(id).textContent = '-');
-                    hideLoader();
+                hideLoader();
             }
         });
-        
+
     </script>
 }

@@ -37,7 +37,7 @@ namespace NLI_POS.Pages.Dashboard
             .Include(o => o.Country).FirstOrDefault(o => o.Id == officeId);
 
             var timeZone = office?.Country.TimeZone ?? "Asia/Manila";
-            var localNow = AuditHelpers.GetLocalTime(timeZone); 
+            var localNow = AuditHelpers.GetLocalTime(timeZone);
             var today = localNow.Date;
             var monthStart = new DateTime(today.Year, today.Month, 1);
 
@@ -68,7 +68,7 @@ namespace NLI_POS.Pages.Dashboard
             var todayOrders = await _context.Orders
                 .Where(o => !o.IsVoided &&
                             o.OrderDate >= startOfDayUtc &&
-                            o.OrderDate < endOfDayUtc)
+                            o.OrderDate < endOfDayUtc && o.OfficeId == officeId)
                 .ToListAsync();
 
             var totalSales = todayOrders.Sum(o => o.TotAmount);
@@ -85,11 +85,11 @@ namespace NLI_POS.Pages.Dashboard
             return new JsonResult(result);
         }
 
-        public async Task<JsonResult> OnGetTopCustomersAsync()
+        public async Task<JsonResult> OnGetTopCustomersAsync(int? officeId)
         {
             var topCustomers = await _context.Orders
                 .Include(o => o.Customers)
-                .Where(o => !o.IsVoided && o.CustomerId != null)
+                .Where(o => !o.IsVoided && o.CustomerId != null && o.OfficeId == officeId)
                 .GroupBy(o => new { o.CustomerId, o.Customers.FirstName, o.Customers.LastName })
                 .Select(g => new
                 {
@@ -135,12 +135,13 @@ namespace NLI_POS.Pages.Dashboard
             var query = _context.Orders
                 .Include(o => o.Customers)
                 .Where(o => !o.IsVoided &&
+                            o.OfficeId == officeId &&
                             o.TotAmount > 0 &&
                             o.CustomerId != null &&
-                            o.Customers != null) ;
-                            //&&
-                            //o.OrderDate >= startUtc &&
-                            //o.OrderDate < endUtc);
+                            o.Customers != null);
+            //&&
+            //o.OrderDate >= startUtc &&
+            //o.OrderDate < endUtc);
 
             // 4. Group and project
             var repeatCustomers = await query
@@ -159,7 +160,7 @@ namespace NLI_POS.Pages.Dashboard
         }
 
 
-        public async Task<JsonResult> OnGetSalesChartAsync(DateTime? startDate, DateTime? endDate, int? officeId)
+        public async Task<JsonResult> OnGetSalesChartAsync(string mode, DateTime? startDate, DateTime? endDate, int? officeId)
         {
             // 1. Get office time zone
             var office = await _context.OfficeCountry
@@ -192,6 +193,7 @@ namespace NLI_POS.Pages.Dashboard
                 .Include(od => od.ProductCombos)
                 .Where(od => od.Order != null &&
                              !od.Order.IsVoided &&
+                            od.Order.OfficeId == officeId &&
                              od.Order.OrderDate >= startUtc &&
                              od.Order.OrderDate < endUtc);
 
@@ -202,64 +204,88 @@ namespace NLI_POS.Pages.Dashboard
 
             // 4. Aggregate product sales
             var productSales = new Dictionary<string, decimal>();
+            List<object> data = new();
 
-            foreach (var od in rawOrderDetails)
+            if (mode == "regular")
             {
-                if (od.ProductId != null)
+                foreach (var od in rawOrderDetails)
                 {
-                    var product = od.Products;
-                    if (product != null && product.IsActive && product.ProductCategory != "Package")
+                    if (od.ProductId != null)
                     {
-                        var name = product.ProductName;
-                        if (!productSales.ContainsKey(name))
-                            productSales[name] = 0;
-
-                        productSales[name] += od.TotalPrice;
-                    }
-                }
-                else if (od.ComboId != null && od.ProductCombos?.IsActive == true)
-                {
-                    var combo = od.ProductCombos;
-                    if (!string.IsNullOrEmpty(combo.ProductIdList))
-                    {
-                        var productIds = combo.ProductIdList
-                            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                            .Select(id => int.Parse(id.Trim()))
-                            .ToList();
-
-                        var products = await _context.Products
-                            .Where(p => productIds.Contains(p.Id) &&
-                                        p.IsActive &&
-                                        p.ProductCategory != "Package")
-                            .ToListAsync();
-
-                        if (products.Count > 0)
+                        var product = od.Products;
+                        if (product != null && product.IsActive && product.ProductCategory != "Package")
                         {
-                            var perProductPrice = od.TotalPrice / products.Count;
-                            foreach (var p in products)
-                            {
-                                var name = p.ProductName;
-                                if (!productSales.ContainsKey(name))
-                                    productSales[name] = 0;
+                            var name = product.ProductName;
+                            if (!productSales.ContainsKey(name))
+                                productSales[name] = 0;
 
-                                productSales[name] += perProductPrice;
+                            productSales[name] += od.TotalPrice;
+                        }
+                    }
+                    else if (od.ComboId != null && od.ProductCombos?.IsActive == true)
+                    {
+                        var combo = od.ProductCombos;
+                        if (!string.IsNullOrEmpty(combo.ProductIdList))
+                        {
+                            var productIds = combo.ProductIdList
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(id => int.Parse(id.Trim()))
+                                .ToList();
+
+                            var products = await _context.Products
+                                .Where(p => productIds.Contains(p.Id) &&
+                                            p.IsActive &&
+                                            p.ProductCategory != "Package")
+                                .ToListAsync();
+
+                            if (products.Count > 0)
+                            {
+                                var perProductPrice = od.TotalPrice / products.Count;
+                                foreach (var p in products)
+                                {
+                                    var name = p.ProductName;
+                                    if (!productSales.ContainsKey(name))
+                                        productSales[name] = 0;
+
+                                    productSales[name] += perProductPrice;
+                                }
                             }
                         }
                     }
                 }
+                data = productSales
+               .Select(kv => new { ProductName = kv.Key, TotalSales = kv.Value })
+               .OrderByDescending(x => x.TotalSales)
+               .Cast<object>()
+               .ToList();
+            }
+            else //Promo/Package
+            {
+                var packageSales = await _context.OrderDetails
+                    .Where(od => od.ProductCategory == "Package" &&
+                             !od.Order.IsVoided &&
+                            od.Order.OfficeId == officeId &&
+                             od.Order.OrderDate >= startUtc &&
+                             od.Order.OrderDate < endUtc)
+                    .GroupBy(od => od.Products.ProductName)
+                    .Select(g => new
+                    {
+                        ProductName = g.Key,
+                        TotalSales = g.Sum(od => od.Price)
+                    })
+                    .Cast<object>()
+                    .ToListAsync();
+
+                data = packageSales;
             }
 
-            var data = productSales
-                .Select(kv => new { ProductName = kv.Key, TotalSales = kv.Value })
-                .OrderByDescending(x => x.TotalSales)
-                .ToList();
 
             return new JsonResult(data);
         }
 
-        public JsonResult OnGetTopSalespeople()
+        public JsonResult OnGetTopSalespeople(int? officeId)
         {
-            var topSalespeople = _context.Orders
+            var topSalespeople = _context.Orders.Where(o => o.OfficeId == officeId)
                 .GroupBy(o => o.SalesBy)
                 .Select(g => new
                 {
@@ -301,7 +327,7 @@ namespace NLI_POS.Pages.Dashboard
             }
 
             var query = _context.Orders
-                .Where(o => !o.IsVoided);
+                .Where(o => !o.IsVoided && o.OfficeId == officeId);
 
             if (startDate.HasValue)
             {

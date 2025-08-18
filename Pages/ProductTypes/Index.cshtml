@@ -1,0 +1,150 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Product Types";
+}
+
+<div class="container-fluid bg-white p-3 rounded shadow">
+    <div class="d-flex justify-content-between mb-3">
+        <h4 class="text-primary">Product Types</h4>
+        <button class="btn btn-success" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i> Add Product Type
+        </button>
+    </div>
+
+    <table id="productTypeTable" class="table table-striped table-bordered" style="width:100%">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Active</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal fade" id="productTypeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="productTypeForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Add Product Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="productTypeId">
+                    <div class="mb-3">
+                        <label>Name</label>
+                        <input type="text" id="name" class="form-control" required maxlength="50">
+                    </div>
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <input type="text" id="description" class="form-control" maxlength="100">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let table;
+
+        $(document).ready(function () {
+            table = $('#productTypeTable').DataTable({
+                ajax: '?handler=List',
+                columns: [
+                    { data: 'Name' },
+                    { data: 'Description' },
+                    {
+                        data: 'IsActive',
+                        render: data => data ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-danger">No</span>'
+                    },
+                    {
+                        data: 'Id',
+                        render: function (data, type, row) {
+                            return `
+                                <button class="btn btn-sm btn-warning" onclick="openEditModal(${data}, '${row.Name}', '${row.Description}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deactivate(${data})"><i class="fas fa-ban"></i></button>
+                            `;
+                        }
+                    }
+                ]
+            });
+
+            $('#productTypeForm').submit(function (e) {
+                e.preventDefault();
+                saveProductType();
+            });
+        });
+
+        function openCreateModal() {
+            $('#productTypeId').val('');
+            $('#name').val('');
+            $('#description').val('');
+            $('#modalTitle').text('Add Product Type');
+            $('#productTypeModal').modal('show');
+        }
+
+        function openEditModal(id, name, description) {
+            $('#productTypeId').val(id);
+            $('#name').val(name);
+            $('#description').val(description);
+            $('#modalTitle').text('Edit Product Type');
+            $('#productTypeModal').modal('show');
+        }
+
+        function saveProductType() {
+            const id = $('#productTypeId').val();
+            const payload = {
+                Id: id ? parseInt(id) : 0,
+                Name: $('#name').val(),
+                Description: $('#description').val()
+            };
+
+            const url = id ? '?handler=Edit' : '?handler=Create';
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    $('#productTypeModal').modal('hide');
+                    table.ajax.reload();
+                    Swal.fire('Success', 'Product Type saved successfully', 'success');
+                }
+            });
+        }
+
+        function deactivate(id) {
+            Swal.fire({
+                title: 'Deactivate this Product Type?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, deactivate',
+                cancelButtonText: 'Cancel'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    fetch(`?handler=Deactivate&id=${id}`, { method: 'POST' })
+                        .then(res => res.json())
+                        .then(res => {
+                            if (res.success) {
+                                table.ajax.reload();
+                                Swal.fire('Deactivated', 'Product Type is now inactive', 'success');
+                            }
+                        });
+                }
+            });
+        }
+    </script>
+}

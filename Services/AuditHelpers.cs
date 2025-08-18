@@ -1,6 +1,7 @@
 ﻿using NLI_POS.Data;
 using NLI_POS.Models;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Claims;
 
@@ -20,6 +21,32 @@ namespace NLI_POS.Services
                 return DateTime.UtcNow; // fallback to UTC
             }
         }
+
+        public static class CurrencyHelper
+        {
+            public static CultureInfo GetCulture(string locale, string currencyCode = null)
+            {
+                var culture = !string.IsNullOrEmpty(locale)
+                    ? new CultureInfo(locale)
+                    : CultureInfo.InvariantCulture;
+
+                if (!string.IsNullOrEmpty(currencyCode))
+                {
+                    try
+                    {
+                        var region = new RegionInfo(currencyCode);
+                        culture.NumberFormat.CurrencySymbol = region.CurrencySymbol;
+                    }
+                    catch
+                    {
+                        // Ignore invalid codes
+                    }
+                }
+
+                return culture;
+            }
+        }
+
 
         public static (DateTime StartUtc, DateTime EndUtc) GetUtcDayRange(string timeZoneId, DateTime? dateLocal = null)
         {
@@ -105,7 +132,7 @@ namespace NLI_POS.Services
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
-                }; 
+                };
 
                 using var process = Process.Start(startInfo);
                 using var reader = process.StandardOutput;
@@ -119,7 +146,7 @@ namespace NLI_POS.Services
 
         //for Audit on Products
         public static bool TryGetChanges<T>(T original, T current, out List<string> changes, params string[] ignoreProps)
-        {             
+        {
             changes = new List<string>();
             var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 

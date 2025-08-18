@@ -58,19 +58,15 @@
     <form id="filtersForm" class="row mb-4">
         <div class="col-md-3">
             <label asp-for="OfficeId" class="form-label text-light">Office</label>
-            <select asp-for="OfficeId" class="form-select form-select-sm" asp-items="ViewBag.Offices">             
-@*                 @foreach (var office in Model.OfficeList)
+            <select asp-for="OfficeId" class="form-select form-select-sm" asp-items="ViewBag.Offices">
+                @foreach (var office in Model.OfficeList) // assuming it's assigned to your ViewModel
                 {
-                    <option value="@office.Id">@office.Name</option>
-                } *@
-                        @foreach (var office in Model.OfficeList) // assuming it's assigned to your ViewModel
-                        {
-                            <option value="@office.Value"
-                                    data-locale="@office.Locale"
-                                    data-currency="@office.CurrencyCode">
-                                @office.Text
-                            </option>
-                        }
+                    <option value="@office.Value"
+                            data-locale="@office.Locale"
+                            data-currency="@office.CurrencyCode">
+                        @office.Text
+                    </option>
+                }
             </select>
         </div>
 
@@ -92,37 +88,46 @@
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm p-3">
-                <h2 class="h5 mb-3">Sales Per Main Products</h2>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="h5 mb-0">Sales Per Products</h2>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Product Type">
+                        <button type="button" class="btn btn-outline-primary active" id="btnRegular">Regular</button>
+                        <button type="button" class="btn btn-outline-secondary" id="btnPromo">Promo/Package</button>
+                    </div>
+                </div>
                 <canvas id="salesPerProductChart" height="100"></canvas>
             </div>
         </div>
+
         <div class="col-md-6 mb-4">
             <div class="row">
                 <div class="col-md-12 mb-3">
-            <div class="card shadow-sm p-3">
-                <h2 class="h5 mb-3">Top Sales People</h2>
-                <canvas id="topSalespeopleChart" style="max-height: 400px;"></canvas>
-            </div>
-            </div>
-            </div>
-                <div class="row">
-        <div class="col-md-12 mb-4">
                     <div class="card shadow-sm p-3">
-                <h2 class="h5 mb-3">Sales Trend</h2>
-        <canvas id="salesTrendChart" height="100"></canvas>
-        </div>
-        </div>
-         </div>
+                        <h2 class="h5 mb-3">Top Sales People</h2>
+                        <canvas id="topSalespeopleChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <div class="card shadow-sm p-3">
+                        <div class="chart-container" style="min-height:200px;">
+                            <h2 class="h5 mb-3">Sales Trend</h2>
+                            <canvas id="salesTrendChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-
 
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm p-3">
                 <h2 class="h5 mb-3">Top Customers</h2>
-                <canvas id="topCustomersChart" height="425"></canvas>
+                <div style="height: 428px;">
+                    <canvas id="topCustomersChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -148,6 +153,33 @@
 
 @section Scripts {
     <script>
+        //For currency
+        let currencyCode;
+        let locale;
+
+        // Initialize on page load
+        const officeSelect = document.querySelector('select[name="OfficeId"]');
+        const setCurrencyGlobals = () => {
+            const selectedOption = officeSelect.options[officeSelect.selectedIndex];
+            currencyCode = selectedOption.getAttribute('data-currency');
+            locale = selectedOption.getAttribute('data-locale');
+        };
+
+        // Run once on load
+        setCurrencyGlobals();
+
+        const formatCurrency = (value) => {
+            return new Intl.NumberFormat(locale, {
+                style: 'currency',
+                currency: currencyCode,
+                minimumFractionDigits: 2
+            }).format(value);
+        };
+
+        // Also update when Office changes
+        officeSelect.addEventListener('change', setCurrencyGlobals);
+
+
         // 🔹 Shared helper: build query params with dates & officeId
         function getQueryParams(extraParams = {}) {
             const startDate = document.getElementById("StartDate")?.value;
@@ -171,22 +203,36 @@
             try {
                 const response = await fetch(`?handler=TopKpis&${getQueryParams()}`);
                 const data = await response.json();
-                document.getElementById('totalSalesToday').textContent = `₱${data.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+                // document.getElementById('totalSalesToday').textContent = `₱${data.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+                document.getElementById('totalSalesToday').textContent = formatCurrency(data.totalSales);
                 document.getElementById('orderCountToday').textContent = data.orderCount;
-                document.getElementById('avgOrderValueToday').textContent = `₱${data.averageOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+                document.getElementById('avgOrderValueToday').textContent = formatCurrency(data.averageOrderValue);
             } catch (err) {
                 console.error('Failed to load KPIs:', err);
             }
         }
 
         // 🔹 Load Top Customers Chart
+        let topCustomersChartInstance;
+
         async function loadTopCustomersChart() {
             const response = await fetch(`?handler=TopCustomers&${getQueryParams()}`);
             const data = await response.json();
             const labels = data.map(x => x.customerName);
             const values = data.map(x => x.totalSpent);
 
-            new Chart(document.getElementById('topCustomersChart'), {
+            // Calculate height dynamically
+            const chartHeight = data.length * 40; // 40px per bar
+            const chartEl = document.getElementById('topCustomersChart');
+            chartEl.style.height = `${chartHeight}px`;
+
+            // Destroy old chart if exists
+            if (topCustomersChartInstance) {
+                topCustomersChartInstance.destroy();
+            }
+
+            // ✅ Make sure to pass the element or ctx properly
+            topCustomersChartInstance = new Chart(chartEl.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels,
@@ -203,14 +249,31 @@
                 options: {
                     indexAxis: 'y',
                     responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'nearest', intersect: true },
                     scales: { x: { beginAtZero: true } },
                     plugins: {
                         legend: { display: false },
-                        tooltip: { callbacks: { label: ctx => `₱${ctx.raw.toLocaleString()}` } }
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: ctx => {
+                                    const settings = getSelectedOfficeSettings();
+
+                                    return new Intl.NumberFormat(settings.locale, {
+                                        style: 'currency',
+                                        currency: settings.currency
+                                    }).format(ctx.raw);
+                                }
+                            }
+                        }
                     }
                 }
+
             });
+
         }
+
 
         // 🔹 Load Repeat Customers Table
         async function loadRepeatCustomersTable() {
@@ -223,12 +286,12 @@
 
             const tbody = document.querySelector('#repeatCustomersTable tbody');
             tbody.innerHTML = data.map(row => `
-                <tr>
-                    <td>${row.customerName}</td>
-                    <td>${row.orderCount}</td>
-                    <td>${new Date(row.lastOrder).toLocaleDateString()}</td>
-                </tr>
-            `).join('');
+                                                                <tr>
+                                                                    <td>${row.customerName}</td>
+                                                                    <td>${row.orderCount}</td>
+                                                                    <td>${new Date(row.lastOrder).toLocaleDateString()}</td>
+                                                                </tr>
+                                                            `).join('');
 
             $('#repeatCustomersTable').DataTable({
                 order: [[1, 'desc']],
@@ -239,15 +302,30 @@
             });
         }
 
-        document.getElementById('generateReportBtn').addEventListener('click', loadRepeatCustomersTable);
+        // document.getElementById('generateReportBtn').addEventListener('click', loadRepeatCustomersTable);
 
 
         // 🔹 Sales Per Product Chart
+        document.getElementById('btnRegular').addEventListener('click', function () {
+            setActiveButton(this);
+            loadSalesChart('regular');
+        });
+
+        document.getElementById('btnPromo').addEventListener('click', function () {
+            setActiveButton(this);
+            loadSalesChart('promo');
+        });
+
+        function setActiveButton(button) {
+            button.parentNode.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active', 'btn-primary'));
+            button.classList.add('active', 'btn-primary');
+        }
+
         let productChart;
-        async function loadSalesChart() {
+        async function loadSalesChart(mode = 'regular') {
             showLoader();
             try {
-                const response = await fetch(`?handler=SalesChart&${getQueryParams()}`);
+                const response = await fetch(`?handler=SalesChart&mode=${mode}&${getQueryParams()}`);
                 const data = await response.json();
                 const labels = data.map(x => x.productName);
                 const sales = data.map(x => x.totalSales);
@@ -283,13 +361,25 @@
         }
 
         // 🔹 Top Salespeople Chart
+        let topSalespeopleChart = null; // store chart instance
+
         async function loadTopSalespeopleChart() {
             const response = await fetch(`?handler=TopSalespeople&${getQueryParams()}`);
             const data = await response.json();
             const labels = data.map(x => x.salesperson?.trim() || 'UNSPECIFIED');
             const values = data.map(x => x.totalSales);
 
-            new Chart(document.getElementById('topSalespeopleChart'), {
+            // Destroy existing chart before creating a new one
+            if (topSalespeopleChart) {
+                topSalespeopleChart.destroy();
+            }
+
+            // Dynamically adjust height based on rows
+            const chartHeight = data.length * 40; // 40px per bar
+            const canvas = document.getElementById('topSalespeopleChart');
+            canvas.style.height = `${chartHeight}px`;
+
+            topSalespeopleChart = new Chart(document.getElementById('topSalespeopleChart'), {
                 type: 'bar',
                 data: { labels, datasets: [{ data: values, backgroundColor: 'rgba(255, 159, 64, 0.6)' }] },
                 options: {
@@ -298,7 +388,7 @@
                     scales: { x: { beginAtZero: true } },
                     plugins: {
                         legend: { display: false },
-                        tooltip: { callbacks: { label: ctx => `₱${ctx.raw.toLocaleString()}` } }
+                        tooltip: { callbacks: { label: ctx => formatCurrency(ctx.raw) } }
                     }
                 }
             });
@@ -306,6 +396,7 @@
 
         // 🔹 Sales Trend Chart
         let trendChart;
+
         async function loadSalesTrend() {
             const response = await fetch(`?handler=SalesTrend&${getQueryParams()}`);
             const data = await response.json();
@@ -315,7 +406,7 @@
             if (trendChart) trendChart.destroy();
             trendChart = new Chart(document.getElementById("salesTrendChart"), {
                 type: 'line',
-                data: { labels, datasets: [{ data: totals, borderColor: 'rgb(126,239,203)', backgroundColor: 'rgba(54, 162, 235, 0.2)', tension: 0.4 }] },
+                data: { labels, datasets: [{ label: 'Total Sales', data: totals, borderColor: 'rgb(126,239,203)', backgroundColor: 'rgba(54, 162, 235, 0.2)', tension: 0.4 }] },
                 options: { responsive: true, scales: { y: { beginAtZero: true } } }
             });
         }
@@ -330,6 +421,7 @@
             loadSalesTrend();
 
             document.getElementById("generateReportBtn")?.addEventListener("click", () => {
+                loadTopKpis();
                 loadTopCustomersChart();
                 loadRepeatCustomersTable();
                 loadSalesChart();
@@ -337,5 +429,15 @@
                 loadSalesTrend();
             });
         });
+    </script>
+
+    <script>
+        function getSelectedOfficeSettings() {
+            const office = document.querySelector('#OfficeId option:checked');
+            return {
+                locale: office.dataset.locale,
+                currency: office.dataset.currency
+            };
+        }
     </script>
 }

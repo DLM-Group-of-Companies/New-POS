@@ -37,7 +37,7 @@ namespace NLI_POS.Pages.Orders
             }
 
             var baseOrder = await _context.Orders
-                .Include(o => o.Office)
+                .Include(o => o.Office).ThenInclude(off => off.Country)
                 .Include(o => o.Customers)
                     .ThenInclude(c => c.CustClasses)
                 .FirstOrDefaultAsync(o => o.OrderNo == orderNo);
@@ -46,6 +46,10 @@ namespace NLI_POS.Pages.Orders
             {
                 return NotFound();
             }
+
+            ViewData["CurrencyCode"] = baseOrder.Office.Country.CurrencyCode;
+            ViewData["TimeZone"] = baseOrder.Office.Country.TimeZone;
+            ViewData["Locale"] = baseOrder.Office.Country.Locale;
 
             Order = baseOrder;
 
@@ -130,7 +134,7 @@ namespace NLI_POS.Pages.Orders
             order.SalesBy = salesPerson.UserName;
             //TempData["SuccessMessage"] = "Sales Person has been updated.";
             await _context.SaveChangesAsync();
-            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated Order {Order.OrderNo} Sales Person from '{oldSalesPersonUserName}' to '{salesPerson.UserName}'.");
+            await AuditHelpers.LogAsync(HttpContext, _context, User, $"Updated Order {order.OrderNo} Sales Person from '{oldSalesPersonUserName}' to '{salesPerson.UserName}'.");
             return new JsonResult(new { success = true, newName = salesPerson.UserName });
         }
 

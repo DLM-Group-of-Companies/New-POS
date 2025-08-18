@@ -1,7 +1,10 @@
-﻿@model NLI_POS.Models.ViewModels.OrderSummaryViewModel
+﻿@using static NLI_POS.Services.AuditHelpers
+@model NLI_POS.Models.ViewModels.OrderSummaryViewModel
 @{
     var idPrefix = ViewData["IdPrefix"]?.ToString() ?? "default";
+    var culture = (System.Globalization.CultureInfo)ViewData["Culture"];
 }
+
 <div class="table-responsive">
     <table id="@($"{idPrefix}_cartTable")" class="table table-bordered table-hover shadow-sm rounded bg-white small">
         <thead class="table-primary text-center">
@@ -29,9 +32,9 @@
                         <td>
                             @(@item.ComboName == "No Combination Available" ? "--" : @item.ComboName)
                         </td>
-                        <td class="text-end">@item.Price.ToString("N2")</td>
+                        <td class="text-end">@item.Price.ToString("C", culture)</td>
                         <td class="text-end">@item.Quantity.ToString("0")</td>
-                        <td class="text-end">@item.Amount.ToString("N2")</td>
+                        <td class="text-end">@item.Amount.ToString("C", culture)</td>
                         <td></td>
                     </tr>
                 }
@@ -48,9 +51,9 @@
 
                 <tr>
                     <td colspan="4" class="text-end fw-bold">Sub Total:</td>
-                    <td class="text-end fw-bold">@totalPrice.ToString("N2")</td>
+                    <td class="text-end fw-bold">@totalPrice.ToString("C", culture)</td>
                     <td class="text-end fw-bold">@totalQty.ToString("0")</td>
-                    <td class="text-end fw-bold"><span id="grandTotal">@totalAmt.ToString("N2")</span></td>
+                    <td class="text-end fw-bold"><span id="grandTotal">@totalAmt.ToString("C", culture)</span></td>
                     <td></td>
                 </tr>
             }
@@ -71,7 +74,7 @@
                 <tr class="table-light" data-payment="true">
                     <td colspan="4" class="text-end">Payment Method:</td>
                     <td colspan="2" class="text-end">@payment.PayMethod</td>
-                    <td class="text-end">@payment.Amount.ToString("N2")</td>
+                    <td class="text-end">@payment.Amount.ToString("C", culture)</td>
                     <td class="text-muted small">@(!string.IsNullOrWhiteSpace(payment.ReferenceNo) ? $"Ref#: {payment.ReferenceNo}" : "")</td>
                 </tr>
             }
@@ -86,23 +89,23 @@
             {
                 <tr class="table-light fw-light">
                     <td colspan="6" class="text-end text-secondary">Credit Card Service Charge (@serviceChargeRate.ToString("N2")%):</td>
-                    <td class="text-end text-secondary">@totalServiceCharge.ToString("N2")</td>
+                    <td class="text-end text-secondary">@totalServiceCharge.ToString("C", culture)</td>
                     <td></td>
                 </tr>
             }
             <tr class="table-light">
                 <td colspan="6" class="text-end">Grand Total:</td>
-                <td class="text-end text-black">@grandTotal.ToString("N2")</td>
+                <td class="text-end text-black">@grandTotal.ToString("C", culture)</td>
                 <td></td>
             </tr>
             <tr class="table-light">
                 <td colspan="6" class="text-end">Total Payment:</td>
-                <td class="text-end">@paidAmount.ToString("N2")</td>
+                <td class="text-end">@paidAmount.ToString("C", culture)</td>
                 <td></td>
             </tr>
             <tr class="table-light fw-light">
                 <td colspan="6" class="text-end">Change:</td>
-                <td class="text-end">@change.ToString("N2")</td>
+                <td class="text-end">@change.ToString("C", culture)</td>
                 <td></td>
             </tr>
 

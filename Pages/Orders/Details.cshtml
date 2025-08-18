@@ -1,4 +1,5 @@
 ﻿@page
+@using static NLI_POS.Services.AuditHelpers
 @model NLI_POS.Pages.Orders.DetailsModel
 
 @{
@@ -37,6 +38,11 @@
         <br />
         @{
             ViewData["IdPrefix"] = "main";
+            ViewData["Culture"] = CurrencyHelper.GetCulture(
+            ViewData["Locale"]?.ToString(),
+            ViewData["CurrencyCode"]?.ToString()
+            );
+
         }
         <partial name="_OrderDetailsPartial" model="Model.OrderSummary" />
     </div>

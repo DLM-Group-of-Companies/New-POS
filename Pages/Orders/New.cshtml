@@ -25,7 +25,7 @@
                     <!-- Office Info -->
                     <div class="p-3 bg-light border rounded shadow-sm mb-2">
                         <h6 class="text-secondary border-bottom pb-1 mb-2 fw-bold">
-                            <i class="fas fa-building text-primary me-2"></i> Office 
+                            <i class="fas fa-building text-primary me-2"></i> Office
                         </h6>
                         <input type="hidden" asp-for="Order.OrderNo" />
                         <div class="row gx-2">
@@ -37,23 +37,29 @@
                                         <option value="@office.Value"
                                                 data-locale="@office.Locale"
                                                 data-currency="@office.CurrencyCode"
-                                                data-timezone="@office.TimeZone">
+                                                data-timezone="@office.TimeZone"
+                                                selected="@(office.Value == Model.SelectedOfficeId?.ToString() ? "selected" : null)">
                                             @office.Text
                                         </option>
                                     }
                                 </select>
                                 <input type="hidden" id="OfficeTimeZone" name="OfficeTimeZone" />
                                 <input type="hidden" id="OfficeLocale" name="OfficeLocale" />
+                                <input type="hidden" id="OfficeCurrency" name="OfficeCurrency" />
                                 @* /* Set timezone */ *@
                                 <script>
+                                    let locale = '';
+                                    let currency = '';
+
                                     function updateOfficeTimeZone() {
                                         const select = document.getElementById("OfficeId");
                                         const selectedOption = select.options[select.selectedIndex];
                                         const tz = selectedOption.getAttribute("data-timezone");
                                         document.getElementById("OfficeTimeZone").value = tz;
-                                        const loc = selectedOption.getAttribute("data-locale");
-                                        document.getElementById("OfficeLocale").value = loc;
-                                        
+                                        locale = selectedOption.getAttribute("data-locale");
+                                        document.getElementById("OfficeLocale").value = locale;
+                                        currency = selectedOption.getAttribute("data-currency");                                        
+                                        document.getElementById("OfficeCurrency").value = currency;
                                     }
 
                                     document.getElementById("OfficeId").addEventListener("change", updateOfficeTimeZone);
@@ -73,7 +79,7 @@
                     <!-- Customer Info -->
                     <div class="p-3 bg-light border rounded shadow-sm mb-2">
                         <h6 class="text-secondary border-bottom pb-1 mb-2 fw-bold">
-                            <i class="fas fa-user text-success me-2"></i> Customer 
+                            <i class="fas fa-user text-success me-2"></i> Customer
                         </h6>
                         <label asp-for="Order.CustomerId" class="form-label"></label>
                         <div class="input-group mb-2">
@@ -94,14 +100,15 @@
                     <!-- Product Selection -->
                     <div class="p-3 bg-light border rounded shadow-sm mb-2">
                         <h6 class="text-secondary border-bottom pb-1 mb-2 fw-bold">
-                            <i class="fas fa-box text-info me-2"></i> Product 
+                            <i class="fas fa-box text-info me-2"></i> Product
                         </h6>
                         <div class="row gx-2">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
                                 <label class="form-label">Category</label>
                                 <select id="ProductCategory" class="form-control form-control-sm form-select form-select-sm">
                                     <option value="Regular">Regular</option>
-                                    <option value="Package">Package</option>
+                                    <option value="Package">Promo/Package</option>
+                                    @* <option value="Promo">Promo</option> *@
                                     <option value="Freebie">Freebie</option>
                                 </select>
                             </div>
@@ -111,7 +118,7 @@
                             </div>
                         </div>
                         <div class="mb-2">
-                            <label class="form-label">Combo (if applicable)</label>
+                            <label class="form-label">Promo Product or Combination (if applicable)</label>
                             <select id="ComboId" class="form-control form-control-sm form-select form-select-sm" asp-items="ViewBag.ProductCombos"></select>
                         </div>
                         <div class="row">
@@ -241,9 +248,16 @@
                                         <input type="text" name="Payments[0].RefNo" class="form-control form-control-sm" />
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="removePaymentRow(this)">
+                                        <button type="button" class="btn btn-sm btn-danger" title="Delete"
+                                                onclick="Swal.fire({
+                                                                icon: 'warning',
+                                                                title: 'Oops...',
+                                                                text: 'Cannot delete this payment line.',
+                                                                confirmButtonColor: '#d33'
+                                                            })">
                                             <i class="fas fa-times"></i>
                                         </button>
+
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-warning text-white" title="Add" onclick="addPaymentRow()">
@@ -331,8 +345,8 @@
                 return;
             }
 
-
-            const prodCat = $('#ProductCategory option:selected').text();
+            // const prodCat = $('#ProductCategory option:selected').text();
+            const prodCat = $('#ProductCategory').val();
             const selectedProductId = $('#ProductId').val();
             const selectedProductText = $('#ProductId option:selected').text();
             const comboId = $('#ComboId').val();
@@ -340,7 +354,7 @@
 
             if (prodCat === "Package") {
                 if (comboId === "" || comboId === null) {
-                    toastr.warning('Please select a combination.');
+                    toastr.warning('Please select a promo product or combination.');
                     document.getElementById('ComboId').focus();
                     hideLoader();
                     return;
@@ -353,10 +367,19 @@
                 hideLoader();
                 return;
             }
+
             const rawPrice = $("#Price").val();
             let rawAmount = $('#Amount').val();
             let price = parseFloat(rawAmount.replace(/,/g, ''));
             let qty = parseInt($('#Qty').val()) || 1;
+
+            if (prodCat !== "Freebie") {
+                if (rawPrice == 0) {
+                    toastr.warning('Price is not set for this product.');
+                    hideLoader();
+                    return;
+                }
+            }
 
             // STOCK CHECK HERE
             const officeId = $('#OfficeId').val();
@@ -385,7 +408,11 @@
                     }
 
                     // ✅ Proceed with adding to cart
-                    const existing = cart.find(p => p.productId === parseInt(selectedProductId));
+                    //const existing = cart.find(p => p.productId === parseInt(selectedProductId));
+                    const existing = cart.find(p =>
+                        p.productId === parseInt(selectedProductId) &&
+                        p.productCombo === (comboId ? parseInt(comboId) : null)
+                    ); //Corrected to add new row instead of adding it to parent product
                     if (existing) {
                         existing.quantity += qty;
                     } else {
@@ -402,6 +429,7 @@
 
                     syncCartWithServer();
                     updateCartTable();
+                    loadProductList()
                     hideLoader();
                 },
                 error: function () {
@@ -433,14 +461,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                                                                                <tr>
-                                                                                                    <td>${item.productName}</td>
-                                                                                                    <td>${item.comboName}</td>
-                                                                                                    <td class="text-end">${formattedPrice}</td>
-                                                                                                    <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                                                                            <td>${formattedTotalItem}</td>
-                                                                                                    <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                                                                </tr>`);
+                                                                                                        <tr>
+                                                                                                            <td>${item.productName}</td>
+                                                                                                            <td>${item.comboName}</td>
+                                                                                                            <td class="text-end">${formattedPrice}</td>
+                                                                                                            <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                                                                    <td>${formattedTotalItem}</td>
+                                                                                                            <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                                                                        </tr>`);
                 });
             }
 
@@ -485,32 +513,8 @@
     </script>
 
     <script>
-        function getCurrencyCode(locale) {
-    const formatter = new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency: 'USD' // placeholder, will be overridden
-    });
-
-    return formatter.resolvedOptions().currency;
-}
-
-        //let locale = 'en-PH';
-        let currency = 'PHP';
-        let locale = document.getElementById("OfficeLocale").value;
-        
-        $(function () {
-            const selectedOption = $('#OfficeId option:selected');
-            locale = selectedOption.data('locale') || 'en-PH';
-            //currency = selectedOption.data('currency') || 'PHP';
-            currency = getCurrencyCode(locale);
-            console.log('Initial locale:', locale);
-            console.log('Initial currency:', currency);
-        });
-    </script>
-
-    <script>
         document.addEventListener("DOMContentLoaded", function () {
-            showLoader();
+            showLoader();            
         });
 
         const loadTracker = {
@@ -564,6 +568,8 @@
             }
 
             $("#ProductId").empty();
+            $("#ProductId").val("");
+            //updateOfficeTimeZone();
             const tz = document.getElementById("OfficeTimeZone").value;
             let url = `?handler=ProductList&ProdCat=${category}&custclass=${custclasstxt}`;
 
@@ -720,7 +726,7 @@
             const keyword = $(this).val();
             if (keyword.length < 2) return;
 
-            $.get('?handler=SearchCustomer', { term: keyword }, function (data) {
+            $.get('?handler=SearchCustomer', { term: keyword.trim() }, function (data) {
                 const tbody = $('#customerSearchResults').empty();
                 if (!data.length) {
                     tbody.append('<tr><td colspan="5">No results found.</td></tr>');
@@ -729,19 +735,19 @@
 
                 data.forEach(customer => {
                     tbody.append(`
-                                                                                                                                <tr>
-                                                                                                                                    <td>${customer.custcode}</td>
-                                                                                                                                    <td>${customer.name}</td>
-                                                                                                                                    <td>${customer.email}</td>
-                                                                                                                                    <td>${customer.phone}</td>
-                                                                                                                                    <td>
-                                                                                                                                        <button class="btn btn-sm btn-success" title="Select"
-                                                                                                                                                onclick='selectCustomer(${JSON.stringify(customer)})'>
-                                                                                                                                                    <i class="fa-solid fa-arrow-right"></i>
-                                                                                                                                        </button>
-                                                                                                                                    </td>
-                                                                                                                                </tr>
-                                                                                                                            `);
+                                                                                                                                        <tr>
+                                                                                                                                            <td>${customer.custcode}</td>
+                                                                                                                                            <td>${customer.name}</td>
+                                                                                                                                            <td>${customer.email}</td>
+                                                                                                                                            <td>${customer.phone}</td>
+                                                                                                                                            <td>
+                                                                                                                                                <button class="btn btn-sm btn-success" title="Select"
+                                                                                                                                                        onclick='selectCustomer(${JSON.stringify(customer)})'>
+                                                                                                                                                            <i class="fa-solid fa-arrow-right"></i>
+                                                                                                                                                </button>
+                                                                                                                                            </td>
+                                                                                                                                        </tr>
+                                                                                                                                    `);
                 });
             });
         });
@@ -772,28 +778,28 @@
             const options = $('#paymentOptionsSource').html();
 
             const row = `
-                                                    <tr>
-                                                        <td>
-                                                            <select class="form-control form-control-sm form-select form-select-sm payment-method">
-                                                                ${options}
-                                                            </select>
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" class="form-control form-control-sm payment-amount" />
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" class="form-control form-control-sm payment-charge" readonly />
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" class="form-control form-control-sm payment-ref" />
-                                                        </td>
-                                                        <td>
-                                                        <input type="hidden" class="payment-percent" />
-                                                            <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>`;
+                                                            <tr>
+                                                                <td>
+                                                                    <select class="form-control form-control-sm form-select form-select-sm payment-method">
+                                                                        ${options}
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="number" class="form-control form-control-sm payment-amount" />
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="form-control form-control-sm payment-charge" readonly />
+                                                                </td>
+                                                                <td>
+                                                                    <input type="text" class="form-control form-control-sm payment-ref" />
+                                                                </td>
+                                                                <td>
+                                                                <input type="hidden" class="payment-percent" />
+                                                                    <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>`;
 
             $('#paymentTableBody').append(row);
             reindexPaymentRows();
@@ -905,8 +911,8 @@
                 icon: 'question',
                 confirmButtonColor: '#0d6efd',
                 showCancelButton: true,
-    confirmButtonText: '<i class="fas fa-check me-2"></i> Yes, place it',
-    cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
+                confirmButtonText: '<i class="fas fa-check me-2"></i> Yes, place it',
+                cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -988,14 +994,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                                                                                                    <tr>
-                                                                                                                        <td>${item.productName}</td>
-                                                                                                                        <td>${item.comboName}</td>
-                                                                                                                        <td class="text-end">${formattedPrice}</td>
-                                                                                                                        <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" style="max-width: 90px; width: 100%;" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                                                                                        <td>${formattedTotalItem}</td>
-                                                                                                                        <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                                                                                    </tr>`);
+                                                                                                                            <tr>
+                                                                                                                                <td>${item.productName}</td>
+                                                                                                                                <td>${item.comboName}</td>
+                                                                                                                                <td class="text-end">${formattedPrice}</td>
+                                                                                                                                <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" style="max-width: 90px; width: 100%;" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                                                                                                                                <td>${formattedTotalItem}</td>
+                                                                                                                                <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                                                                                                                            </tr>`);
                 });
             }
 
@@ -1006,5 +1012,55 @@
         }
     </script>
 
+    <script>
+        // Reset on Change Office - added on Aug 15 2025
+        $(document).ready(function () {
+            const $officeDropdown = $('#OfficeId');
+
+            // Store original value
+            $officeDropdown.data('previous', $officeDropdown.val());
+
+            $officeDropdown.on('change', function () {
+                const newOfficeId = $(this).val();
+                if (!newOfficeId) return;
+
+                Swal.fire({
+                    title: 'Change Office?',
+                    text: "Changing office will reset your cart and refresh product prices. Continue?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0d6efd',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-check me-2"></i> Yes, change it',
+                    cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {                        
+                        formIsDirty = false;
+                        // Clear cart on server first, then reload
+                        fetch('/Orders/New?handler=ClearCart', {
+                            method: 'POST', 
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            }
+                        })
+                            .then(() => {
+                                const currentUrl = new URL(window.location.href);
+                                currentUrl.searchParams.set('OfficeId', newOfficeId);
+                                //window.location.href = currentUrl.toString();                                
+                                window.location.href = `/Orders/New?officeId=${newOfficeId}`;
+                                //updateOfficeTimeZone();
+                                loadProductList();
+                            });
+                    } else {
+                        // Restore previous value
+                        $officeDropdown.val($officeDropdown.data('previous'));
+                    }
+                });
+            });
+        });
+
+    </script>
 }
 

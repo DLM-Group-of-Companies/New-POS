@@ -16,64 +16,83 @@
         <a href="../Identity/Account/Register" class=" btn btn-primary"><i class="fas fa-user-plus me-2"></i>  Register</a>
     </p>
     @* <div class="table-scroll-container"> *@
-        <table id="usersTable" class="table table-striped table-sm align-middle">
-            <thead class="table-secondary">
+    @Html.AntiForgeryToken()
+    <table id="usersTable" class="table table-striped table-sm align-middle">
+        <thead class="table-secondary">
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Designation</th>
+                <th>Default Office</th>
+                <th>Active</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
                 <tr>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Full Name</th>
-                    <th>Designation</th>
-                    <th>Default Office</th>
-                    <th>Active</th>
-                    <th></th>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>@user.FullName</td>
+                    <td>@user.Designation</td>
+                    <td>@user.OfficeCountry?.Name</td>
+                    <td>
+                        @if (user.IsActive)
+                        {
+                            <span class="badge bg-success opacity-75">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary opacity-50">No</span>
+                        }
+                    </td>
+                    <td>
+                        @* Office Access *@
+                        <button class="btn btn-info btn-sm text-white " title="Manage Office Access"
+                                data-user-id="@user.Id" data-bs-toggle="modal" data-bs-target="#officeAccessModal"
+                                onclick="loadUserAccess(this)" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
+                            <i class="fas fa-grip-horizontal"></i>
+                        </button>
+
+                        @* Manage Account*@
+                        <a href="../Identity/Account/Manage?pEmail=@user.Email" class="btn btn-success btn-sm" title="Edit"
+                           aria-disabled='@( (user.UserName?.ToUpper() == "ADMIN").ToString().ToLower() ) '
+                           style="@(user.UserName?.ToUpper() == "ADMIN" ? "pointer-events: none; opacity: 0.6;" : "")" )>
+                            <i class="fas fa-edit"></i>
+                        </a>
+
+                        @* Manage Roles and Access *@
+                        <button class="btn btn-primary btn-sm "
+                                data-user-id="@user.Id" data-bs-toggle="modal" data-bs-target="#userAccessModal"
+                                onclick="loadAccessModal('@user.Id')" title="Manage Access" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
+                            <i class="fas fa-tasks"></i>
+                        </button>
+
+                        @* Deactivate *@
+                        @if (@user.IsActive)
+                        {
+                            <button class="btn btn-danger btn-sm delete-btn"
+                                    data-user-id="@user.Id" data-user-name="@user.FullName" data-status="@user.IsActive"
+                                    title="Deactivate User" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
+                                <i class="fas fa-user-times"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-warning btn-sm delete-btn"
+                                    data-user-id="@user.Id" data-user-name="@user.FullName" data-status="@user.IsActive"
+                                    title="Activate User" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
+                                <i class="fas fa-user-check"></i>
+                            </button>
+                        }
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var user in Model.Users)
-                {
-                    <tr>
-                        <td>@user.UserName</td>
-                        <td>@user.Email</td>
-                        <td>@user.FullName</td>
-                        <td>@user.Designation</td>
-                        <td>@user.OfficeCountry?.Name</td>
-                        <td>
-                            @if (user.IsActive)
-                            {
-                                <span class="badge bg-success opacity-75">Yes</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary opacity-50">No</span>
-                            }
-                        </td>
-                        <td>
-                            @* Office Access *@
-                            <button class="btn btn-info btn-sm text-white " title="Manage Office Access"
-                                    data-user-id="@user.Id" data-bs-toggle="modal" data-bs-target="#officeAccessModal"
-                                    onclick="loadUserAccess(this)" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
-                                <i class="fas fa-grip-horizontal"></i>
-                            </button>
-
-                            @* Manage Account*@
-                            <a href="../Identity/Account/Manage?pEmail=@user.Email" class="btn btn-success btn-sm" title="Edit"
-                               aria-disabled='@( (user.UserName?.ToUpper() == "ADMIN").ToString().ToLower() ) '
-                               style="@(user.UserName?.ToUpper() == "ADMIN" ? "pointer-events: none; opacity: 0.6;" : "")" )>
-                                <i class="fas fa-edit"></i>
-                            </a>
-
-                            @* Manage Roles and Access *@
-                            <button class="btn btn-primary btn-sm"
-                                    data-user-id="@user.Id" data-bs-toggle="modal" data-bs-target="#userAccessModal"
-                                    onclick="loadAccessModal('@user.Id')" title="Manage Access" @(user.UserName?.ToUpper() == "ADMIN" ? "disabled" : "")>
-                                <i class="fas fa-tasks"></i>
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+            }
+        </tbody>
+    </table>
+</div>
 @* </div> *@
 
 <!-- Office Access Modal -->
@@ -123,7 +142,8 @@
 
         $(document).ready(function () {
             $('#usersTable').DataTable({
-                responsive: true
+                responsive: true,
+                stateSave: true
             });
         });
 
@@ -139,10 +159,10 @@
 
             // Show loading
             modalBody.innerHTML = `
-                                            <div class="text-center p-3">
-                                                <div class="spinner-border text-primary" role="status"></div>
-                                                <p>Loading...</p>
-                                            </div>`;
+                                                                    <div class="text-center p-3">
+                                                                        <div class="spinner-border text-primary" role="status"></div>
+                                                                        <p>Loading...</p>
+                                                                    </div>`;
 
             // Fetch partial view
             fetch(`/UsersOfficeAccess/AccessModal?userId=${encodeURIComponent(userId)}`)
@@ -161,10 +181,10 @@
         function reloadUserAccess(userId) {
             const container = document.getElementById('userAccessModalBody');
             container.innerHTML = `
-                                        <div class="text-center p-3">
-                                            <div class="spinner-border text-primary" role="status"></div>
-                                            <p>Loading...</p>
-                                        </div>`;
+                                                                <div class="text-center p-3">
+                                                                    <div class="spinner-border text-primary" role="status"></div>
+                                                                    <p>Loading...</p>
+                                                                </div>`;
 
             fetch(`/UsersOfficeAccess/AccessModal?userId=${encodeURIComponent(userId)}`)
                 .then(res => res.text())
@@ -181,7 +201,6 @@
         }
     </script>
 
-
     <script>
         function openAddAccessModal(userId) {
             //alert(userId);
@@ -190,10 +209,10 @@
             const contentDiv = document.getElementById('addAccessModalBody');
 
             contentDiv.innerHTML = `
-                                            <div class="text-center p-4">
-                                                <div class="spinner-border text-primary" role="status"></div>
-                                                <p>Loading form...</p>
-                                            </div>`;
+                                                                    <div class="text-center p-4">
+                                                                        <div class="spinner-border text-primary" role="status"></div>
+                                                                        <p>Loading form...</p>
+                                                                    </div>`;
 
             fetch(`/UsersOfficeAccess/Create?userId=${encodeURIComponent(userId)}`)
                 .then(res => res.text())
@@ -209,7 +228,6 @@
     </script>
 
     <script>
-
         document.addEventListener('submit', function (e) {
             if (e.target && e.target.id === 'addAccessForm') {
                 e.preventDefault();
@@ -299,7 +317,7 @@
     <script>
         function loadAccessModal(userId) {
             $('#userAccessModalContainer').html(`<div class="text-center p-4">
-                                    <div class="spinner-border text-primary" role="status"></div><p>Loading...</p></div>`);
+                                                            <div class="spinner-border text-primary" role="status"></div><p>Loading...</p></div>`);
 
             $.get(`/Users/UserAccess?userId=${userId}`, function (modalHtml) {
                 $('#userAccessModalContainer').html(modalHtml);
@@ -328,7 +346,68 @@
                     toastr.error('Error saving roles and claims.');
                 });
         });
+    </script>
+    <script>
+        $(document).on('click', '.delete-btn', function () {
+            const userId = $(this).data('user-id');
+            const userName = $(this).data('user-name');
+            const status = $(this).data('status');
+            
+            let text = "";
+            let confirmText = "";
+
+            if (status == 'True') {
+                text = `Deactivate user: ${userName}?`
+                confirmText = 'Yes, deactivate';
+                confirmButtonColor = '#d33';
+            }
+            else {
+                text = `Re-Activate user: ${userName}?`
+                confirmText = 'Yes, re-eactivate';
+                confirmButtonColor = '#1a9';
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: confirmText,
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: confirmButtonColor
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const token = $('input[name="__RequestVerificationToken"]').val();
+                    let table = $('#usersTable').DataTable();
+                    fetch(`/Users?handler=ToggleUserActive&userId=${encodeURIComponent(userId)}`, {
+                        method: 'POST',
+                        headers: { 'RequestVerificationToken': token }
+                    })
+                        .then(async response => {
+                            const data = await response.json();
+                            if (response.ok) {
+                                Swal.fire('Deactivated!', data.message, 'success');
+
+                                // 🔄 Refresh table body after success
+                                fetch('/Users?handler=TablePartial')
+                                    .then(res => res.text())
+                                    .then(html => {
+                                        let newRows = $(html).find('#usersTable tbody tr');
+                                        table.clear();                 // clear existing rows
+                                        table.rows.add(newRows).draw(false); // add new rows and redraw
+                                    });
+
+                            } else {
+                                Swal.fire('Failed', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            Swal.fire('Error', 'Unexpected error occurred', 'error');
+                        });
+                }
+            });
+        });
 
     </script>
-
 }

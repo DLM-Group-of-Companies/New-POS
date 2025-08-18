@@ -198,6 +198,13 @@
                             </tr>
                         }
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2" style="text-align:right">Total:</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -207,12 +214,50 @@
 
 @section Scripts {
     <script>
-                $(document).ready(function () {
+        $(document).ready(function () {
             $('#orderDetTable').DataTable({
                 "pageLength": 25,
-                "order": [[1, "desc"]] // Optional: sort by date descending
+                "order": [[1, "desc"]], // Optional: sort by date descending
+                "footerCallback": function (row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Helper to parse numbers
+                    var intVal = function (i) {
+                        return typeof i === 'string'
+                            ? i.replace(/[\$,]/g, '') * 1
+                            : typeof i === 'number'
+                                ? i : 0;
+                    };
+
+                    // Total over all pages
+                    var total = api
+                        .column(2, { search: 'applied' }) // column index 2 = Amount
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Total over this page
+                    var pageTotal = api
+                        .column(2, { page: 'current' })
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Check if paging is active (records > page length OR filtered)
+                    var info = api.page.info();
+                    var showGrandTotal = info.recordsDisplay > info.length;
+
+                    // Update footer
+                    $(api.column(2).footer()).html(
+                        pageTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+                        (showGrandTotal ? ' (Total: ' + total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ')' : '')
+                    );
+                }
             });
         });
+                // });
 
         $(document).ready(function () {
             hideLoader();

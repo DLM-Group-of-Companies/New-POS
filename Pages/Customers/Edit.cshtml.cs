@@ -61,6 +61,9 @@ namespace NLI_POS.Pages.Customers
                 return NotFound();
             }
 
+            var custClassLookup = _context.CustClass
+    .ToDictionary(c => c.Id, c => c.Name);
+
             // Step 2: Track the current model for changes
             _context.Attach(Customer).State = EntityState.Modified;
 
@@ -70,12 +73,22 @@ namespace NLI_POS.Pages.Customers
 
             foreach (var prop in entry.Properties)
             {
+                var propName = prop.Metadata.Name;
                 var originalValue = existingCustomer.GetType().GetProperty(prop.Metadata.Name)?.GetValue(existingCustomer)?.ToString();
                 var currentValue = prop.CurrentValue?.ToString();
 
+                if (propName == "CustClass") //This is to get the Name instead of Id
+                {
+                    if (int.TryParse(originalValue?.ToString(), out int originalId))
+                        originalValue = custClassLookup.GetValueOrDefault(originalId);
+
+                    if (int.TryParse(currentValue?.ToString(), out int currentId))
+                        currentValue = custClassLookup.GetValueOrDefault(currentId);
+                }
+
                 if (originalValue != currentValue)
                 {
-                    changedFields.Add($"{prop.Metadata.Name}: '{originalValue}' → '{currentValue}'");
+                    changedFields.Add($"{propName}: '{originalValue}' → '{currentValue}'");
                 }
             }
 
