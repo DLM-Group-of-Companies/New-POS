@@ -383,6 +383,11 @@ input[type="number"] {
         left: 400px;
     }
 
+    .pos-dashboard {
+        top: 400px;
+        left: 0px;
+    }
+
     .pos-users {
         top: 400px;
         left: 200px;

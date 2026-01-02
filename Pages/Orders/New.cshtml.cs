@@ -253,7 +253,8 @@ namespace NLI_POS.Pages.Orders
             {
                 return new JsonResult(ProdAmount?.MedPackPrice);
             }
-            if (custclass == "Naturopath Package")
+            //if (custclass == "Naturopath Package")
+            if (custclass.StartsWith("Naturopath"))
             {
                 return new JsonResult(ProdAmount?.NaturoPrice);
             }
@@ -593,7 +594,7 @@ namespace NLI_POS.Pages.Orders
         //        return new JsonResult(stock?.StockQty ?? 0);
         //    }
         //}
-        public async Task<IActionResult> OnGetGetStockAsync(int productId, int officeId, int qty)
+        public async Task<IActionResult> OnGetGetStockAsync(int productId, int? comboId, int officeId, int qty)
         {
             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
@@ -604,7 +605,7 @@ namespace NLI_POS.Pages.Orders
 
             if (product.ProductCategory == "Package")
             {
-                var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == productId);
+                var combo = await _context.ProductCombos.FirstOrDefaultAsync(c => c.ProductId == productId && c.IsActive);
 
                 if (combo == null)
                 {
@@ -705,8 +706,6 @@ namespace NLI_POS.Pages.Orders
             }
         }
 
-
-
         public class ProductInput
         {
             public int ProductId { get; set; }
@@ -727,6 +726,7 @@ namespace NLI_POS.Pages.Orders
 
             public int ProductId { get; set; }
             public string ProductCat { get; set; }
+            //public string ProductClass { get; set; }
             public string ProductName { get; set; }
             public int? ProductCombo { get; set; }
             public string ComboName { get; set; }
@@ -737,6 +737,7 @@ namespace NLI_POS.Pages.Orders
             public decimal ServiceChargePct { get; set; } = 0;
 
             public int ItemNo { get; set; } // optional
+            public virtual Product Product { get; set; }
         }
 
 

@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
 using NLI_POS.Models.ViewModels;
 using NLI_POS.Services;
-using static NLI_POS.Services.BasePageModel;
 
 namespace NLI_POS.Pages.Report
 {

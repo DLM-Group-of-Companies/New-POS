@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -283,21 +284,87 @@ namespace NLI_POS.Pages.Dashboard
             return new JsonResult(data);
         }
 
-        public JsonResult OnGetTopSalespeople(int? officeId)
+        public JsonResult OnGetTopSalespeople(int? officeId, DateTime? endDate, string? type)
         {
-            var topSalespeople = _context.Orders.Where(o => o.OfficeId == officeId)
-                .GroupBy(o => o.SalesBy)
-                .Select(g => new
-                {
-                    Salesperson = g.Key,
-                    TotalSales = g.Sum(o => o.TotAmount)
-                })
-                .OrderByDescending(x => x.TotalSales)
-                .Take(10) // Top 10 performers
-                .ToList();
+            if (!endDate.HasValue)
+                return new JsonResult(new { error = "End Date required" });
+
+            List<object> topSalespeople;
+
+            if (type == "YearToDate")
+            {
+                topSalespeople = _context.Orders
+                    .Where(o => o.OfficeId == officeId &&
+                                o.OrderDate.Year == endDate.Value.Year)
+                    .GroupBy(o => o.SalesBy)
+                    .Select(g => new
+                    {
+                        Salesperson = g.Key,
+                        TotalSales = g.Sum(o => o.TotAmount)
+                    })
+                    .OrderByDescending(x => x.TotalSales)
+                    .Take(10)
+                    .ToList<object>();
+            }
+            else
+            {
+                topSalespeople = _context.Orders
+                    .Where(o => o.OfficeId == officeId &&
+                                o.OrderDate.Year == endDate.Value.Year &&
+                                o.OrderDate.Month == endDate.Value.Month)
+                    .GroupBy(o => o.SalesBy)
+                    .Select(g => new
+                    {
+                        Salesperson = g.Key,
+                        TotalSales = g.Sum(o => o.TotAmount)
+                    })
+                    .OrderByDescending(x => x.TotalSales)
+                    .Take(10)
+                    .ToList<object>();
+            }
 
             return new JsonResult(topSalespeople);
         }
+
+
+        //public List<string> Labels { get; set; } = new(); // months like ["2025-06", "2025-07"]
+        //public List<object> Datasets { get; set; } = new();
+
+        public async Task<JsonResult> OnGetCountPerProductAsync(int year, string? type)
+        {
+            var query = _context.OrderDetails
+                .Where(od => !od.Order.IsVoided && od.ProductId != null && od.Order.OrderDate.Year == year);
+
+            if (!string.IsNullOrEmpty(type))
+            {
+                if (type == "Regular")
+                    query = query.Where(od => od.Products.ProductCategory == "Regular");
+                else if (type == "Promo")
+                    query = query.Where(od => od.Products.ProductCategory.Contains("Package"));
+            }
+
+            var raw = await query
+                .GroupBy(od => new {
+                    od.Order.OrderDate.Year,
+                    od.Order.OrderDate.Month,
+                    od.ProductId,
+                    od.Products.ProductName
+                })
+                .Select(g => new
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    ProductId = g.Key.ProductId,
+                    ProductName = g.Key.ProductName,
+                    TotalQuantity = g.Sum(x => x.Quantity)
+                })
+                .OrderBy(x => x.Year).ThenBy(x => x.Month)
+                .ToListAsync();
+
+            return new JsonResult(raw);
+        }
+
+
 
         public async Task<JsonResult> OnGetSalesTrendAsync(DateTime? startDate, DateTime? endDate, int? officeId)
         {

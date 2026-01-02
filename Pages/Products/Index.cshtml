@@ -51,7 +51,7 @@
                     <td class="align-middle">
                         <a href="javascript:;" class="btn btn-success btn-sm edit-product" data-id="@item.Id" title="Edit"><i class="far fa-edit"></i></a>
                         <a asp-page="./Details" class="btn btn-primary btn-sm" title="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a>
-@*                         @if (User.IsInRole("Admin"))
+                        @*                         @if (User.IsInRole("Admin"))
                         {
                             <a class="btn btn-danger btn-sm delete-product" href="javascript:;" title="Delete"><i class="fas fa-trash-alt"></i></a>
                         } *@
@@ -66,135 +66,149 @@
     @Html.AntiForgeryToken()
 
     <script>
-        $(document).ready(function () {
-            // Clear sessionStorage if coming from Home or Index (but not from Details or Edit)
-            const referrer = document.referrer;
-            if (referrer.includes("/Home") || referrer.endsWith("/Index") || referrer.endsWith("/")) {
-                sessionStorage.removeItem('ProductsTableState');
-            }
+            $(document).ready(function () {
+                // Clear sessionStorage if coming from Home or Index (but not from Details or Edit)
+                const referrer = document.referrer;
+                if (referrer.includes("/Home") || referrer.endsWith("/Index") || referrer.endsWith("/")) {
+                    sessionStorage.removeItem('ProductsTableState');
+                }
 
-            // Initialize DataTable with sessionStorage state saving
-            const table = $('#ProductTable').DataTable({
-                stateSave: true,
-                stateSaveCallback: function (settings, data) {
-                    sessionStorage.setItem('ProductsTableState', JSON.stringify(data));
-                },
-                stateLoadCallback: function (settings) {
-                    return JSON.parse(sessionStorage.getItem('ProductsTableState'));
-                },
-                dom: 'Bfrtip',
-                responsive: true,
-                buttons: [
-                    {
-                        extend: 'copy',
-                        className: 'btn btn-sm btn-outline-secondary',
-                        exportOptions: { columns: ':not(:last-child)' }
-                    },
-                    {
-                        extend: 'csv',
-                        className: 'btn btn-sm btn-outline-success',
-                        exportOptions: { columns: ':not(:last-child)' }
-                    },
-                    {
-                        extend: 'excel',
-                        className: 'btn btn-sm btn-outline-success',
-                        exportOptions: { columns: ':not(:last-child)' }
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        orientation: 'landscape',
-                        className: 'btn btn-sm btn-outline-danger',
-                        exportOptions: { columns: ':not(:last-child)' }
-                    },
-                    {
-                        extend: 'print',
-                        className: 'btn btn-sm btn-outline-dark',
-                        exportOptions: { columns: ':not(:last-child)' }
-                    }
-                ],
-                columnDefs: [
-                    { targets: [0], visible: false }, // Hide ID column
-                    { targets: -1, orderable: false } // Disable sort on last column
-                ]
-            });
+                    // Function to calculate dynamic height
+        function getTableHeight() {
+            return window.innerHeight - 250;  // adjust 250 based on your header/footer height
+        }
 
-            // Edit product handler
-            $('#ProductTable').on('click', '.edit-product', function () {
-                const id = $(this).data('id');
-                window.location.href = `/Products/Edit?id=${id}`;
-            });
 
-            // Handle delete modal open
-            $('#ProductTable').on('click', '.details', function () {
-                const vID = $(this).closest("tr").find("td").eq(0).text().trim();
-                window.selRow = $(this).closest("tr"); // store for delete
-
-                $.ajax({
-                    type: "GET",
-                    url: '@Url.Page("Delete")',
-                    data: { __RequestVerificationToken: getToken(), id: vID },
-                    success: function (response) {
-                        $("#partialModal .modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
-                        $("#partialModal .modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-user-times"></i> Delete</button>');
-                        $("#partialModal .modal-body").html(response);
-                        $("#partialModal").modal('show');
-                        window.vID = vID; // store globally for deleteRecord
+                // Initialize DataTable with sessionStorage state saving
+                const table = $('#ProductTable').DataTable({
+                    stateSave: true,
+                    stateSaveCallback: function (settings, data) {
+                        sessionStorage.setItem('ProductsTableState', JSON.stringify(data));
                     },
-                    error: function () {
-                        alert('Error encountered. This record may already have been deleted.');
-                    }
+                    stateLoadCallback: function (settings) {
+                        return JSON.parse(sessionStorage.getItem('ProductsTableState'));
+                    },
+                            scrollY: getTableHeight() + "px",
+        scrollCollapse: true,
+                    dom: 'Bfrtip',
+                    responsive: true,
+                    buttons: [
+                        {
+                            extend: 'copy',
+                            className: 'btn btn-sm btn-outline-secondary',
+                            exportOptions: { columns: ':not(:last-child)' }
+                        },
+                        {
+                            extend: 'csv',
+                            className: 'btn btn-sm btn-outline-success',
+                            exportOptions: { columns: ':not(:last-child)' }
+                        },
+                        {
+                            extend: 'excel',
+                            className: 'btn btn-sm btn-outline-success',
+                            exportOptions: { columns: ':not(:last-child)' }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            orientation: 'landscape',
+                            className: 'btn btn-sm btn-outline-danger',
+                            exportOptions: { columns: ':not(:last-child)' }
+                        },
+                        {
+                            extend: 'print',
+                            className: 'btn btn-sm btn-outline-dark',
+                            exportOptions: { columns: ':not(:last-child)' }
+                        }
+                    ],
+                    columnDefs: [
+                        { targets: [0], visible: false }, // Hide ID column
+                        { targets: -1, orderable: false } // Disable sort on last column
+                    ]
+                });
+
+                        // ⭐ Make height adjust automatically on window resize ⭐
+        $(window).on('resize', function () {
+            table.settings()[0].oScroll.sY = getTableHeight() + "px";
+            table.draw(false);
+        });
+
+                // Edit product handler
+                $('#ProductTable').on('click', '.edit-product', function () {
+                    const id = $(this).data('id');
+                    window.location.href = `/Products/Edit?id=${id}`;
+                });
+
+                // Handle delete modal open
+                $('#ProductTable').on('click', '.details', function () {
+                    const vID = $(this).closest("tr").find("td").eq(0).text().trim();
+                    window.selRow = $(this).closest("tr"); // store for delete
+
+                    $.ajax({
+                        type: "GET",
+                        url: '@Url.Page("Delete")',
+                        data: { __RequestVerificationToken: getToken(), id: vID },
+                        success: function (response) {
+                            $("#partialModal .modal-title").html('<i class="fas fa-question-circle fa-lg"></i> Confirmation');
+                            $("#partialModal .modal-footer-button").html('<button type="button" class="btn btn-danger" onclick="deleteRecord()"><i class="fas fa-user-times"></i> Delete</button>');
+                            $("#partialModal .modal-body").html(response);
+                            $("#partialModal").modal('show');
+                            window.vID = vID; // store globally for deleteRecord
+                        },
+                        error: function () {
+                            alert('Error encountered. This record may already have been deleted.');
+                        }
+                    });
                 });
             });
-        });
 
-        function deleteRecord() {
-            $.ajax({
-                url: '@Url.Page("Delete")',
-                type: 'POST',
-                cache: false,
-                data: {
-                    __RequestVerificationToken: getToken(),
-                    id: window.vID
-                },
-                success: function (successDelete) {
-                    if (successDelete) {
-                        toastr.options.closeButton = false;
-                        toastr.options.timeOut = 800;
-                        toastr.options.fadeOut = 1000;
-                        toastr.options.onHidden = function () {
-                            window.selRow.remove();
-                        };
-                        toastr.success('Successfully deleted!');
-                        $("#partialModal").modal('hide');
+            function deleteRecord() {
+                $.ajax({
+                    url: '@Url.Page("Delete")',
+                    type: 'POST',
+                    cache: false,
+                    data: {
+                        __RequestVerificationToken: getToken(),
+                        id: window.vID
+                    },
+                    success: function (successDelete) {
+                        if (successDelete) {
+                            toastr.options.closeButton = false;
+                            toastr.options.timeOut = 800;
+                            toastr.options.fadeOut = 1000;
+                            toastr.options.onHidden = function () {
+                                window.selRow.remove();
+                            };
+                            toastr.success('Successfully deleted!');
+                            $("#partialModal").modal('hide');
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('An error occurred while deleting the record.');
+                        console.error(xhr.responseText);
                     }
-                },
-                error: function (xhr) {
-                    alert('An error occurred while deleting the record.');
-                    console.error(xhr.responseText);
-                }
+                });
+            }
+
+            function getToken() {
+                const tokenInput = $('input[name="__RequestVerificationToken"]');
+                return tokenInput.val();
+            }
+
+            // Clean up modal on close
+            $('body').on('hidden.bs.modal', '.modal', function () {
+                $(this).removeData('bs.modal');
             });
-        }
 
-        function getToken() {
-            const tokenInput = $('input[name="__RequestVerificationToken"]');
-            return tokenInput.val();
-        }
-
-        // Clean up modal on close
-        $('body').on('hidden.bs.modal', '.modal', function () {
-            $(this).removeData('bs.modal');
-        });
-
-        // Fix pagination UI
-        $(document).ready(function () {
-            $('ul.pagination > li.disabled > a').addClass('page-link');
-        });
-
-        // PageSize dropdown form submit
-        $(function () {
-            $("#pageSize").change(function () {
-                $("#form1").submit();
+            // Fix pagination UI
+            $(document).ready(function () {
+                $('ul.pagination > li.disabled > a').addClass('page-link');
             });
-        });
+
+            // PageSize dropdown form submit
+            $(function () {
+                $("#pageSize").change(function () {
+                    $("#form1").submit();
+                });
+            });
     </script>
 }

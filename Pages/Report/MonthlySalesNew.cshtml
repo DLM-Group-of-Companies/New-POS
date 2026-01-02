@@ -1,0 +1,152 @@
+﻿@page
+@using static NLI_POS.Services.BasePageModel
+@model NLI_POS.Pages.Report.MonthlySalesNewModel
+
+@{
+    ViewData["Title"] = "Monthly Sales Pivot Report";
+}
+
+<div class="container-fluid bg-white bg-gradient shadow p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary mb-0">
+            <i class="fas fa-calendar-alt me-2"></i> @ViewData["Title"]
+        </h3>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
+    </div>
+
+    <hr />
+
+    <div class="row g-3 mb-4">
+        <form method="post" asp-page-handler="Show" class="row g-2 align-items-end mb-1" onsubmit="return validateAndShowLoader(this)">
+            <div class="col-md-3">
+                <label for="officeFilter" class="form-label">Office</label>
+
+                <!-- NOTE: name must match the PageModel property OfficeId -->
+                <select id="officeFilter" name="OfficeId" class="form-select" required onchange="setTimeZoneFromSelected(this)">
+                    <option value="">Select Office</option>
+                    @foreach (var office in Model.OfficeList ?? new List<OfficeSelectItem>())
+                    {
+                        <option value="@office.Value"
+                                data-timezone="@office.TimeZone"
+                                data-currency="@office.CurrencyCode"
+                                selected="@(office.Value == Model.OfficeId?.ToString() ? "selected" : null)">
+                            @office.Text
+                        </option>
+                    }
+                </select>
+
+                <!-- NOTE: name must match PageModel property TimeZoneId -->
+                <input type="hidden" id="timeZoneInput" name="TimeZoneId" value="@Model.TimeZoneId" />
+            </div>
+
+            <div class="col-md-2">
+                <label for="dateFilter" class="form-label">Month</label>
+
+                <!-- NOTE: name must match PageModel property SelectedMonth -->
+                <input type="month" id="dateFilter" name="SelectedMonth" class="form-control"
+                       value="@(Model.SelectedMonth.HasValue? Model.SelectedMonth.Value.ToString("yyyy-MM") : DateTime.UtcNow.ToString("yyyy-MM"))"
+                       required />
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+
+    @if (Model.PivotData is not null && Model.PivotData.Count > 0)
+    {
+        <hr />
+
+        <!-- Export form: POST to Export handler. Use asp-for to bind hidden inputs properly -->
+        <form method="post" asp-page-handler="Export">
+            <input type="hidden" asp-for="OfficeId" />
+            <input type="hidden" asp-for="TimeZoneId" />
+            <input type="hidden" asp-for="SelectedMonth" />
+
+            <button class="btn btn-success mb-3">Export to Excel</button>
+        </form>
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive ">
+                    <table id="pivotTable" class="table table-sm table-bordered table-striped mt-3 small">
+                        <thead>
+                            <tr class="table-danger">
+                                @* Use the first row's keys as columns (or prefer Model.PivotColumns if you added it) *@
+                                @foreach (var col in Model.PivotData.First().Keys)
+                                {
+                                    <th>@col</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in Model.PivotData)
+                            {
+                                <tr>
+                                    @foreach (var col in Model.PivotData.First().Keys)  @* ensure consistent order *@
+                                    {
+                                        <td>@row[col]</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    <div id="pager" class="d-flex gap-1 justify-content-center mt-2 bg-white p-2"></div>
+</div>
+
+@section Scripts {
+    <script>
+        // when office select changes, update hidden timezone input with selected option's data-timezone
+        function setTimeZoneFromSelected(select) {
+            const opt = select.options[select.selectedIndex];
+            const tz = opt?.dataset?.timezone || '';
+            document.getElementById('timeZoneInput').value = tz;
+        }
+
+        // set timezone on page load based on current selection
+        (function () {
+            const sel = document.getElementById('officeFilter');
+            if (sel) setTimeZoneFromSelected(sel);
+        })();
+    </script>
+
+    <script>
+        const rowsPerPage = 20;
+        const table = document.getElementById("pivotTable");
+        const rows = table.querySelectorAll("tbody tr");
+        let currentPage = 1;
+
+        function renderPage(page) {
+            currentPage = page;
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+
+            renderPager();
+        }
+
+        function renderPager() {
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+            const pager = document.getElementById("pager");
+            pager.innerHTML = "";
+
+            for (let i = 1; i <= totalPages; i++) {
+                pager.innerHTML += `
+                    <button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'}"
+                            onclick="renderPage(${i})">
+                        ${i}
+                    </button>`;
+            }
+        }
+
+        renderPage(1);
+    </script>
+
+}

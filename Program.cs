@@ -8,8 +8,13 @@ using NLI_POS.Models;
 using NLI_POS.Services;
 using System.Text.Json;
 using static NLI_POS.Services.AuditHelpers;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Set EPPlus license for non-commercial use
+ExcelPackage.License.SetNonCommercialPersonal("NobleLife International");
+
 var localTimeZone = "UTC";
 
 var connectionString = builder.Configuration.GetConnectionString("NLPOSLiveConn") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -19,6 +24,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36)))
                .EnableSensitiveDataLogging()   // <-- SHOWS PARAMETER VALUES
            .EnableDetailedErrors());
+
+// In Program.cs or Startup.cs
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSMSApp",
+        policy => policy
+            .WithOrigins("https://sms.yourdomain.com") // SMS app URL
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 
 builder.Logging.AddConsole();
 
@@ -107,6 +122,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddSingleton<DatabaseBackupService>();
 
+builder.Services.AddScoped<MainProductSalesReportService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -150,10 +167,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
+app.UseCors("AllowSMSApp"); //For SMS to access POS
 app.UseAuthorization();
 
 app.UseNotyf();
 
 app.MapRazorPages();
+app.MapControllers();
 
 app.Run();
