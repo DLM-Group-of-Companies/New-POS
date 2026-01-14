@@ -735,19 +735,19 @@
 
                 data.forEach(customer => {
                     tbody.append(`
-                                                                                                                                        <tr>
-                                                                                                                                            <td>${customer.custcode}</td>
-                                                                                                                                            <td>${customer.name}</td>
-                                                                                                                                            <td>${customer.email}</td>
-                                                                                                                                            <td>${customer.phone}</td>
-                                                                                                                                            <td>
-                                                                                                                                                <button class="btn btn-sm btn-success" title="Select"
-                                                                                                                                                        onclick='selectCustomer(${JSON.stringify(customer)})'>
-                                                                                                                                                            <i class="fa-solid fa-arrow-right"></i>
-                                                                                                                                                </button>
-                                                                                                                                            </td>
-                                                                                                                                        </tr>
-                                                                                                                                    `);
+                            <tr>
+                                <td>${customer.custcode}</td>
+                                <td>${customer.name}</td>
+                                <td>${customer.email}</td>
+                                <td>${customer.phone}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" title="Select"
+                                            onclick='selectCustomer(${JSON.stringify(customer)})'>
+                                                <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
                 });
             });
         });
@@ -778,28 +778,28 @@
             const options = $('#paymentOptionsSource').html();
 
             const row = `
-                                                            <tr>
-                                                                <td>
-                                                                    <select class="form-control form-control-sm form-select form-select-sm payment-method">
-                                                                        ${options}
-                                                                    </select>
-                                                                </td>
-                                                                <td>
-                                                                    <input type="number" class="form-control form-control-sm payment-amount" />
-                                                                </td>
-                                                                <td>
-                                                                    <input type="text" class="form-control form-control-sm payment-charge" readonly />
-                                                                </td>
-                                                                <td>
-                                                                    <input type="text" class="form-control form-control-sm payment-ref" />
-                                                                </td>
-                                                                <td>
-                                                                <input type="hidden" class="payment-percent" />
-                                                                    <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
-                                                                        <i class="fas fa-times"></i>
-                                                                    </button>
-                                                                </td>
-                                                            </tr>`;
+                        <tr>
+                            <td>
+                                <select class="form-control form-control-sm form-select form-select-sm payment-method">
+                                    ${options}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm payment-amount" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm payment-charge" readonly />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm payment-ref" />
+                            </td>
+                            <td>
+                            <input type="hidden" class="payment-percent" />
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removePaymentRow(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>`;
 
             $('#paymentTableBody').append(row);
             reindexPaymentRows();
@@ -994,14 +994,14 @@
                     }).format(totalItem);
 
                     tbody.append(`
-                                                                                                                            <tr>
-                                                                                                                                <td>${item.productName}</td>
-                                                                                                                                <td>${item.comboName}</td>
-                                                                                                                                <td class="text-end">${formattedPrice}</td>
-                                                                                                                                <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" style="max-width: 90px; width: 100%;" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
-                                                                                                                                <td>${formattedTotalItem}</td>
-                                                                                                                                <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
-                                                                                                                            </tr>`);
+                        <tr>
+                            <td>${item.productName}</td>
+                            <td>${item.comboName}</td>
+                            <td class="text-end">${formattedPrice}</td>
+                            <td class="text-end"><input type="number" min="1" class="form-control form-control-sm input-sm" style="max-width: 90px; width: 100%;" value="${item.quantity}" onchange="editQuantity(${item.productId}, this.value)" /></td>
+                            <td>${formattedTotalItem}</td>
+                            <td><button class="btn btn-outline-danger btn-sm" onclick="removeProduct(${item.productId})"><i class="fas fa-backspace"></i></button></td>
+                        </tr>`);
                 });
             }
 

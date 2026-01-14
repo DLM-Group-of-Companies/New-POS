@@ -50,15 +50,15 @@ namespace NLI_POS.Pages.Orders
         public List<SelectListItem> SalesPersons { get; set; }
 
         [BindProperty]
-        public string OfficeTimeZone { get; set; } 
-        
+        public string OfficeTimeZone { get; set; }
+
         [BindProperty]
         public string OfficeLocale { get; set; }
 
         [BindProperty(SupportsGet = true)]
         public int? SelectedOfficeId { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? officeId )
+        public async Task<IActionResult> OnGetAsync(int? officeId)
         {
             //Reset cart
             HttpContext.Session.Remove("Cart");
@@ -692,7 +692,7 @@ namespace NLI_POS.Pages.Orders
             else
             {
                 // Regular product
-                var stock = await _context.InventoryStocks
+                var stock = await _context.InventoryStocks.Include(i=>i.Location)
                     .FirstOrDefaultAsync(s => s.ProductId == productId && s.Location.OfficeId == officeId);
 
                 int available = stock?.StockQty ?? 0;

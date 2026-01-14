@@ -25,8 +25,15 @@ namespace NLI_POS.Pages.Report
         [BindProperty(SupportsGet = true)]
         public string TimeZoneId { get; set; } = "Asia/Manila";
 
+        //[BindProperty(SupportsGet = true)]
+        //public DateTime? SelectedMonth { get; set; }
+
         [BindProperty(SupportsGet = true)]
-        public DateTime? SelectedMonth { get; set; }
+        public int SelectedMonth { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int SelectedYear { get; set; }
+
 
         [BindProperty]
         public List<Dictionary<string, object>>? PivotData { get; set; }
@@ -37,8 +44,11 @@ namespace NLI_POS.Pages.Report
         {
             OfficeList = await GetUserOfficesAsync();
 
-            if (SelectedMonth == null)
-                SelectedMonth = DateTime.Today;
+            if (SelectedMonth == 0)
+                SelectedMonth = DateTime.UtcNow.Month;
+
+            if (SelectedYear==0)
+                SelectedYear = DateTime.UtcNow.Year;
 
             return Page();
         }
@@ -47,7 +57,9 @@ namespace NLI_POS.Pages.Report
         {
             var tz = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);
 
-            DateTime localStart = new DateTime(SelectedMonth.Value.Year, SelectedMonth.Value.Month, 1);
+            var selectedDate = new DateTime(SelectedYear, SelectedMonth, 1);
+
+            DateTime localStart = new DateTime(SelectedYear, SelectedMonth, 1);
             DateTime localEnd = localStart.AddMonths(1);
 
             return (
@@ -59,7 +71,8 @@ namespace NLI_POS.Pages.Report
         public async Task<IActionResult> OnPostShowAsync()
         {
             var (utcStart, utcEnd) = GetUtcRange();
-            PivotData = await _reportService.GetOrderPivotReport(utcStart, utcEnd, OfficeId);
+            var report = await _reportService.GetOrderPivotReport(utcStart, utcEnd, OfficeId);
+            PivotData = report.Data;
 
             OfficeList = await GetUserOfficesAsync();
             return Page();
@@ -69,7 +82,7 @@ namespace NLI_POS.Pages.Report
         {
             var (utcStart, utcEnd) = GetUtcRange();
             var data = await _reportService.GetOrderPivotReport(utcStart, utcEnd, OfficeId);
-            var excelBytes = _reportService.ExportOrderPivotToExcel(data);
+            var excelBytes = _reportService.ExportOrderPivotToExcel(data.Data, utcStart, utcEnd, OfficeId, data.MainProductDict);
 
             return File(
                 excelBytes,

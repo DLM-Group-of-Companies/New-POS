@@ -63,10 +63,7 @@ namespace NLI_POS.Data
             modelBuilder.Entity<PromoSetting>()
             .HasIndex(p => p.ProductId)
             .IsUnique(); // Optional: only if you want it unique.
-
-
         }
-
 
         public DbSet<Customer> Customer { get; set; }
         public DbSet<CustClass> CustClass { get; set; }
