@@ -43,6 +43,10 @@ namespace NLI_POS.Models
         [Required]
         public string SalesBy { get; set; } = "";
 
+        [StringLength(50)]
+        [Display(Name = "Sales Source")]
+        public string? SalesSource { get; set; } = "";
+
         public bool IsVoided { get; set; }
         public DateTime? VoidedDate { get; set; }
         [StringLength(30)]

@@ -368,6 +368,11 @@ input[type="number"] {
         left: 400px;
     }
 
+    .pos-salesources {
+        top: 0;
+        left: 600px;
+    }
+
     .pos-products {
         top: 200px;
         left: 0;

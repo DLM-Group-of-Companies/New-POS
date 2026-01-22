@@ -17,7 +17,7 @@ namespace NLI_POS.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.15")
+                .HasAnnotation("ProductVersion", "8.0.23")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -648,6 +648,32 @@ namespace NLI_POS.Migrations
                     b.ToTable("InventoryTransactions");
                 });
 
+            modelBuilder.Entity("NLI_POS.Models.NLI_POS.Models.ProductConversion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ConversionQty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FromProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromProductId");
+
+                    b.HasIndex("ToProductId");
+
+                    b.ToTable("ProductConversions");
+                });
+
             modelBuilder.Entity("NLI_POS.Models.OfficeCountry", b =>
                 {
                     b.Property<int>("Id")
@@ -756,6 +782,10 @@ namespace NLI_POS.Migrations
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
+
+                    b.Property<string>("SalesSource")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<decimal>("TotAmount")
                         .HasColumnType("decimal(65,30)");
@@ -1155,6 +1185,45 @@ namespace NLI_POS.Migrations
                     b.ToTable("SalesQuotas");
                 });
 
+            modelBuilder.Entity("NLI_POS.Models.SalesSources", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTime?>("EncodeDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EncodedBy")
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("SalesSources");
+                });
+
             modelBuilder.Entity("NLI_POS.Models.SysParam", b =>
                 {
                     b.Property<int>("Id")
@@ -1430,6 +1499,25 @@ namespace NLI_POS.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("SourceLocation");
+                });
+
+            modelBuilder.Entity("NLI_POS.Models.NLI_POS.Models.ProductConversion", b =>
+                {
+                    b.HasOne("NLI_POS.Models.Product", "FromProduct")
+                        .WithMany()
+                        .HasForeignKey("FromProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NLI_POS.Models.Product", "ToProduct")
+                        .WithMany()
+                        .HasForeignKey("ToProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FromProduct");
+
+                    b.Navigation("ToProduct");
                 });
 
             modelBuilder.Entity("NLI_POS.Models.OfficeCountry", b =>

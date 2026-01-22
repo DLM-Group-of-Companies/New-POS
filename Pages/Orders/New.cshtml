@@ -58,7 +58,7 @@
                                         document.getElementById("OfficeTimeZone").value = tz;
                                         locale = selectedOption.getAttribute("data-locale");
                                         document.getElementById("OfficeLocale").value = locale;
-                                        currency = selectedOption.getAttribute("data-currency");                                        
+                                        currency = selectedOption.getAttribute("data-currency");
                                         document.getElementById("OfficeCurrency").value = currency;
                                     }
 
@@ -169,7 +169,7 @@
                                                 <td>@item.ComboName</td>
                                                 <td class="text-end">@item.Price.ToString("N2")</td>
                                                 <td class="text-end">@item.Quantity</td>
-                                                <td class="text-end">@(item.Price * item.Quantity).ToString("N2")</td>
+                                                <td class="text-end">@(item.Price* item.Quantity).ToString("N2")</td>
                                                 <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(@item.ProductId)"><i class="fas fa-trash"></i></button></td>
                                             </tr>
                                         }
@@ -273,12 +273,21 @@
                             <label asp-for="Order.Notes" class="form-label"></label>
                             <textarea asp-for="Order.Notes" class="form-control form-control-sm" rows="3"></textarea>
                         </div>
-                        <div class="mb-2">
-                            <label asp-for="Order.SalesBy" class="form-label">Sales By</label>
-                            <select id="SalesBy" asp-for="Order.SalesBy" class="form-control form-control-sm form-select form-select-sm" asp-items="Model.SalesPersons" required>
-                                <option value="">Select Sales Person</option>
-                            </select>
-                            <span asp-validation-for="Order.SalesBy" class="text-danger small"></span>
+                        <div class="row">
+                            <div class="col-6 mb-2">
+                                <label asp-for="Order.SalesBy" class="form-label">Sales By</label>
+                                <select id="SalesBy" asp-for="Order.SalesBy" class="form-control form-control-sm form-select form-select-sm" asp-items="Model.SalesPersons" required>
+                                    <option value="">Select Sales Person</option>
+                                </select>
+                                <span asp-validation-for="Order.SalesBy" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <label asp-for="Order.SalesBy" class="form-label">Sales Source</label>
+                                <select id="SalesBy" asp-for="Order.SalesSource" class="form-control form-control-sm form-select form-select-sm" asp-items="Model.SalesSources" required>
+                                    <option value="">Select Sales Source</option>
+                                </select>
+                                <span asp-validation-for="Order.SalesSource" class="text-danger small"></span>
+                            </div>
                         </div>
                     </div>
 
@@ -514,7 +523,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            showLoader();            
+            showLoader();
         });
 
         const loadTracker = {
@@ -1035,11 +1044,11 @@
                     cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
                     reverseButtons: true
                 }).then((result) => {
-                    if (result.isConfirmed) {                        
+                    if (result.isConfirmed) {
                         formIsDirty = false;
                         // Clear cart on server first, then reload
                         fetch('/Orders/New?handler=ClearCart', {
-                            method: 'POST', 
+                            method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
@@ -1048,7 +1057,7 @@
                             .then(() => {
                                 const currentUrl = new URL(window.location.href);
                                 currentUrl.searchParams.set('OfficeId', newOfficeId);
-                                //window.location.href = currentUrl.toString();                                
+                                //window.location.href = currentUrl.toString();
                                 window.location.href = `/Orders/New?officeId=${newOfficeId}`;
                                 //updateOfficeTimeZone();
                                 loadProductList();

@@ -23,7 +23,7 @@
         <div class="col-md-9">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    
+
                     <div class="row mb-3">
                         <div class="col-lg-8 col-md-6">
                             <h5 class="text-primary fw-bold mb-3">Offices Inventory</h5>
@@ -51,8 +51,9 @@
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
-                                        <th >Status</th>
-                                        <th>Actions</th>
+                                        <th>Status</th>
+                                        <th>Transfer</th>
+                                        <th>Convert</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -65,8 +66,8 @@
                                         <th>Product</th>
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
-                                        <th >Status</th>
-                                        <th>Actions</th>
+                                        <th>Status</th>
+                                        <th>Transfer</th>                                        
                                     </tr>
                                 </thead>
                             </table>
@@ -112,152 +113,166 @@
     </div>
 </div>
 
+<!-- Convert Modal Placeholder -->
+<div class="modal fade" id="convertModal" tabindex="-1" aria-labelledby="convertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="convertModalContent">
+            <!-- AJAX-loaded partial goes here -->
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            showLoader();
-            var mainTable = $('#mainTable').DataTable({
-                ajax: {
-                    url: '@Url.Page("Index", "Main")',
-                    data: function (d) {
-                        d.LocationId = $('#locationId').val();
-                    },
-                    dataSrc: 'data',
-                    error: function (xhr, error, thrown) {
-                        console.warn('DataTable error:', error);
-                        hideLoader(); // still hide loader even on failure
-                    },
-                    complete: function () {
-                        hideLoader(); // hide only when done
-                    }
-                },
-                columns: [
-                    { data: 'productName' },
-                    { data: 'productDescription' },
-                    {
-                        data: 'stockQty',
-                        className: 'text-end',
-                        orderable: false,
-                        render: function (data) {
-                            return data != null ? data.toLocaleString() : '0';
-                        }
-                    },
-{
-    data: null,
-    orderable: false,
-    render: function (data, type, row) {
-        const stock = parseFloat(row.stockQty) || 0;
-        const min = parseFloat(row.warehouseMinLevel) || 0;
-
-        // alert(stock);alert(min);
-        if (stock === 0) {
-            return '<span class="badge bg-danger fw-bold">Out of stock</span>';
-        } else if (stock <= min) {
-            return '<span class="badge bg-warning fw-bold">Low stocks</span>';
-        } else {
-            return '<span class="badge bg-success">Sufficient</span>';
-        }
-    }
-},
-
-                    {
-                        data: 'id',
-                        orderable: false,
-                        render: function (data, type, row) {
-                            return `
-                                                <button class="btn btn-info btn-sm transfer-btn text-white"
-                                                        data-id="${data}"
-                                                        data-product-id="${row.productId}"
-                                                        data-location-id="${$('#locationId').val()}"
-                                                        title="Transfer stock">
-                                                        <i class="fas fa-random me-1"></i>
-                                                </button>`;
-                        }
-                    }
-                ],
-                responsive: true,
-                dom: 'Bfrtip',
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-            });
-
-            var collTable = $('#collTable').DataTable({
-                ajax: {
-                    url: '@Url.Page("Index", "Collateral")',
-                    data: function (d) {
-                        d.LocationId = $('#locationId').val();
-                    },
-                    dataSrc: 'data'
-                },
-                columns: [
-                    { data: 'productName' },
-                    { data: 'productDescription' },
-                    {
-                        data: 'stockQty',
-                        className: 'text-end',
-                        orderable: false,
-                        render: function (data) {
-                            return data != null ? data.toLocaleString() : '0';
-                        }
-                    },
-    {
-        data: null,
-        orderable: false,
-        render: function (data, type, row) {
-            const stock = parseFloat(row.stockQty) || 0;
-            const min = parseFloat(row.minLevel) || 0;
-
-            if (stock === 0) {
-                                return '<span class="badge bg-danger fw-bold">Out of stock</span>';
-            } else if (stock <= min) {
-                                return '<span class="badge bg-warning fw-bold">Low stocks</span>';
-            } else {
-                                return '<span class="badge bg-success">Sufficient</span>';
-            }
-        }
-    },
-
-                    {
-                        data: 'id',
-                        orderable: false,
-                        render: function (data, type, row) {
-                            return `
-                                                <button class="btn btn-info btn-sm transfer-btn text-white"
-                                                        data-id="${data}"
-                                                        data-product-id="${row.productId}"
-                                                        data-location-id="${$('#locationId').val()}"
-                                                        title="Transfer stock">
-                                                        <i class="fas fa-random me-1"></i>
-                                                </button>`;
-                        }
-                    }
-                ],
-                responsive: true,
-                dom: 'Bfrtip',
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-            });
-
-            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-                $.fn.dataTable
-                    .tables({ visible: true, api: true })
-                    .columns.adjust()
-                    .responsive.recalc();
-            });
-
-            $('#locationId').on('change', function () {
+            $(document).ready(function () {
                 showLoader();
-                mainTable.ajax.reload();
-                collTable.ajax.reload();
-            });
-        });
+                var mainTable = $('#mainTable').DataTable({
+                    ajax: {
+                        url: '@Url.Page("Index", "Main")',
+                        data: function (d) {
+                            d.LocationId = $('#locationId').val();
+                        },
+                        dataSrc: 'data',
+                        error: function (xhr, error, thrown) {
+                            console.warn('DataTable error:', error);
+                            hideLoader(); // still hide loader even on failure
+                        },
+                        complete: function () {
+                            hideLoader(); // hide only when done
+                        }
+                    },
+                    columns: [
+                        { data: 'productName' },
+                        { data: 'productDescription' },
+                        {
+                            data: 'stockQty',
+                            className: 'text-end',
+                            orderable: false,
+                            render: function (data) {
+                                return data != null ? data.toLocaleString() : '0';
+                            }
+                        },
+                        {
+                            data: null,
+                            orderable: false,
+                            render: function (data, type, row) {
+                                const stock = parseFloat(row.stockQty) || 0;
+                                const min = parseFloat(row.warehouseMinLevel) || 0;
 
-        document.getElementById("addNewBtn").addEventListener("click", function () {
-            const officeId = document.getElementById("officeId").value;
-            if (officeId) {
-                window.location.href = `/Inventory/Create?officeId=${officeId}`;
-            } else {
-                alert("Please select an office.");
+                                // alert(stock);alert(min);
+                                if (stock === 0) {
+                                    return '<span class="badge bg-danger fw-bold">Out of stock</span>';
+                                } else if (stock <= min) {
+                                    return '<span class="badge bg-warning fw-bold">Low stocks</span>';
+                                } else {
+                                    return '<span class="badge bg-success">Sufficient</span>';
+                                }
+                            }
+                        },
+
+                        {
+                            data: 'id',
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return `
+                                                    <button class="btn btn-info btn-sm transfer-btn text-white"
+                                                            data-id="${data}"
+                                                            data-product-id="${row.productId}"
+                                                            data-location-id="${$('#locationId').val()}"
+                                                            title="Transfer stock">
+                                                            <i class="fas fa-exchange-alt"></i>
+                                                    </button>`;
+                            }
+                        },
+        {
+            data: 'id',
+            orderable: false,
+            render: function (data, type, row) {
+                return `
+                    <button class="btn btn-sm btn-primary convert-btn"
+                    title="Convert (e.g. box to sachet)"
+                            onclick="openConvertModal(${row.productId})">
+                         <i class="fas fa-random"></i>
+                    </button>`;
             }
-        });
+        }
+
+                    ],
+                    responsive: true,
+                    dom: 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                });
+
+                var collTable = $('#collTable').DataTable({
+                    ajax: {
+                        url: '@Url.Page("Index", "Collateral")',
+                        data: function (d) {
+                            d.LocationId = $('#locationId').val();
+                        },
+                        dataSrc: 'data'
+                    },
+                    columns: [
+                        { data: 'productName' },
+                        { data: 'productDescription' },
+                        {
+                            data: 'stockQty',
+                            className: 'text-end',
+                            orderable: false,
+                            render: function (data) {
+                                return data != null ? data.toLocaleString() : '0';
+                            }
+                        },
+        {
+            data: null,
+            orderable: false,
+            render: function (data, type, row) {
+                const stock = parseFloat(row.stockQty) || 0;
+                const min = parseFloat(row.minLevel) || 0;
+
+                if (stock === 0) {
+                                    return '<span class="badge bg-danger fw-bold">Out of stock</span>';
+                } else if (stock <= min) {
+                                    return '<span class="badge bg-warning fw-bold">Low stocks</span>';
+                } else {
+                                    return '<span class="badge bg-success">Sufficient</span>';
+                }
+            }
+        },
+
+                        {
+                            data: 'id',
+                            orderable: false,
+                            render: function (data, type, row) {
+                                return `
+                                                    <button class="btn btn-info btn-sm transfer-btn text-white"
+                                                            data-id="${data}"
+                                                            data-product-id="${row.productId}"
+                                                            data-location-id="${$('#locationId').val()}"
+                                                            title="Transfer stock">
+                                                            <i class="fas fa-exchange-alt"></i>
+                                                    </button>`;
+                            }
+                        }
+                    ],
+                    responsive: true,
+                    dom: 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                });
+
+                $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                    $.fn.dataTable
+                        .tables({ visible: true, api: true })
+                        .columns.adjust()
+                        .responsive.recalc();
+                });
+
+                $('#locationId').on('change', function () {
+                    showLoader();
+                    mainTable.ajax.reload();
+                    collTable.ajax.reload();
+                });
+            });
+
     </script>
 
     <script>
@@ -377,4 +392,61 @@
             });
         });
     </script>
+    <script>
+        function openConvertModal(productId) {
+         const locationId = $('#locationId').val();
+
+        if (!locationId || locationId === '0') {
+            Swal.fire('Missing Location', 'Please select a location first.', 'warning');
+            return;
+        }
+            $.get('?handler=LoadConvertModal', { productId: productId,locationId: locationId }, function (html) {
+                $('#convertModalContent').html(html);
+                $('#convertModal').modal('show');
+            });
+        }
+
+    </script>
+    <script>
+        $(document).on('submit', '#convertForm', function (e) {
+            e.preventDefault();
+
+            const form = $(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                success: function (res) {
+
+                    if (res.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Conversion Successful',
+                            text: res.message || 'Inventory converted successfully.',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            $('#convertModal').modal('hide');
+                            $('#mainTable').DataTable().ajax.reload(null, false);
+                        });
+
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Conversion Failed',
+                            html: res.message || 'Please check the input and try again.'
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong while converting.'
+                    });
+                }
+            });
+        });
+    </script>
+
 }

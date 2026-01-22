@@ -1,0 +1,62 @@
+﻿@using static NLI_POS.Pages.Inventory.Conversion.IndexModel
+@model ProductConversionModalModel
+@{
+    //var products = (SelectList)ViewData["Products"];
+}
+
+<div class="modal fade" id="conversionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @(Model.Conversion.Id == 0 ? "Add Conversion" : "Edit Conversion")
+                </h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="conversionForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Conversion.Id" />
+
+                    <div class="mb-3">
+                        <label>From Product</label>
+                        <select asp-for="Conversion.FromProductId"
+                                asp-items="Model.FromProducts"
+                                class="form-control">
+                            <option value="">-- Select Product --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>To Product</label>
+                        <select asp-for="Conversion.ToProductId"
+                                asp-items="Model.ToProducts"
+                                class="form-control">
+                            <option value="">-- Select Product --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Quantity</label>
+                        <input asp-for="Conversion.ConversionQty" class="form-control" />
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button class="btn btn-success"
+                        onclick="saveConversion()">
+                    Save
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

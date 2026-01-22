@@ -1,0 +1,33 @@
+﻿@using NLI_POS.Models
+@model SalesSources
+
+<form id="saleSourceForm" method="post" asp-page-handler="Save">
+    <div class="modal-header">
+        <h5 class="modal-title">@((Model.id == 0) ? "Add Sales Source" : "Edit Sales Source")</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        <input type="hidden" asp-for="id" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+        </div>
+
+        <div class="form-check">
+            <input asp-for="isActive" class="form-check-input" />
+            <label asp-for="isActive" class="form-check-label"></label>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>
+

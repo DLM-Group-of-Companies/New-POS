@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NLI_POS.Models;
 using NLI_POS.Models.Base;
+using NLI_POS.Models.NLI_POS.Models;
 using static NLI_POS.Pages.Orders.NewModel;
 
 namespace NLI_POS.Data
@@ -50,8 +51,20 @@ namespace NLI_POS.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Product>()
-    .HasIndex(p => p.ProductCode)
-    .IsUnique();
+                .HasIndex(p => p.ProductCode)
+                .IsUnique();
+
+             modelBuilder.Entity<ProductConversion>()
+                .HasOne(pc => pc.FromProduct)
+                .WithMany()
+                .HasForeignKey(pc => pc.FromProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ProductConversion>()
+                .HasOne(pc => pc.ToProduct)
+                .WithMany()
+                .HasForeignKey(pc => pc.ToProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<InventoryLocation>().HasData(
             new InventoryLocation { Id = 1, Name = "Main Warehouse", LocationType = "Warehouse", IsActive = true },
@@ -88,5 +101,8 @@ namespace NLI_POS.Data
         public DbSet<InventoryLocation> InventoryLocations { get; set; }
         public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
         public DbSet<SalesQuota> SalesQuotas { get; set; }
+        public DbSet<SalesSources> SalesSources { get; set; }
+        public DbSet<ProductConversion> ProductConversions { get; set; }
+
     }
 }

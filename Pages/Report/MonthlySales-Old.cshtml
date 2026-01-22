@@ -1,0 +1,358 @@
+﻿@page
+@model NLI_POS.Pages.Report.MonthySalesModel
+
+@{
+    ViewData["Title"] = "Monthy Sales";
+}
+<div class="container-fluid bg-white bg-gradient  shadow p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary mb-0">
+            <i class="fas fa-calendar-alt me-2"></i> @ViewData["Title"]
+        </h3>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
+    </div>
+    <hr />
+    <div class="row g-3 mb-4">
+        <form method="get" class="row g-2 align-items-end mb-1" onsubmit="return validateAndShowLoader(this)">
+            <div class="col-md-3">
+                <label for="officeFilter" class="form-label">Office</label>
+                <select id="officeFilter" name="Office" class="form-select" required>
+                    <option value="">Select Office</option>
+                    @foreach (var office in Model.OfficeList)
+                    {
+                        <option value="@office.Value"
+                                data-timezone="@office.TimeZone"
+                                data-currency="@office.CurrencyCode"
+                                selected="@(office.Value == Model.Office ? "selected" : null)">
+                            @office.Text
+                        </option>
+                    }
+                </select>
+                <input type="hidden" id="timeZoneInput" name="timeZone" />
+
+            </div>
+            <div class="col-md-2">
+                <label for="dateFilter" class="form-label">Date</label>
+                @{
+                    var timeZoneId = Request.Query["timeZone"].ToString();
+
+                    TimeZoneInfo timeZone;
+                    DateTime localDate;
+
+                    try
+                    {
+                        timeZone = !string.IsNullOrWhiteSpace(timeZoneId)
+                        ? TimeZoneInfo.FindSystemTimeZoneById(timeZoneId)
+                        : TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila"); // Fallback
+
+                        localDate = Model.Date.HasValue
+                        ? TimeZoneInfo.ConvertTimeFromUtc(Model.Date.Value, timeZone)
+                        : TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+                    }
+                    catch
+                    {
+                        // Fallback in case of invalid time zone
+                        localDate = DateTime.UtcNow.AddHours(8);
+                    }
+                }
+
+                <input type="month" name="Date" class="form-control"
+                       value="@(Model.Date.HasValue ? Model.Date.Value.ToString("yyyy-MM") : DateTime.UtcNow.ToString("yyyy-MM"))" required />
+
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i> Filter</button>
+            </div>
+        </form>
+
+    </div>
+
+    @* <div class="table-responsive"> *@
+    <table id="ordersTable" class="table table-bordered table-striped table-sm small w-100 text-nowrap">
+            <thead class="table-warning text-center">
+                <tr>
+                    <th>Order No.</th>
+                    <th>Order Date</th>
+                    <th>Customer Code</th>
+                    <th>Customer</th>
+                    <th>Item No</th>
+                    <th>Order Type</th>
+                    <th>Product Category</th>
+                    <th>Product</th>
+                    <th>Product Combo</th>
+                    <th>Office</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Ref No</th>
+                    <th>Notes</th>
+                    <th>Encode Date</th>
+                    <th>Encoded By</th>
+                    <th>Update Date</th>
+                    <th>Updated By</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Order)
+                {
+                    int itemNo = 1;
+                    foreach (var item in order.ProductItems)
+                    {
+                        <tr>
+                            <td>@order.OrderNo</td>
+
+                            <td>
+                                @{
+                                    var tz = TimeZoneInfo.FindSystemTimeZoneById(Request.Query["timeZone"]);
+                                    var vlocalDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, tz);
+                                }
+                                @vlocalDate.ToString("yyyy-MM-dd")
+                            </td>
+
+                            <td>@order.Customers?.CustCode</td>
+                            <td>@($"{order.Customers?.FirstName} {order.Customers?.LastName}")</td>
+                            <td>@itemNo</td>
+                            <td>@order.OrderType</td>
+                            <td>@item.ProductCat</td>
+                            <td>@item.ProductName</td>
+                            <td>@(@item.ComboName == "No Combination Available" ? "--" : @item.ComboName)</td>
+                            <td>@order.Office?.Name</td>
+                            <td class=" text-end">@item.Price.ToString("N2")</td>
+                            <td class=" text-end">@item.Quantity</td>
+                            <td class=" text-end">
+                                @{
+                                    var total = item.Price * item.Quantity;
+                                }
+                                @total.ToString("N2")
+                            </td>
+                            <td>
+                                @string.Join(", ", order.Payments.Select(p => p.PayMethod))
+                            </td>
+                            <td>
+                                @string.Join(", ", order.Payments.Select(p => p.ReferenceNo))
+                            </td>
+                            <td>@order.Notes</td>
+                            <td>@order.EncodeDate?.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td>@order.EncodedBy</td>
+                            <td>@order.UpdateDate?.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td>@order.UpdatedBy</td>
+                        </tr>
+                        itemNo++;
+                    }
+                }
+            </tbody>
+            <tfoot class="table-warning fw-bold text-end">
+                <tr>
+                    <th class="border-0"></th>
+                    <th class="border-0"></th>
+                    <th class="border-0"></th>
+                    <th class="border-0"></th>
+                    <th class="border-0"></th>
+                    <th class="border-0"></th>
+                    <th class="border-0"></th>
+                    <th class="border-0"></th>
+                    <th class="border-0"></th>
+                    <th class="border-0 text-start">TOTALS:</th>
+                    <th class="border-0 text-end">@Model.Order.SelectMany(o => o.ProductItems).Sum(i => i.Price).ToString("N2")</th>
+                    <th class="border-0 text-end">@Model.Order.SelectMany(o => o.ProductItems).Sum(i => i.Quantity).ToString("N0")</th>
+                    <th class="border-0 text-end">
+                        @{
+                            var totalAmount = Model.Order.SelectMany(o => o.ProductItems)
+                            .Sum(i => i.Price * i.Quantity);
+                        }
+                        @totalAmount.ToString("N2")
+                    </th>
+                    <th colspan="7" class="border-0"></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+@* </div> *@
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const table = $('#ordersTable').DataTable({
+                dom: '<"row"<"col-md-8"B><"col-md-4 text-end"l>>' +
+                    '<"row"<"col-12"tr>>' +
+                    '<"row"<"col-md-6"i><"col-md-6 text-end"p>>',
+
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        footer: true,
+                        className: 'btn btn-outline-success',
+                        exportOptions: {
+                            columns: ':visible'
+                        },
+                        filename: function () {
+                            const officeText = $('select[name="Office"] option:selected').text().trim() || 'AllOffices';
+                            const date = $('#dDate').val() || new Date().toISOString().slice(0, 10);
+                            return `MontlySales_${officeText}_${date}`;
+                        },
+                        customize: function (xlsx) {
+                            const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            const styles = xlsx.xl['styles.xml'];
+                            const lastRow = $('sheetData row', sheet).last();
+                            const rowIndex = parseInt(lastRow.attr('r'));
+                            const firstDataRow = 3;
+
+                            // Ensure numFmts exists
+                            let numFmts = $('numFmts', styles);
+                            if (numFmts.length === 0) {
+                                $('styleSheet', styles).prepend('<numFmts count="1"></numFmts>');
+                                numFmts = $('numFmts', styles);
+                            }
+
+                            // Define number formats
+                            const numFmtDecimalId = 165;
+                            const numFmtIntegerId = 166;
+
+                            numFmts.append(`<numFmt numFmtId="${numFmtDecimalId}" formatCode="#,##0.00"/>`);
+                            numFmts.append(`<numFmt numFmtId="${numFmtIntegerId}" formatCode="#,##0"/>`);
+
+                            // Append corresponding xf styles
+                            $('cellXfs', styles).append(`
+                        <xf numFmtId="${numFmtDecimalId}" applyNumberFormat="1" applyFont="1">
+                            <alignment horizontal="right"/>
+                            <font><b/></font>
+                        </xf>`);
+                            const decimalStyleIndex = $('cellXfs xf', styles).length - 1;
+
+                            $('cellXfs', styles).append(`
+                        <xf numFmtId="${numFmtIntegerId}" applyNumberFormat="1" applyFont="1">
+                            <alignment horizontal="right"/>
+                            <font><b/></font>
+                        </xf>`);
+                            const integerStyleIndex = $('cellXfs xf', styles).length - 1;
+
+                            // Assign styles per column
+                            const columnStyles = {
+                                'K': decimalStyleIndex, // Price
+                                'L': integerStyleIndex, // Quantity
+                                'M': decimalStyleIndex  // Amount
+                            };
+
+                            // Loop through columns to apply formula and correct style
+                            ['K', 'L', 'M'].forEach(function (col) {
+                                const formula = `SUM(${col}${firstDataRow}:${col}${rowIndex - 1})`;
+                                const $cell = $(`c[r="${col}${rowIndex}"]`, sheet);
+
+                                if ($cell.length) {
+                                    $cell.attr('t', 'str');
+                                    $cell.attr('s', columnStyles[col]);
+                                    $cell.html(`<f>${formula}</f>`);
+                                }
+                            });
+
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        className: 'btn btn-outline-danger',
+                        exportOptions: {
+                            // To ensure footer appears, you must export the columns that contain your totals.
+                            // ':visible' is often the easiest way to ensure all visible columns (and their footer cells) are included.
+                            columns: ':visible',
+                            footer: true // Include footer in PDF export
+                        },
+                        title: 'Sales Report by Date Range' // Add a title for the PDF document
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-outline-secondary',
+                        exportOptions: {
+                            // ':visible' works well here too.
+                            columns: ':visible',
+                            footer: true // Include footer in Print export
+                        },
+                        title: 'Sales Report by Date Range' // Add a title for the print page
+                    }
+                ],
+                lengthChange: true,
+                pageLength: 10, // Default page size (optional)
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                columnDefs: [
+                    // Keeping original hidden columns.
+                    // If you want any of these to show in exports for the footer, remove them from here.
+                    //{ targets: [9, 13, 14, 15, 16, 17, 18, 19], visible: false }
+                ],
+                paging: true,
+                ordering: true,
+                scrollX: true,
+                responsive: false,
+                autoWidth: true,
+                searching: false,
+                // ADD THIS FOOTER CALLBACK
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Function to parse formatted number strings (e.g., "1,234.56" to 1234.56)
+                    var parseFormattedNumber = function (i) {
+                        if (typeof i === 'string') {
+                            // Remove any non-numeric characters except for the decimal point and leading minus sign
+                            return parseFloat(i.replace(/[^\d.-]/g, ''));
+                        }
+                        return parseFloat(i); // Already a number or can be directly parsed
+                    };
+
+                    // Function to format numbers for display in the footer
+                    var formatNumber = function (num) {
+                        return num.toLocaleString('en-PH', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    };
+
+                    // Calculate total for the 'Price' column (index 10)
+                    var totalPrice = api
+                        .column(10, { page: 'current' }) // 'current' sums only visible data after filtering/pagination
+                        .data()
+                        .reduce(function (a, b) {
+                            var val = parseFormattedNumber(b);
+                            return a + (isNaN(val) ? 0 : val);
+                        }, 0);
+
+                    // Calculate total for the 'Qty' column (index 11)
+                    var totalQty = api
+                        .column(11, { page: 'current' })
+                        .data()
+                        .reduce(function (a, b) {
+                            var val = parseFormattedNumber(b); // Quantity might be integer, but parsing float is safe
+                            return a + (isNaN(val) ? 0 : val);
+                        }, 0);
+
+                    // Calculate total for the 'Amount' column (index 12)
+                    var totalAmount = api
+                        .column(12, { page: 'current' })
+                        .data()
+                        .reduce(function (a, b) {
+                            var val = parseFormattedNumber(b);
+                            return a + (isNaN(val) ? 0 : val);
+                        }, 0);
+
+                    // Update the footer cells
+                    $(api.column(10).footer()).html(formatNumber(totalPrice));
+                    $(api.column(11).footer()).html(totalQty.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })); // Quantity as whole numbers
+                    $(api.column(12).footer()).html(formatNumber(totalAmount));
+                }
+            });
+        });
+
+        // Your existing functions (syncTimeZoneBeforeSubmit, validateAndShowLoader)
+        function syncTimeZoneBeforeSubmit() {
+            const select = document.getElementById('officeFilter');
+            const tz = select.options[select.selectedIndex].getAttribute('data-timezone');
+            document.getElementById('timeZoneInput').value = tz;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form[method="get"]');
+            if (form) {
+                form.addEventListener('submit', syncTimeZoneBeforeSubmit);
+            }
+            syncTimeZoneBeforeSubmit(); // Set default value on page load
+        });
+    </script>
+}

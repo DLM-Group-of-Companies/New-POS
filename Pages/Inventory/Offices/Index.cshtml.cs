@@ -30,6 +30,19 @@ namespace NLI_POS.Pages.Inventory.Office
 
         public TransferInventoryViewModel TransferView { get; set; }
 
+        public class ConvertInventoryModel
+        {
+            public int FromProductId { get; set; }
+            public int LocationId { get; set; }
+            [Required]
+            [Range(1, int.MaxValue)]
+            public int ConvertQty { get; set; }
+        }
+
+        [BindProperty]
+        public ConvertInventoryModel ConvertModal { get; set; }
+
+
         public IActionResult OnGet(int? LocationId)
         {
             if (!User.IsInRole("Admin") && !User.IsInRole("Inventory"))
@@ -215,5 +228,100 @@ namespace NLI_POS.Pages.Inventory.Office
 
             return new JsonResult(new { success = true });
         }
+
+        public IActionResult OnGetLoadConvertModal(int productId, int locationId)
+        {
+            return Partial("_ProductConvertPartial", new ConvertInventoryModel
+            {
+                FromProductId = productId,
+                LocationId = locationId,
+                ConvertQty = 1
+            });
+        }
+
+        public async Task<IActionResult> OnPostConvertAsync(ConvertInventoryModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "Invalid conversion quantity."
+                });
+            }
+
+            // 1️⃣ Get stock for product at selected location
+            var stock = await _context.InventoryStocks
+                .FirstOrDefaultAsync(s =>
+                    s.ProductId == ConvertModal.FromProductId &&
+                    s.LocationId == locationId);
+
+            if (stock == null || stock.StockQty < ConvertModal.ConvertQty)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "Insufficient stock."
+                });
+            }
+
+            // 2️⃣ Get conversion rule (BOX → SACHET)
+            var conversion = await _context.ProductConversions
+                .FirstOrDefaultAsync(c => c.FromProductId == ConvertModal.FromProductId);
+
+            if (conversion == null)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "No conversion rule defined."
+                });
+            }
+
+            using var tx = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // 3️⃣ Deduct BOX
+                stock.StockQty -= ConvertModal.ConvertQty;
+
+                // 4️⃣ Add SACHET
+                var toStock = await _context.InventoryStocks
+                    .FirstOrDefaultAsync(s =>
+                        s.ProductId == conversion.ToProductId &&
+                        s.LocationId == locationId);
+
+                var addQty = ConvertModal.ConvertQty * conversion.ConversionQty;
+
+                if (toStock == null)
+                {
+                    _context.InventoryStocks.Add(new InventoryStock
+                    {
+                        ProductId = conversion.ToProductId,
+                        LocationId = locationId.Value,
+                        StockQty = addQty
+                    });
+                }
+                else
+                {
+                    toStock.StockQty += addQty;
+                }
+
+                await _context.SaveChangesAsync();
+                await tx.CommitAsync();
+
+                return new JsonResult(new { success = true, message = "Successfully converted." });
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "Conversion failed."
+                });
+            }
+        }
+
     }
 }

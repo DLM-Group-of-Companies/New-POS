@@ -49,6 +49,8 @@ namespace NLI_POS.Pages.Orders
 
         public List<SelectListItem> SalesPersons { get; set; }
 
+        public List<SelectListItem> SalesSources { get; set; }
+
         [BindProperty]
         public string OfficeTimeZone { get; set; }
 
@@ -95,6 +97,13 @@ namespace NLI_POS.Pages.Orders
                 Value = u.UserName,
                 Text = u.FullName ?? u.UserName
             }).ToList();
+
+            SalesSources = _context.SalesSources.Select(s => new SelectListItem
+            {
+                Value = s.Name,
+                Text = s.Name
+            }).ToList();
+
             return Page();
         }
 
@@ -130,8 +139,8 @@ namespace NLI_POS.Pages.Orders
 
             //var productsQuery = _context.Products.AsQueryable();
             var productsQuery = _context.Products
-    .Include(p => p.PromoSetting) // To check if Promo/Package is on going or by date
-    .Where(p => p.IsActive);
+            .Include(p => p.PromoSetting) // To check if Promo/Package is on going or by date
+            .Where(p => p.IsActive);
 
             //productsQuery = productsQuery.Where(p => p.IsActive);
 
@@ -149,8 +158,7 @@ namespace NLI_POS.Pages.Orders
                 productsQuery = productsQuery.Where(p => p.isStaffAvailable == true);
             }
 
-            var nowLocal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
-     TimeZoneInfo.FindSystemTimeZoneById(OfficeTimeZone)); // from office dropdown
+            var nowLocal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,TimeZoneInfo.FindSystemTimeZoneById(OfficeTimeZone)); // from office dropdown
 
             // ✅ Filter Promo Packages if applicable
             if (ProdCat?.Trim() == "Package")
@@ -404,7 +412,8 @@ namespace NLI_POS.Pages.Orders
                 TotAmount = Order.TotAmount,
                 TotPaidAmount = Payments.Sum(p => p.Amount) + ServiceChargeValue,
                 Notes = Order.Notes,
-                SalesBy = Order.SalesBy
+                SalesBy = Order.SalesBy,
+                SalesSource = Order.SalesSource
             };
 
             // Attach Product Items

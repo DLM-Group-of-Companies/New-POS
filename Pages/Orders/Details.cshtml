@@ -16,7 +16,21 @@
             <span class="form-label">@Html.DisplayNameFor(model => model.Order.OrderNo)</span>
             <span class="form-control fw-bold">@Html.DisplayFor(model => model.Order.OrderNo)</span>
         </div>
-        <div class="col-sm-6">
+        @{
+            // Check if SalesSource is not empty
+            bool hasSalesSource = !string.IsNullOrWhiteSpace(Model.Order.SalesSource);
+            int customerColWidth = hasSalesSource ? 4 : 6; // 4 if SalesSource exists, 6 if not
+        }
+
+        @if (hasSalesSource)
+        {
+            <div class="col-sm-2 form-group">
+                <span class="form-label">@Html.DisplayNameFor(model => model.Order.SalesSource)</span>
+                <span class="form-control fw-bold">@Html.DisplayFor(model => model.Order.SalesSource)</span>
+            </div>
+        }
+
+        <div class="col-sm-@customerColWidth">
             Customer
             <span class="form-control fw-bold">
                 @Html.DisplayFor(model => model.Order.Customers.CustCode) |

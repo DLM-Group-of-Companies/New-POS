@@ -1,0 +1,61 @@
+﻿@page
+@model NLI_POS.Pages.SaleSources.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>SalesSources</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SalesSources.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SalesSources.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SalesSources.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SalesSources.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SalesSources.isActive)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SalesSources.isActive)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SalesSources.EncodeDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SalesSources.EncodeDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SalesSources.EncodedBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SalesSources.EncodedBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SalesSources.UpdateDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SalesSources.UpdateDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SalesSources.UpdatedBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SalesSources.UpdatedBy)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.SalesSources.id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

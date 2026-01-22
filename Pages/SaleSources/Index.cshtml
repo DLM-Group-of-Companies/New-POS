@@ -1,0 +1,149 @@
+﻿@page
+@model NLI_POS.Pages.SaleSources.IndexModel
+
+@{
+    ViewData["Title"] = "Sales Sources";
+}
+
+<div class="container mt-4">
+    <div class="card border-0 shadow rounded-4 p-4 mx-auto" style="max-width: 720px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary mb-0">
+                <i class="fa-solid fa-tags me-2"></i> @ViewData["Title"]
+            </h4>
+            <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '/';"></i>
+        </div>
+
+        <hr />
+
+        <p>
+            <button class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#saleSourceModal"
+                    data-url="/SaleSources?handler=CreateModal">
+                <i class="far fa-plus-square me-2"></i>Add New
+            </button>
+
+        </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesSources[0].Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesSources[0].Description)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.SalesSources[0].isActive)
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.SalesSources)
+                {
+                    <tr class="align-middle">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            @* @Html.DisplayFor(modelItem => item.isActive) *@
+                            @if (item.isActive)
+                            {
+                                <span class="text-success">&#10004;</span>
+                            }
+                        </td>
+
+                        <td>
+                            <button class="btn btn-sm btn-success"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#saleSourceModal"
+                                    data-url="/SaleSources?handler=EditModal&id=@item.id">
+                                <i class="far fa-edit"></i>
+                            </button>
+
+@*                             <button class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#saleSourceModal"
+                                    data-url="/SaleSources?handler=DeleteModal&id=@item.id">
+                                Delete
+                            </button> *@
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* Modal *@
+    <div class="modal fade" id="saleSourceModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body p-0" id="saleSourceModalContent">
+                    <!-- Partial view will load here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+ 
+
+    <script>
+        $(document).on("submit", "#saleSourceForm", function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: "POST",
+                url: $(this).attr("action"),
+                data: $(this).serialize(),
+                success: function (data) {
+                    if (data.success) {
+                        // Close modal and optionally reload or update table
+                        var modalEl = document.getElementById('saleSourceModal');
+                        var modal = bootstrap.Modal.getInstance(modalEl);
+                        modal.hide();
+
+                        //alert(data.message); // success alert
+                        toastr.success(data.message);
+                        // Wait 2 seconds before reloading the page
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1300);
+                    } else {
+                        //alert(data.message); // validation errors alert
+                        toastr.error(data.message);
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error("An unexpected error occurred.");
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    </script>
+
+    <script>
+        const saleSourceModalEl = document.getElementById('saleSourceModal');
+
+        saleSourceModalEl.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const url = button.getAttribute('data-url');
+
+            if (!url) return;
+
+            fetch(url)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('saleSourceModalContent').innerHTML = html;
+                });
+        });
+    </script>
+}

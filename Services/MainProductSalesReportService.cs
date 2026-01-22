@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using NLI_POS.Data;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -133,9 +135,9 @@ public class MainProductSalesReportService
         };
     }
 
-    public byte[] ExportOrderPivotToExcel(List<Dictionary<string, object>> data, 
+    public byte[] ExportOrderPivotToExcel(List<Dictionary<string, object>> data,
         DateTime start,
-        DateTime end, 
+        DateTime end,
         int? officeId,
         Dictionary<int, string> mainProduct)
     {
@@ -275,75 +277,81 @@ public class MainProductSalesReportService
 
         //INVENTORY SECTION
 
+        int startCol = 1;
+        int currentRow = 1;
+        int headerRow;
+        int headerCount;
+
         //Stockroom to Office
         var InvTransactions = _context.InventoryTransactions
         .Include(t => t.Product)
         .Include(t => t.SourceLocation)
         .Include(t => t.DestinationLocation)
-        .Where(t=>t.DestinationLocation.OfficeId==officeId && t.TransactionDate >= start &&
-                        t.TransactionDate <= end && t.FromLocationId==2) //2 for Stockroom
+        .Where(t => t.DestinationLocation.OfficeId == officeId && t.TransactionDate >= start &&
+                        t.TransactionDate <= end && t.FromLocationId == 2) //2 for Stockroom
         .OrderByDescending(t => t.TransactionDate)
         .ToList();
 
-        
-        int invRow = voidedRow + 4;
-
-        ws.Cells[invRow - 1, 1].Value = "Product IN from Stock Room";
-        ws.Cells[invRow - 1, 1].Style.Font.Bold = true;
-
-        var invResult = new List<Dictionary<string, object>>();
-
-        foreach (var item in InvTransactions)
+        if (InvTransactions.Count > 0)
         {
-            var rowInv = new Dictionary<string, object>();
+            int invRow = voidedRow + 4;
 
-            rowInv["Date"] = item.TransactionDate.ToString("yyyy-MM-dd HH:mm:ss");
-            rowInv["Office"] = item.SourceLocation.Name;
-            rowInv["Product"] = item.Product.ProductName;
-            rowInv["Type"] = item.Product.ProductType;
-            rowInv["Qty"] = item.Quantity;
+            ws.Cells[invRow - 1, 1].Value = "Product IN from Stock Room";
+            ws.Cells[invRow - 1, 1].Style.Font.Bold = true;
 
-            invResult.Add(rowInv);
-        }
+            var invResult = new List<Dictionary<string, object>>();
 
-        int startCol = 1;
-        int currentRow = invRow;
-
-        // 1️⃣ Write headers (once)
-        if (invResult.Any())
-        {
-            int col = startCol;
-            foreach (var header in invResult.First().Keys)
+            foreach (var item in InvTransactions)
             {
-                ws.Cells[currentRow, col++].Value = header;
-            }
-            currentRow++;
-        }
+                var rowInv = new Dictionary<string, object>();
 
-        // 2️⃣ Write data rows
-        foreach (var irow in invResult)
-        {
-            int col = startCol;
-            foreach (var value in irow.Values)
+                rowInv["Date"] = item.TransactionDate.ToString("yyyy-MM-dd HH:mm:ss");
+                rowInv["Office"] = item.SourceLocation.Name;
+                rowInv["Product"] = item.Product.ProductName;
+                rowInv["Type"] = item.Product.ProductType;
+                rowInv["Qty"] = item.Quantity;
+
+                invResult.Add(rowInv);
+            }
+
+            //int startCol = 1;
+            currentRow = invRow;
+
+            // 1️⃣ Write headers (once)
+            if (invResult.Any())
             {
-                ws.Cells[currentRow, col++].Value = value;
+                int col = startCol;
+                foreach (var header in invResult.First().Keys)
+                {
+                    ws.Cells[currentRow, col++].Value = header;
+                }
+                currentRow++;
             }
-            currentRow++;
-        }
 
-        // Main Header Styling
-        int headerRow = invRow;
-        int headerCount = invResult.First().Count;
-        using (var range = ws.Cells[headerRow, startCol, headerRow, startCol + headerCount - 1])
-        {
-            range.Style.Font.Bold = true;
-            range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-            range.Style.Fill.BackgroundColor.SetColor(Color.GreenYellow);
-            range.Style.Font.Color.SetColor(Color.DarkGreen);
+            // 2️⃣ Write data rows
+            foreach (var irow in invResult)
+            {
+                int col = startCol;
+                foreach (var value in irow.Values)
+                {
+                    ws.Cells[currentRow, col++].Value = value;
+                }
+                currentRow++;
+            }
+
+            // Main Header Styling
+            headerRow = invRow;
+            headerCount = invResult.First().Count;
+            using (var range = ws.Cells[headerRow, startCol, headerRow, startCol + headerCount - 1])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(Color.GreenYellow);
+                range.Style.Font.Color.SetColor(Color.DarkGreen);
+            }
         }
 
         //Other Office to Selcted Office
-
         int?[] excludedLocations = { 1, 2 };
 
         var InvTransactionsIn = _context.InventoryTransactions
@@ -355,60 +363,63 @@ public class MainProductSalesReportService
         .OrderByDescending(t => t.TransactionDate)
         .ToList();
 
-        int invRowIn = currentRow + 4;
-
-        ws.Cells[invRowIn - 1, 1].Value = "Product IN from Other Office";
-        ws.Cells[invRowIn - 1, 1].Style.Font.Bold = true;
-
-        var invResultIn = new List<Dictionary<string, object>>();
-
-        foreach (var item in InvTransactionsIn)
+        if (InvTransactionsIn.Count > 0)
         {
-            var rowInv = new Dictionary<string, object>();
+            int invRowIn = currentRow + 4;
 
-            rowInv["Date"] = item.TransactionDate.ToString("yyyy-MM-dd HH:mm:ss");
-            rowInv["Office"] = item.SourceLocation.Name;
-            rowInv["Product"] = item.Product.ProductName;
-            rowInv["Type"] = item.Product.ProductType;
-            rowInv["Qty"] = item.Quantity;
+            ws.Cells[invRowIn - 1, 1].Value = "Product IN from Other Office";
+            ws.Cells[invRowIn - 1, 1].Style.Font.Bold = true;
 
-            invResultIn.Add(rowInv);
-        }
+            var invResultIn = new List<Dictionary<string, object>>();
 
-        startCol = 1;
-        currentRow = invRowIn;
-
-        // 1️⃣ Write headers (once)
-        if (invResultIn.Any())
-        {
-            int col = startCol;
-            foreach (var header in invResultIn.First().Keys)
+            foreach (var item in InvTransactionsIn)
             {
-                ws.Cells[currentRow, col++].Value = header;
-            }
-            currentRow++;
-        }
+                var rowInv = new Dictionary<string, object>();
 
-        // 2️⃣ Write data rows
-        foreach (var irow in invResultIn)
-        {
-            int col = startCol;
-            foreach (var value in irow.Values)
+                rowInv["Date"] = item.TransactionDate.ToString("yyyy-MM-dd HH:mm:ss");
+                rowInv["Office"] = item.SourceLocation.Name;
+                rowInv["Product"] = item.Product.ProductName;
+                rowInv["Type"] = item.Product.ProductType;
+                rowInv["Qty"] = item.Quantity;
+
+                invResultIn.Add(rowInv);
+            }
+
+            startCol = 1;
+            currentRow = invRowIn;
+
+            // 1️⃣ Write headers (once)
+            if (invResultIn.Any())
             {
-                ws.Cells[currentRow, col++].Value = value;
+                int col = startCol;
+                foreach (var header in invResultIn.First().Keys)
+                {
+                    ws.Cells[currentRow, col++].Value = header;
+                }
+                currentRow++;
             }
-            currentRow++;
-        }
 
-        // Main Header Styling
-        headerRow = invRowIn;
-        headerCount = invResultIn.First().Count;
-        using (var range = ws.Cells[headerRow, startCol, headerRow, startCol + headerCount - 1])
-        {
-            range.Style.Font.Bold = true;
-            range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-            range.Style.Fill.BackgroundColor.SetColor(Color.GreenYellow);
-            range.Style.Font.Color.SetColor(Color.DarkGreen);
+            // 2️⃣ Write data rows
+            foreach (var irow in invResultIn)
+            {
+                int col = startCol;
+                foreach (var value in irow.Values)
+                {
+                    ws.Cells[currentRow, col++].Value = value;
+                }
+                currentRow++;
+            }
+
+            // Main Header Styling
+            headerRow = invRowIn;
+            headerCount = invResultIn.First().Count;
+            using (var range = ws.Cells[headerRow, startCol, headerRow, startCol + headerCount - 1])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(Color.GreenYellow);
+                range.Style.Font.Color.SetColor(Color.DarkGreen);
+            }
         }
 
         ws.Cells.AutoFitColumns();
