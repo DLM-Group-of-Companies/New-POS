@@ -37,11 +37,18 @@ namespace NLI_POS.Pages.Inventory.Office
             [Required]
             [Range(1, int.MaxValue)]
             public int ConvertQty { get; set; }
+            public int ConversionQty { get; set; }
+            public int ResultQty => ConvertQty * ConversionQty;
+
+
+            public string FromProductName { get; set; }
+            public string ConvertedProductName { get; set; }
         }
 
         [BindProperty]
         public ConvertInventoryModel ConvertModal { get; set; }
 
+        public string ConvertedProduct { get; set; }
 
         public IActionResult OnGet(int? LocationId)
         {
@@ -229,13 +236,30 @@ namespace NLI_POS.Pages.Inventory.Office
             return new JsonResult(new { success = true });
         }
 
-        public IActionResult OnGetLoadConvertModal(int productId, int locationId)
+        public async Task<IActionResult> OnGetLoadConvertModalAsync(int productId, int locationId)
         {
+            // 2️⃣ Get conversion rule (BOX → SACHET)
+            var conversion = await _context.ProductConversions.Include(p => p.ToProduct).Include(p => p.FromProduct)
+                .FirstOrDefaultAsync(c => c.FromProductId == productId);
+
+            if (conversion == null)
+            {
+                //return Content("<div class='alert alert-danger text-center'>No conversion rule found for this product.</div>");
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "No conversion rule found for this product."
+                });
+            }
+
             return Partial("_ProductConvertPartial", new ConvertInventoryModel
             {
                 FromProductId = productId,
                 LocationId = locationId,
-                ConvertQty = 1
+                ConvertQty = 1,
+                ConversionQty = conversion.ConversionQty,
+                FromProductName = conversion.FromProduct.ProductName,
+                ConvertedProductName = conversion.ToProduct.ProductName
             });
         }
 
@@ -309,6 +333,25 @@ namespace NLI_POS.Pages.Inventory.Office
 
                 await _context.SaveChangesAsync();
                 await tx.CommitAsync();
+
+                // Save transaction log
+                var sourceProduct = await _context.Products.FindAsync(model.FromProductId);
+                var targetProduct = await _context.Products.FindAsync(conversion.ToProductId);
+
+                _context.InventoryTransactions.Add(new InventoryTransaction
+                {
+                    ProductId = model.FromProductId,
+                    FromLocationId = model.LocationId,
+                    ToLocationId = null,
+                    Quantity = model.ConvertQty,
+                    TransactionType = "Conversion",
+                    TransactionDate = DateTime.UtcNow,
+                    EncodedBy = User.Identity?.Name ?? "SYSTEM",
+                    Remarks = $"Converted {model.ConvertQty} {sourceProduct.ProductType} of {sourceProduct.ProductName} " +
+                    $"to {addQty} {targetProduct.ProductType} of {targetProduct.ProductName}"
+                });
+
+                await _context.SaveChangesAsync(); //Save the Transaction event
 
                 return new JsonResult(new { success = true, message = "Successfully converted." });
             }

@@ -31,7 +31,7 @@
                                     <th>Date</th>
                                     <th>Type</th>
                                     <th>Product</th>
-                                    <th>Order No.</th>
+                                    <th>Order#/Remarks</th>
                                     <th>From</th>
                                     <th>To</th>
                                     <th>Qty</th>
@@ -49,6 +49,7 @@
                                                   tx.TransactionType == "Product IN" ? "bg-primary" :
                                                   tx.TransactionType == "Product OUT" ? "bg-success" :
                                                   tx.TransactionType == "Sale" ? "bg-success" :
+                                                  tx.TransactionType == "Conversion" ? "bg-info" :
                                                   tx.TransactionType == "Transfer" ? "bg-secondary" :
                                                   "bg-dark")">
                                                 @tx.TransactionType
@@ -56,7 +57,7 @@
                                         </td>
 
                                         <td>@tx.Product?.ProductName</td>
-                                        <td>@tx.OrderNo</td>
+                                        <td>@(string.IsNullOrEmpty(tx.OrderNo) ? tx.Remarks : tx.OrderNo)</td>
                                         <td>@tx.SourceLocation?.Name</td>
                                         <td>@tx.DestinationLocation?.Name</td>
                                         <td class="text-end">@tx.Quantity</td>

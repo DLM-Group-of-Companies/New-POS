@@ -1,7 +1,7 @@
 ﻿<!-- /Pages/Inventory/_InventorySubNavPartial.cshtml -->
 <div class="card shadow-sm" style="min-width: 180px;">
     <div class="card-body p-2 d-flex flex-column gap-2 text-nowrap">
-        <a class="btn btn-outline-success w-100 p-4 text-start" asp-page="/Inventory/Warehouse/Index">
+        <a class="sidebar-item btn btn-outline-success w-100 p-4 text-start" asp-page="/Inventory/Warehouse/Index">
             <i class="fas fa-warehouse me-2"></i> Warehouse
         </a>
         <a class="btn btn-outline-info w-100 p-4 text-start" asp-page="/Inventory/Stockroom/Index">
@@ -16,6 +16,9 @@
         </a>        
         <a class="btn btn-outline-warning w-100 p-4 text-start" asp-page="/Inventory/Locations/Index">
             <i class="fas fa-location-arrow me-2"></i> Locations
+        </a>
+        <a class="btn btn-outline-danger w-100 p-4 text-start text-wrap" asp-page="/Inventory/Conversion/Index">
+            <i class="fas fa-random me-2"></i> Conversion
         </a>
     </div>
 </div>

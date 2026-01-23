@@ -10,7 +10,7 @@
 
             <div class="modal-header">
                 <h5 class="modal-title">
-                    @(Model.Conversion.Id == 0 ? "Add Conversion" : "Edit Conversion")
+                    <i class="fas fa-hand-point-up me-2"></i> @(Model.Conversion.Id == 0 ? "Add Conversion Rule" : "Edit Conversion Rule")
                 </h5>
                 <button type="button" class="btn-close"
                         data-bs-dismiss="modal"></button>
@@ -49,11 +49,11 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary"
                         data-bs-dismiss="modal">
-                    Cancel
+                    <i class="fas fa-times me-2"></i> Cancel
                 </button>
                 <button class="btn btn-success"
                         onclick="saveConversion()">
-                    Save
+                    <i class="far fa-save me-2"></i> Save
                 </button>
             </div>
 

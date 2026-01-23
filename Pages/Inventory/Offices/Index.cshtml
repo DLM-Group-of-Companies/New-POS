@@ -67,7 +67,7 @@
                                         <th>Description</th>
                                         <th class="text-end">Stock</th>
                                         <th>Status</th>
-                                        <th>Transfer</th>                                        
+                                        <th>Transfer</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -393,58 +393,106 @@
         });
     </script>
     <script>
-        function openConvertModal(productId) {
-         const locationId = $('#locationId').val();
+        // function openConvertModal(productId) {
+        //  const locationId = $('#locationId').val();
 
-        if (!locationId || locationId === '0') {
-            Swal.fire('Missing Location', 'Please select a location first.', 'warning');
-            return;
-        }
-            $.get('?handler=LoadConvertModal', { productId: productId,locationId: locationId }, function (html) {
-                $('#convertModalContent').html(html);
-                $('#convertModal').modal('show');
-            });
+        // if (!locationId || locationId === '0') {
+        //     Swal.fire('Missing Location', 'Please select a location first.', 'warning');
+        //     return;
+        // }
+        //     $.get('?handler=LoadConvertModal', { productId: productId,locationId: locationId }, function (html) {
+        //         $('#convertModalContent').html(html);
+        //         $('#convertModal').modal('show');
+        //     });
+        // }
+                function openConvertModal(productId) {
+            const locationId = $('#locationId').val();
+
+            $.get('?handler=LoadConvertModal', { productId, locationId })
+                .done(function (res) {
+
+                    // 🔴 JSON response → Swal ONLY
+                    if (typeof res === 'object' && res.success === false) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Conversion not available',
+                            text: res.message
+                        });
+                        return; // 🚨 STOP HERE
+                    }
+
+                    // 🟢 HTML response → inject + show modal
+                    $('#convertModalContent').html(res);
+
+                    const modalEl = document.getElementById('convertModal');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                });
         }
 
     </script>
+
     <script>
         $(document).on('submit', '#convertForm', function (e) {
             e.preventDefault();
 
             const form = $(this);
 
-            $.ajax({
-                url: form.attr('action'),
-                type: 'POST',
-                data: form.serialize(),
-                success: function (res) {
+            Swal.fire({
+                title: 'Confirm Conversion',
+                html: `
+                    <div class="text-center">
+                        <p><strong>Are you sure you want to convert this item?</strong></p>
+                        <p>This will update inventory quantities.</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-check"></i> Yes, Convert',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancel',
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary me-2',
+                    cancelButton: 'btn btn-secondary'
+                }
+            }).then((result) => {
 
-                    if (res.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Conversion Successful',
-                            text: res.message || 'Inventory converted successfully.',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            $('#convertModal').modal('hide');
-                            $('#mainTable').DataTable().ajax.reload(null, false);
-                        });
+                if (!result.isConfirmed) return;
 
-                    } else {
+                // ✅ Proceed with AJAX only after confirmation
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (res) {
+
+                        if (res.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Conversion Successful',
+                                text: res.message || 'Inventory converted successfully.',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                $('#convertModal').modal('hide');
+                                $('#mainTable').DataTable().ajax.reload(null, false);
+                            });
+
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Conversion Failed',
+                                html: res.message || 'Please check the input and try again.'
+                            });
+                        }
+                    },
+                    error: function () {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Conversion Failed',
-                            html: res.message || 'Please check the input and try again.'
+                            title: 'Error',
+                            text: 'Something went wrong while converting.'
                         });
                     }
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Something went wrong while converting.'
-                    });
-                }
+                });
             });
         });
     </script>

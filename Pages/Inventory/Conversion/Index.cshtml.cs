@@ -44,12 +44,12 @@ namespace NLI_POS.Pages.Inventory.Conversion
         public async Task<IActionResult> OnGetCreateEditAsync(int? id)
         {
             var fromProducts = await _context.Products
-                .Where(p => p.ProductType.ToUpper() == "BOX" && p.ProductCategory=="Regular")
+                .Where(p => p.ProductType.ToUpper() == "BOX" && p.ProductCategory == "Regular" && p.IsActive)
                 .OrderBy(p => p.ProductName)
                 .ToListAsync();
 
             var toProducts = await _context.Products
-                .Where(p => p.ProductType.ToUpper() == "SACHET")
+                .Where(p => (p.ProductType == "SACHET"|| p.ProductType == "BLISTER") && p.IsActive)
                 .OrderBy(p => p.ProductName)
                 .ToListAsync();
 

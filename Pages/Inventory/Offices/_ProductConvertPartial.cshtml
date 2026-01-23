@@ -6,7 +6,7 @@
     @Html.AntiForgeryToken()
 
     <div class="modal-header">
-        <h5 class="modal-title">Convert to Sachets</h5>
+        <h5 class="modal-title"><i class="fas fa-random me-2"></i>Convert</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
     </div>
 
@@ -15,13 +15,41 @@
         <input type="hidden" asp-for="FromProductId" />
         <input type="hidden" asp-for="LocationId" />
 
-        <div class="mb-3">
-            <label class="form-label">Convert Quantity (Boxes)</label>
-            <input asp-for="ConvertQty"
-                   type="number"
-                   min="1"
-                   class="form-control"
-                   required />
+        <input type="hidden"
+               id="ConversionQty"
+               value="@Model.ConversionQty" />
+
+        <input type="hidden"
+               id="ResultQty"
+               class="form-control"
+               value="@Model.ResultQty"
+               readonly />
+
+        <input type="hidden"
+               id="convProdName"
+               value="@Model.ConvertedProductName" />
+
+        <input type="hidden" asp-for="FromProductName" value="@Model.FromProductName" />
+        <input type="hidden" asp-for="ConvertedProductName" value="@Model.ConvertedProductName" />
+
+        <div class="mb-3 row">
+            <div class="col-6">
+                <label class="form-label">Quantity to Convert (Boxes)</label>
+                <input id="ConvertQty" asp-for="ConvertQty"
+                       type="number"
+                       min="1"
+                       class="form-control"
+                       required />
+            </div>
+            <div class="col-6">
+                <div class="alert alert-info mb-3">
+                    <strong>Conversion Result:</strong><br />
+                    @Model.FromProductName →
+                    <span id="ResultInfo" class="fw-bold text-success">
+                        @Model.ResultQty @Model.ConvertedProductName
+                    </span>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -29,14 +57,26 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary"
                 data-bs-dismiss="modal">
-            Cancel
+            <i class="fas fa-times me-2"></i> Cancel
         </button>
 
-        <button type="submit" class="btn btn-warning">
-            Convert
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-random me-2"></i> Convert
         </button>
     </div>
 
 </form>
 
+<script>
+    const qtyInput = document.getElementById('ConvertQty');    
+    const resultSpan = document.getElementById('ResultInfo');
+    const resultInput = document.getElementById('ResultQty');
+    const conversionQty = parseFloat(document.getElementById('ConversionQty').value);
+    const productName = document.getElementById('convProdName').value;
 
+qtyInput.addEventListener('input', () => {
+    const qty = parseFloat(qtyInput.value) || 0;
+    const result = qty * conversionQty;
+    resultSpan.textContent = result + ' ' + productName;
+});
+</script>
