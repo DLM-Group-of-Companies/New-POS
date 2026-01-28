@@ -22,6 +22,7 @@
                 <th hidden></th>
                 <th>@Html.DisplayNameFor(model => model.Product[0].ProductCode)</th>
                 <th>@Html.DisplayNameFor(model => model.Product[0].ProductName)</th>
+                <th>@Html.DisplayNameFor(model => model.Product[0].ProductClass)</th>
                 <th>@Html.DisplayNameFor(model => model.Product[0].ProductType)</th>
                 <th>@Html.DisplayNameFor(model => model.Product[0].ProductCategory)</th>
                 <th>@Html.DisplayNameFor(model => model.Product[0].IsActive)</th>
@@ -36,6 +37,7 @@
                     <td hidden>@item.Id</td>
                     <td class="align-middle">@item.ProductCode</td>
                     <td class="align-middle">@item.ProductName</td>
+                    <td class="align-middle">@item.ProductClass</td>
                     <td class="align-middle">@item.ProductType</td>
                     <td>@item.ProductCategory</td>
                     <td class="align-middle">

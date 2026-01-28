@@ -88,7 +88,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
         var ipAddress = context.HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
                         ?? context.HttpContext.Connection.RemoteIpAddress?.ToString();
-        
+
         // Define a typed HttpClient (or use IHttpClientFactory ideally)
         using var httpClient = new HttpClient();
         GeoResponse? geoData = null;
