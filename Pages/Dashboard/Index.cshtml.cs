@@ -1,4 +1,4 @@
-using DocumentFormat.OpenXml.Bibliography;
+﻿using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -32,6 +32,15 @@ namespace NLI_POS.Pages.Dashboard
 
         public List<OfficeSelectItem> OfficeList { get; set; } = new();
 
+        public class StaffCustomerProductDto
+        {
+            public string CustomerName { get; set; }
+            public string ProductName { get; set; }
+            public int TotalQuantity { get; set; }
+            public decimal TotalAmount { get; set; }
+        }
+
+
         public async Task OnGetAsync(int? officeId)
         {
             var office = _context.OfficeCountry
@@ -59,8 +68,8 @@ namespace NLI_POS.Pages.Dashboard
         {
             //var today = DateTime.UtcNow.Date;
             var office = await _context.OfficeCountry
-    .Include(o => o.Country)
-    .FirstOrDefaultAsync(o => o.Id == officeId);
+                        .Include(o => o.Country)
+                        .FirstOrDefaultAsync(o => o.Id == officeId);
 
             var timeZone = office?.Country.TimeZone ?? "Asia/Manila";
             var (startOfDayUtc, endOfDayUtc) = AuditHelpers.GetUtcDayRange(timeZone);
@@ -344,7 +353,8 @@ namespace NLI_POS.Pages.Dashboard
             }
 
             var raw = await query
-                .GroupBy(od => new {
+                .GroupBy(od => new
+                {
                     od.Order.OrderDate.Year,
                     od.Order.OrderDate.Month,
                     od.ProductId,
@@ -425,5 +435,62 @@ namespace NLI_POS.Pages.Dashboard
 
             return new JsonResult(salesByDay);
         }
+
+        public async Task<JsonResult> OnGetStaffCustomerProductsAsync(
+    DateTime? startDate,
+    DateTime? endDate,
+    int? officeId)
+        {
+            if (!startDate.HasValue || !endDate.HasValue)
+                return new JsonResult(new List<object>());
+
+            var office = await _context.OfficeCountry
+                .Include(o => o.Country)
+                .FirstOrDefaultAsync(o => o.Id == officeId);
+
+            var timeZone = office?.Country.TimeZone ?? "Asia/Manila";
+            var tzInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+
+            var startUtc = TimeZoneInfo.ConvertTimeToUtc(startDate.Value.Date, tzInfo);
+            var endUtc = TimeZoneInfo.ConvertTimeToUtc(endDate.Value.Date.AddDays(1), tzInfo);
+
+            var data = await _context.OrderDetails
+     .Where(od =>
+         !od.Order.IsVoided &&
+         od.Order.OfficeId == officeId &&
+         od.Order.OrderDate >= startUtc &&
+         od.Order.OrderDate < endUtc &&
+         od.Order.Customers != null &&
+         od.ProductCategory != "Freebie" &&
+         od.Order.Customers.CustClasses.Name == "Staff")
+     .Select(od => new
+     {
+         CustomerId = od.Order.CustomerId,
+         CustomerName = od.Order.Customers.FirstName + " " + od.Order.Customers.LastName,
+         ProductName = od.Products.ProductName,
+         Quantity = od.Quantity,
+         LineTotal = od.Quantity * od.Price 
+     })
+     .GroupBy(x => new
+     {
+         x.CustomerId,
+         x.CustomerName,
+         x.ProductName
+     })
+     .Select(g => new StaffCustomerProductDto
+     {
+         CustomerName = g.Key.CustomerName,
+         ProductName = g.Key.ProductName,
+         TotalQuantity = g.Sum(x => x.Quantity),
+         TotalAmount = g.Sum(x => x.LineTotal) 
+     })
+     .OrderBy(x => x.CustomerName).ThenBy(x => x.ProductName)
+     .ToListAsync();
+
+
+
+            return new JsonResult(data);
+        }
+
     }
 }

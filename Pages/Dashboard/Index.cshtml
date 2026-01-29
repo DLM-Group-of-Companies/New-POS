@@ -170,7 +170,29 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm p-3">
+                <h2 class="h5 mb-3">Staff Purchase</h2>
+                <div class="table-responsive" style="height: 428px;">
+                    <div class="small">
+                        <table id="staffCustomerProductsTable" class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Staff</th>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
 </div>
 
 @section Scripts {
@@ -521,6 +543,7 @@
                loadSalesChart();
                loadTopSalespeopleChart();
                loadSalesTrend();
+               loadStaffCustomerProducts();
 
         document.getElementById("generateReportBtn")?.addEventListener("click", () => {
             const startInput = document.getElementById("StartDate");
@@ -541,6 +564,8 @@
             loadSalesChart();
             loadTopSalespeopleChart();
             loadSalesTrend();
+            loadStaffCustomerProducts();
+
         });
 
 
@@ -554,4 +579,37 @@
                };
            }
     </script>
+    <script>
+
+            const toTitleCase = (str) => {
+                   return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+               };
+
+        async function loadStaffCustomerProducts() {
+                   const response = await fetch(`?handler=StaffCustomerProducts&${getQueryParams()}`);
+                   const data = await response.json();
+
+                   if ($.fn.DataTable.isDataTable('#staffCustomerProductsTable')) {
+                       $('#staffCustomerProductsTable').DataTable().clear().destroy();
+                   }
+
+                   const tbody = document.querySelector('#staffCustomerProductsTable tbody');
+                   tbody.innerHTML = data.map(row => `
+                       <tr>
+                            <td>${toTitleCase(row.customerName)}</td>
+                           <td>${row.productName}</td>
+                           <td>${row.totalQuantity}</td>
+                           <td>${formatCurrency(row.totalAmount)}</td>
+                       </tr>
+                   `).join('');
+
+                   $('#staffCustomerProductsTable').DataTable({
+                       pageLength: 10,
+                       lengthChange: false,
+                       searching:false
+                   });
+               }
+
+    </script>
+
 }
