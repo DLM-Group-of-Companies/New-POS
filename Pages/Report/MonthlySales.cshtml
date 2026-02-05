@@ -147,7 +147,7 @@
                                 </tr>
                             }
                     </tbody>
-                    <tfoot>
+ @*                    <tfoot>
                         <tr>
                             <th colspan="3" style="text-align:right">TOTALS:</th>
                             <th>@totalTrans</th>
@@ -163,6 +163,9 @@
                             </th>
                             <th>
                                 @Model.PivotData.Sum(row => Convert.ToInt32(row["Crypto Toothpaste"]))
+                            </th>
+                            <th>
+                                @Model.PivotData.Sum(row => Convert.ToInt32(row["Coffee Sachet"]))
                             </th>
                             <th>
                                 @Model.PivotData.Sum(row => Convert.ToInt32(row["Cryptomonadales"]))
@@ -186,7 +189,64 @@
                                 @Model.PivotData.Sum(row => Convert.ToDecimal(row["Total Amount"])).ToString("N2")
                             </th>
                         </tr>
-                    </tfoot>
+                    </tfoot> *@
+                        <tfoot>
+                            <tr class="table-warning fw-bold">
+
+                                @foreach (var col in Model.PivotData.First().Keys)
+                                {
+                                    // Skip hidden columns EXACTLY like header/body
+                                    if (col.Contains("void", StringComparison.OrdinalIgnoreCase) ||
+                                    col.Contains("encode", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        continue;
+                                    }
+
+                                    // First visible column(s): label + transaction count
+                                    if (col.Equals("Customer", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <th class="text-end">TOTALS</th>
+                                        continue;
+                                    }
+
+                                    if (col.Equals("Product", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <th>Count: @totalTrans</th>
+                                        continue;
+                                    }
+
+                                    decimal sum = 0;
+                                    bool hasNumeric = false;
+
+                                    foreach (var row in Model.PivotData.Where(r => !r.TryGetValue("Voided", out var v)
+                                    || v is not bool isVoided
+                                    || !isVoided))
+                                    {
+                                        if (row.TryGetValue(col, out var v) && v != null &&
+                                        decimal.TryParse(v.ToString(), out var num))
+                                        {
+                                            sum += num;
+                                            hasNumeric = true;
+                                        }
+                                    }
+
+                                    if (!hasNumeric)
+                                    {
+                                        <th></th>
+                                    }
+                                    else if (col.Equals("Total Amount", StringComparison.OrdinalIgnoreCase) ||
+                                    col.Equals("Unit Price", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <th>@sum.ToString("N2")</th>
+                                    }
+                                    else
+                                    {
+                                        <th>@Convert.ToInt32(sum)</th>
+                                    }
+                                }
+                            </tr>
+                        </tfoot>
+
                 </table>
             </div>
         </div>

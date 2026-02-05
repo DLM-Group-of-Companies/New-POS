@@ -45,7 +45,7 @@ namespace NLI_POS.Pages.Inventory.Office
             public string ConvertedProductName { get; set; }
         }
 
-        [BindProperty]
+        //[BindProperty]
         public ConvertInventoryModel ConvertModal { get; set; }
 
         public string ConvertedProduct { get; set; }
@@ -277,10 +277,10 @@ namespace NLI_POS.Pages.Inventory.Office
             // 1️⃣ Get stock for product at selected location
             var stock = await _context.InventoryStocks
                 .FirstOrDefaultAsync(s =>
-                    s.ProductId == ConvertModal.FromProductId &&
+                    s.ProductId == model.FromProductId &&
                     s.LocationId == locationId);
 
-            if (stock == null || stock.StockQty < ConvertModal.ConvertQty)
+            if (stock == null || stock.StockQty < model.ConvertQty)
             {
                 return new JsonResult(new
                 {
@@ -291,7 +291,7 @@ namespace NLI_POS.Pages.Inventory.Office
 
             // 2️⃣ Get conversion rule (BOX → SACHET)
             var conversion = await _context.ProductConversions
-                .FirstOrDefaultAsync(c => c.FromProductId == ConvertModal.FromProductId);
+                .FirstOrDefaultAsync(c => c.FromProductId == model.FromProductId);
 
             if (conversion == null)
             {
@@ -307,7 +307,7 @@ namespace NLI_POS.Pages.Inventory.Office
             try
             {
                 // 3️⃣ Deduct BOX
-                stock.StockQty -= ConvertModal.ConvertQty;
+                stock.StockQty -= model.ConvertQty;
 
                 // 4️⃣ Add SACHET
                 var toStock = await _context.InventoryStocks
@@ -315,7 +315,7 @@ namespace NLI_POS.Pages.Inventory.Office
                         s.ProductId == conversion.ToProductId &&
                         s.LocationId == locationId);
 
-                var addQty = ConvertModal.ConvertQty * conversion.ConversionQty;
+                var addQty = model.ConvertQty * conversion.ConversionQty;
 
                 if (toStock == null)
                 {

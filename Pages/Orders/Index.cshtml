@@ -46,6 +46,28 @@
                 </tr>
             </thead>
         </table>
+
+        <div class="modal fade" id="customerModal" tabindex="-1">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-user me-2"></i> Customer Details
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div id="customerModalContent">
+                            <div class="spinner-border text-primary"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -142,7 +164,17 @@
                             }
                         }
                     },
-                    { data: 'customerName' },
+        {
+            data: 'customerName',
+            render: function (data, type, row) {
+                return `
+                    <a href="javascript:void(0)"
+                       class="text-primary fw-semibold customer-link text-decoration-none"
+                       data-customer-id="${row.customerId}">
+                        ${data}
+                    </a>`;
+            }
+        },
                     { data: 'office' },
                     {
                         data: 'totAmount',
@@ -291,8 +323,55 @@
             dt.ajax.reload();
         }
 
+    </script>
 
+    <script>
+         $(document).on('click', '.customer-link', function () {
+            const customerId = $(this).data('customer-id');
 
+            $('#customerModal').modal('show');
+            $('#customerModalContent').html(`
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary"></div>
+                </div>
+            `);
+
+            $('#customerModalContent').load(`/Customers/_DetailsPartial?id=${customerId}`, function () {
+
+                // Initialize DataTable only after content is loaded
+                $('#orderDetTable').DataTable({
+                    destroy: true,
+                    pageLength: 10,
+                    order: [[1, 'desc']],
+                    footerCallback: function (row, data, start, end, display) {
+                        var api = this.api();
+
+                        var parseFloatSafe = function (i) {
+                            if (typeof i === 'string') return parseFloat(i.replace(/[^0-9.-]+/g, "")) || 0;
+                            return typeof i === 'number' ? i : 0;
+                        };
+
+                        var total = api
+                            .column(2)
+                            .data()
+                            .reduce((a, b) => parseFloatSafe(a) + parseFloatSafe(b), 0);
+
+                        var pageTotal = api
+                            .column(2, { page: 'current' })
+                            .data()
+                            .reduce((a, b) => parseFloatSafe(a) + parseFloatSafe(b), 0);
+
+                        $(api.column(2).footer()).html(
+                            pageTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+                            ' <small class="text-muted">(Grand Total: ' +
+                            total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+                            ')</small>'
+                        );
+                    }
+                });
+
+            });
+        });
 
     </script>
 

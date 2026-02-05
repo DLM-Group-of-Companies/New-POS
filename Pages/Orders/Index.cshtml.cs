@@ -150,6 +150,7 @@ namespace NLI_POS.Pages.Orders
             .ConvertTimeFromUtc(DateTime.SpecifyKind(o.OrderDate, DateTimeKind.Utc), tz)
             .ToString("yyyy-MM-dd HH:mm:ss"),
                     CustomerName = o.Customers.FirstName + " " + o.Customers.LastName,
+                    customerId = o.CustomerId,   
                     Office = o.Office.Name,
                     o.IsVoided,
                     TotAmount = o.TotAmount
