@@ -14,7 +14,7 @@
     </div>
     <hr />
 
-    <div class="container">
+    <div class="container-fluid">
         <p>
             <a class="btn btn-primary btn-gradient" asp-page="New"><i class="fas fa-cart-plus me-2"></i> New Order</a>
         </p>
@@ -86,6 +86,16 @@
 
             showLoader();
 
+            // Calculate page length based on screen height
+            function calculatePageLength() {
+                const headerHeight = document.querySelector('.container-fluid')?.offsetHeight || 150;
+                const availableHeight = window.innerHeight - headerHeight - 150; // 150px for pagination, filters, etc.
+                const rowHeight = 35; // approximate DataTable row height
+                return Math.max(5, Math.floor(availableHeight / rowHeight));
+            }
+
+            const initialPageLength = calculatePageLength();
+
             const table = $('#ordersTable').DataTable({
                 stateSave: true,
                 stateSaveCallback: function (settings, data) {
@@ -95,6 +105,7 @@
                     return JSON.parse(sessionStorage.getItem('OrdersTableState'));
                 },
                 serverSide: true,
+                pageLength: initialPageLength,
                 responsive: {
                     details: {
                         display: $.fn.dataTable.Responsive.display.childRowImmediate, // show expanded content immediately in mobile
@@ -284,6 +295,14 @@
             // Replace original filter container
             $('#ordersTable_filter').html($filterWrapper);
 
+
+            // Handle window resize to adjust page length
+            $(window).on('resize', function() {
+                const newPageLength = calculatePageLength();
+                if (table.page.len() !== newPageLength) {
+                    table.page.len(newPageLength).draw();
+                }
+            });
 
             // Reload table on filter change
             $('#officeFilter').on('change', function () {
