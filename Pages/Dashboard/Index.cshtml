@@ -379,7 +379,14 @@
                    productChart = new Chart(document.getElementById('salesPerProductChart'), {
                        type: 'pie',
                        data: { labels, datasets: [{ data: sales, backgroundColor: backgroundColors, borderColor: '#fff' }] },
-                       options: { responsive: true, plugins: { legend: { position: 'right' } } }
+                       options: {
+                           responsive: true,
+                           plugins: { legend: { position: 'right' } },
+                           animation: {
+                               duration: 1000,
+                               easing: 'easeInOutQuad'
+                           }
+                       }
                    });
                } catch (err) {
                    console.error("Failed to load sales chart:", err);
@@ -464,7 +471,14 @@
                trendChart = new Chart(document.getElementById("salesTrendChart"), {
                    type: 'line',
                    data: { labels, datasets: [{ label: 'Total Sales', data: totals, borderColor: 'rgb(126,239,203)', backgroundColor: 'rgba(54, 162, 235, 0.2)', tension: 0.4 }] },
-                   options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                   options: {
+                       responsive: true,
+                       scales: { y: { beginAtZero: true } },
+                       animation: {
+                           duration: 1500,
+                           easing: 'easeInOutQuad'
+                       }
+                   }
                });
            }
 
@@ -526,7 +540,11 @@
                        responsive: true,
                        interaction: { mode: 'index', intersect: false },
                        plugins: { title: { display: true, text: `Monthly Product Sales Trend (${type})` } },
-                       scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                       scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                       animation: {
+                           duration: 1500,
+                           easing: 'easeInOutQuad'
+                       }
                    }
                });
            }
