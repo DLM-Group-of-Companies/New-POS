@@ -13,7 +13,7 @@
         <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
     </div>
     <hr />
-    <div class="container">
+    <div class="container-fluid">
 
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2" id="customFilterRow">
             <a class="btn btn-primary btn-gradient" asp-page="Create"><i class="fas fa-user-plus me-2"></i> New Customer</a>
@@ -65,8 +65,19 @@
         const userCanDelete = @(User.HasPermission("Delete").ToString().ToLower() == "true" ? "true" : "false");
 
         $(document).ready(function () {
+            // Calculate page length based on screen height
+            function calculatePageLength() {
+                const headerHeight = document.querySelector('.container-fluid')?.offsetHeight || 150;
+                const availableHeight = window.innerHeight - headerHeight - 150; // 150px for pagination, filters, etc.
+                const rowHeight = 35; // approximate DataTable row height
+                return Math.max(5, Math.floor(availableHeight / rowHeight));
+            }
+
+            const initialPageLength = calculatePageLength();
+
             const table = $('#customerTable').DataTable({
                 dom: 'Bfrtip', // Manually move the buttons and search box // 'B' for Buttons, 'f' for searching, 'r' for processing display, 't' for table, 'i' for information, 'p' for pagination
+                pageLength: initialPageLength,
                 buttons: [
                     {
                         text: '<i class="fas fa-file-excel me-2"></i> Export All to Excel',
@@ -157,6 +168,14 @@
                     $('#searchBoxContainer').append($searchGroup);
                 }
 
+            });
+
+            // Handle window resize to adjust page length
+            $(window).on('resize', function() {
+                const newPageLength = calculatePageLength();
+                if (table.page.len() !== newPageLength) {
+                    table.page.len(newPageLength).draw();
+                }
             });
         });
 
