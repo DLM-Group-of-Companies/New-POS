@@ -1,142 +1,140 @@
-// ── Currency helpers ──────────────────────────────────────────────
-let currencyCode;
-let locale;
+const Dashboard = (() => {
 
-const officeSelect = document.querySelector('select[name="OfficeId"]');
-const setCurrencyGlobals = () => {
-    const selectedOption = officeSelect.options[officeSelect.selectedIndex];
-    currencyCode = selectedOption.getAttribute('data-currency');
-    locale = selectedOption.getAttribute('data-locale');
-};
-
-setCurrencyGlobals();
-
-const formatCurrency = (value) => {
-    return new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency: currencyCode,
-        minimumFractionDigits: 2
-    }).format(value);
-};
-
-officeSelect.addEventListener('change', setCurrencyGlobals);
-
-function getSelectedOfficeSettings() {
-    const office = document.querySelector('#OfficeId option:checked');
-    return {
-        locale: office.dataset.locale,
-        currency: office.dataset.currency
+    // ── State ─────────────────────────────────────────────────────
+    const state = {
+        charts: {},
+        currency: { code: 'USD', locale: 'en-US' }
     };
-}
 
-// ── Query params helper ───────────────────────────────────────────
-function getQueryParams(extraParams = {}) {
-    const startDate = document.getElementById("StartDate")?.value;
-    const endDate   = document.getElementById("EndDate")?.value;
-    const officeId  = document.getElementById("OfficeId")?.value;
+    // ── DOM References ────────────────────────────────────────────
+    const ui = {
+        officeSelect: document.querySelector('select[name="OfficeId"]'),
+        startDate:    document.getElementById("StartDate"),
+        endDate:      document.getElementById("EndDate"),
+    };
 
-    const params = new URLSearchParams();
-    if (startDate) params.append("StartDate", startDate);
-    if (endDate)   params.append("EndDate", endDate);
-    if (officeId)  params.append("OfficeId", officeId);
+    // ── Currency ──────────────────────────────────────────────────
+    const setCurrencyGlobals = () => {
+        const selected = ui.officeSelect.options[ui.officeSelect.selectedIndex];
+        state.currency.code   = selected.getAttribute('data-currency');
+        state.currency.locale = selected.getAttribute('data-locale');
+    };
 
-    for (const [key, value] of Object.entries(extraParams)) {
-        params.append(key, value);
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat(state.currency.locale, {
+            style: 'currency',
+            currency: state.currency.code,
+            minimumFractionDigits: 2
+        }).format(value);
+    };
+
+    // ── Query Params ──────────────────────────────────────────────
+    const getParams = (extra = {}) => {
+        const params = new URLSearchParams();
+        if (ui.startDate?.value)    params.append('StartDate', ui.startDate.value);
+        if (ui.endDate?.value)      params.append('EndDate', ui.endDate.value);
+        if (ui.officeSelect?.value) params.append('OfficeId', ui.officeSelect.value);
+        Object.entries(extra).forEach(([k, v]) => params.append(k, v));
+        return params.toString();
+    };
+
+    // ── Fetch Helper ──────────────────────────────────────────────
+    async function fetchData(handler, extra = {}) {
+        try {
+            const response = await fetch(`?handler=${handler}&${getParams(extra)}`);
+            if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
+            return await response.json();
+        } catch (err) {
+            console.error(`Error loading ${handler}:`, err);
+            return null;
+        }
     }
-    return params.toString();
-}
 
-// ── Shared active button helper ───────────────────────────────────
-function setActiveButton(button) {
-    button.parentNode.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active', 'btn-dark'));
-    button.classList.add('active', 'btn-dark');
-}
+    // ── Chart Engine ──────────────────────────────────────────────
+    const ROUND_CHARTS = ['pie', 'doughnut'];
 
-const toTitleCase = (str) => str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    function syncChart(id, config) {
+        const canvas = document.getElementById(id);
+        if (!canvas) return;
 
-// ── KPIs ──────────────────────────────────────────────────────────
-async function loadTopKpis() {
-    try {
-        const response = await fetch(`?handler=TopKpis&${getQueryParams()}`);
-        const data = await response.json();
-        document.getElementById('totalSalesToday').textContent  = formatCurrency(data.totalSales);
-        document.getElementById('orderCountToday').textContent  = data.orderCount;
+        const isRound = ROUND_CHARTS.includes(config.type);
+
+        // Dynamic height for horizontal bar charts only
+        if (config.options?.indexAxis === 'y' && config.data.labels) {
+            canvas.style.height = `${config.data.labels.length * 40}px`;
+        }
+
+        if (state.charts[id]) {
+            const chart = state.charts[id];
+            chart.data.labels   = config.data.labels;
+            chart.data.datasets = config.data.datasets;
+
+            if (config.options?.plugins?.title) {
+                chart.options.plugins.title = config.options.plugins.title;
+            }
+
+            chart.update('default');
+        } else {
+            state.charts[id] = new Chart(canvas, {
+                type: config.type,
+                data: config.data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: isRound,
+                    animation: { duration: 700, easing: 'easeOutQuart' },
+                    ...config.options
+                }
+            });
+        }
+    }
+
+    // ── KPIs ──────────────────────────────────────────────────────
+    async function loadKpis() {
+        const data = await fetchData('TopKpis');
+        if (!data) return;
+        document.getElementById('totalSalesToday').textContent    = formatCurrency(data.totalSales);
+        document.getElementById('orderCountToday').textContent    = data.orderCount;
         document.getElementById('avgOrderValueToday').textContent = formatCurrency(data.averageOrderValue);
-    } catch (err) {
-        console.error('Failed to load KPIs:', err);
     }
-}
 
-// ── Top Customers Chart ───────────────────────────────────────────
-let topCustomersChartInstance;
+    // ── Top Customers Chart ───────────────────────────────────────
+    async function loadCustomers() {
+        const data = await fetchData('TopCustomers');
+        if (!data) return;
 
-async function loadTopCustomersChart() {
-    try {
-        const response = await fetch(`?handler=TopCustomers&${getQueryParams()}`);
-        const data = await response.json();
-        const labels = data.map(x => x.customerName);
-        const values = data.map(x => x.totalSpent);
-
-        const chartEl = document.getElementById('topCustomersChart');
-        chartEl.style.height = `${data.length * 40}px`;
-
-        if (topCustomersChartInstance) topCustomersChartInstance.destroy();
-
-        // Force layout flush then render on next frame
-        void chartEl.parentElement.offsetHeight;
-        requestAnimationFrame(() => {
-            topCustomersChartInstance = new Chart(chartEl.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Total Spent',
-                            data: values,
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1,
-                            barPercentage: 0.7,
-                            categoryPercentage: 0.8
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: { mode: 'nearest', intersect: true },
-                        scales: { x: { beginAtZero: true } },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                enabled: true,
-                                callbacks: {
-                                    label: ctx => {
-                                        const settings = getSelectedOfficeSettings();
-                                        return new Intl.NumberFormat(settings.locale, {
-                                            style: 'currency',
-                                            currency: settings.currency
-                                        }).format(ctx.raw);
-                                    }
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 600,
-                            easing: 'easeOutQuart'
-                        }
+        syncChart('topCustomersChart', {
+            type: 'bar',
+            data: {
+                labels: data.map(x => x.customerName),
+                datasets: [{
+                    label: 'Total Spent',
+                    data: data.map(x => x.totalSpent),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    barPercentage: 0.7,
+                    categoryPercentage: 0.8
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                interaction: { mode: 'nearest', intersect: true },
+                scales: { x: { beginAtZero: true } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: { label: ctx => formatCurrency(ctx.raw) }
                     }
-                });
+                }
+            }
         });
-    } catch (err) {
-        console.error('Failed to load top customers chart:', err);
     }
-}
 
-// ── Repeat Customers Table ────────────────────────────────────────
-async function loadRepeatCustomersTable() {
-    try {
-        const response = await fetch(`?handler=RepeatCustomers&${getQueryParams()}`);
-        const data = await response.json();
+    // ── Repeat Customers Table ────────────────────────────────────
+    async function loadRepeatCustomers() {
+        const data = await fetchData('RepeatCustomers');
+        if (!data) return;
 
         if ($.fn.DataTable.isDataTable('#repeatCustomersTable')) {
             $('#repeatCustomersTable').DataTable().clear().destroy();
@@ -158,178 +156,82 @@ async function loadRepeatCustomersTable() {
             searching: false,
             info: false
         });
-    } catch (err) {
-        console.error('Failed to load repeat customers:', err);
     }
-}
 
-// ── Sales Per Product Chart ───────────────────────────────────────
-let productChart;
+    // ── Sales Per Product Pie ─────────────────────────────────────
+    async function loadSalesPie(mode = 'regular') {
+        const data = await fetchData('SalesChart', { mode });
+        if (!data) return;
 
-document.getElementById('btnRegular').addEventListener('click', function () {
-    setActiveButton(this);
-    loadSalesChart('regular');
-});
-
-document.getElementById('btnPromo').addEventListener('click', function () {
-    setActiveButton(this);
-    loadSalesChart('promo');
-});
-
-async function loadSalesChart(mode = 'regular') {
-    try {
-        const response = await fetch(`?handler=SalesChart&mode=${mode}&${getQueryParams()}`);
-        const data = await response.json();
-        const labels = data.map(x => x.productName);
-        const sales  = data.map(x => x.totalSales);
-        const backgroundColors = labels.map(name => getProductColor(name));
-
-        if (productChart) productChart.destroy();
-
-        void document.getElementById('salesPerProductChart').parentElement.offsetHeight;
-        requestAnimationFrame(() => {
-            productChart = new Chart(document.getElementById('salesPerProductChart'), {
-                    type: 'pie',
-                    data: {
-                        labels,
-                        datasets: [{ data: sales, backgroundColor: backgroundColors, borderColor: '#fff' }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { position: 'right' } },
-                        animation: {
-                            duration: 600,
-                            easing: 'easeInOutCirc'
-                        }
-                    }
-                });
+        syncChart('salesPerProductChart', {
+            type: 'pie',
+            data: {
+                labels: data.map(x => x.productName),
+                datasets: [{
+                    data: data.map(x => x.totalSales),
+                    backgroundColor: data.map(x => getProductColor(x.productName)),
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'right' } }
+            }
         });
-    } catch (err) {
-        console.error("Failed to load sales chart:", err);
     }
-}
 
-function getProductColor(name) {
-    switch (name.toLowerCase()) {
-        case 'cryptomonadales': return 'rgba(0, 128, 0, 0.7)';
-        case 'cleanse':        return 'rgba(255, 165, 0, 0.7)';
-        case 'ppars plus':     return 'rgba(128, 0, 128, 0.7)';
-        case 'coffee':         return 'rgba(139, 69, 19, 0.7)';
-        default:               return getRandomColor();
-    }
-}
+    // ── Top Salespeople Chart ─────────────────────────────────────
+    async function loadSalespeople(type = 'YearToDate') {
+        const data = await fetchData('TopSalespeople', { type });
+        if (!data) return;
 
-function getRandomColor() {
-    const r = Math.floor(Math.random() * 155) + 100;
-    const g = Math.floor(Math.random() * 155) + 100;
-    const b = Math.floor(Math.random() * 155) + 100;
-    return `rgba(${r}, ${g}, ${b}, 0.7)`;
-}
-
-// ── Top Salespeople Chart ─────────────────────────────────────────
-let topSalespeopleChart = null;
-
-document.getElementById('btnYearToDate').addEventListener('click', function () {
-    setActiveButton(this);
-    loadTopSalespeopleChart('YearToDate');
-});
-
-document.getElementById('btnMonthToDate').addEventListener('click', function () {
-    setActiveButton(this);
-    loadTopSalespeopleChart('MonthToDate');
-});
-
-async function loadTopSalespeopleChart(type = 'YearToDate') {
-    try {
-        const typeParam = type ? `type=${encodeURIComponent(type)}&` : "";
-        const response  = await fetch(`?handler=TopSalespeople&${typeParam}${getQueryParams()}`);
-        const data      = await response.json();
-        const labels    = data.map(x => x.salesperson?.trim() || 'UNSPECIFIED');
-        const values    = data.map(x => x.totalSales);
-
-        if (topSalespeopleChart) topSalespeopleChart.destroy();
-
-        const canvas = document.getElementById('topSalespeopleChart');
-        canvas.style.height = `${data.length * 40}px`;
-
-        void canvas.parentElement.offsetHeight;
-        requestAnimationFrame(() => {
-            topSalespeopleChart = new Chart(canvas, {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{ data: values, backgroundColor: 'rgba(255, 159, 64, 0.6)' }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { x: { beginAtZero: true } },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { callbacks: { label: ctx => formatCurrency(ctx.raw) } }
-                        },
-                        animation: {
-                            duration: 600,
-                            easing: 'easeOutQuart'
-                        }
-                    }
-                });
+        syncChart('topSalespeopleChart', {
+            type: 'bar',
+            data: {
+                labels: data.map(x => x.salesperson?.trim() || 'UNSPECIFIED'),
+                datasets: [{
+                    data: data.map(x => x.totalSales),
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => formatCurrency(ctx.raw) } }
+                }
+            }
         });
-    } catch (err) {
-        console.error('Failed to load top salespeople chart:', err);
     }
-}
 
-// ── Sales Trend Chart ─────────────────────────────────────────────
-let trendChart;
+    // ── Sales Trend Chart ─────────────────────────────────────────
+    async function loadTrend() {
+        const data = await fetchData('SalesTrend');
+        if (!data) return;
 
-async function loadSalesTrend() {
-    try {
-        const response = await fetch(`?handler=SalesTrend&${getQueryParams()}`);
-        const data     = await response.json();
-        const labels   = data.map(x => x.date);
-        const totals   = data.map(x => x.total);
-
-        if (trendChart) trendChart.destroy();
-
-        void document.getElementById("salesTrendChart").parentElement.offsetHeight;
-        requestAnimationFrame(() => {
-            trendChart = new Chart(document.getElementById("salesTrendChart"), {
-                    type: 'line',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Total Sales',
-                            data: totals,
-                            borderColor: 'rgb(126,239,203)',
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } },
-                        animation: {
-                            duration: 600,
-                            easing: 'easeInOutQuad'
-                        }
-                    }
-                });
+        syncChart('salesTrendChart', {
+            type: 'line',
+            data: {
+                labels: data.map(x => x.date),
+                datasets: [{
+                    label: 'Total Sales',
+                    data: data.map(x => x.total),
+                    borderColor: 'rgb(126,239,203)',
+                    backgroundColor: 'rgba(126,239,203, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } }
+            }
         });
-    } catch (err) {
-        console.error('Failed to load sales trend:', err);
     }
-}
 
-// ── Product Trend Chart ───────────────────────────────────────────
-let productTrendChart;
-
-async function loadProductTrend(year, type = 'Regular') {
-    try {
-        const res  = await fetch(`?handler=CountPerProduct&year=${year}&type=${type}`);
-        const data = await res.json();
+    // ── Product Trend Chart ───────────────────────────────────────
+    async function loadProductTrend(year = new Date().getFullYear(), type = 'Regular') {
+        const data = await fetchData('CountPerProduct', { year, type });
+        if (!data) return;
 
         const labels = [...new Set(data.map(d => `${d.year}-${String(d.month).padStart(2, '0')}`))];
 
@@ -350,36 +252,21 @@ async function loadProductTrend(year, type = 'Regular') {
             fill: false
         }));
 
-        if (productTrendChart) productTrendChart.destroy();
-
-        void document.getElementById('productTrendChart').parentElement.offsetHeight;
-        requestAnimationFrame(() => {
-            productTrendChart = new Chart(document.getElementById('productTrendChart'), {
-                    type: 'line',
-                    data: { labels, datasets },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: { mode: 'index', intersect: false },
-                        plugins: { title: { display: true, text: `Monthly Product Sales Trend (${type})` } },
-                        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-                        animation: {
-                            duration: 600,
-                            easing: 'easeInOutQuad'
-                        }
-                    }
-                });
+        syncChart('productTrendChart', {
+            type: 'line',
+            data: { labels, datasets },
+            options: {
+                interaction: { mode: 'index', intersect: false },
+                plugins: { title: { display: true, text: `Monthly Product Sales Trend (${type})` } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
         });
-    } catch (err) {
-        console.error('Failed to load product trend:', err);
     }
-}
 
-// ── Staff Customer Products Table ─────────────────────────────────
-async function loadStaffCustomerProducts() {
-    try {
-        const response = await fetch(`?handler=StaffCustomerProducts&${getQueryParams()}`);
-        const data = await response.json();
+    // ── Staff Purchases Table ─────────────────────────────────────
+    async function loadStaffPurchases() {
+        const data = await fetchData('StaffCustomerProducts');
+        if (!data) return;
 
         if ($.fn.DataTable.isDataTable('#staffCustomerProductsTable')) {
             $('#staffCustomerProductsTable').DataTable().clear().destroy();
@@ -400,55 +287,101 @@ async function loadStaffCustomerProducts() {
             lengthChange: false,
             searching: false
         });
-    } catch (err) {
-        console.error('Failed to load staff purchases:', err);
     }
-}
 
-// ── Initialization ────────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", () => {
+    // ── Load All ──────────────────────────────────────────────────
+    function loadAll() {
+        loadKpis();
+        loadCustomers();
+        loadRepeatCustomers();
+        loadSalesPie();
+        loadSalespeople();
+        loadTrend();
+        loadStaffPurchases();
+        loadProductTrend(new Date().getFullYear(), 'Regular');
+    }
 
-    // Product trend toggle buttons
-    const btnProdRegular = document.getElementById("btnProdRegular");
-    const btnProdPromo   = document.getElementById("btnProdPromo");
+    // ── Utilities ─────────────────────────────────────────────────
+    const toTitleCase = (str) => str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 
-    btnProdRegular.addEventListener("click", () => {
-        setActiveButton(btnProdRegular);
-        loadProductTrend(new Date().getFullYear(), "Regular");
-    });
+    function setActiveBtn(btn) {
+        btn.parentNode.querySelectorAll('.btn').forEach(b => b.classList.remove('active', 'btn-dark'));
+        btn.classList.add('active', 'btn-dark');
+    }
 
-    btnProdPromo.addEventListener("click", () => {
-        setActiveButton(btnProdPromo);
-        loadProductTrend(new Date().getFullYear(), "Promo");
-    });
+    function getProductColor(name) {
+        const map = {
+            'cryptomonadales': 'rgba(0, 128, 0, 0.7)',
+            'cleanse':         'rgba(255, 165, 0, 0.7)',
+            'ppars plus':      'rgba(128, 0, 128, 0.7)',
+            'coffee':          'rgba(139, 69, 19, 0.7)'
+        };
+        return map[name.toLowerCase()] || `hsla(${Math.random() * 360}, 60%, 50%, 0.7)`;
+    }
 
-    // Apply Filters button
-    document.getElementById("generateReportBtn")?.addEventListener("click", () => {
-        const startInput = document.getElementById("StartDate");
-        const endInput   = document.getElementById("EndDate");
+    // ── Init ──────────────────────────────────────────────────────
+    function init() {
+        setCurrencyGlobals();
 
-        const start = new Date(startInput.value + "T00:00:00");
-        const end   = new Date(endInput.value + "T00:00:00");
+        // Office change
+        ui.officeSelect?.addEventListener('change', () => {
+            setCurrencyGlobals();
+            loadAll();
+        });
 
-        if (end < start) {
-            const newStart = new Date(end.getFullYear(), end.getMonth(), 1);
-            startInput.value = newStart.toISOString().split("T")[0];
-        }
+        // Sales pie toggles
+        document.getElementById('btnRegular')?.addEventListener('click', function () {
+            setActiveBtn(this);
+            loadSalesPie('regular');
+        });
+        document.getElementById('btnPromo')?.addEventListener('click', function () {
+            setActiveBtn(this);
+            loadSalesPie('promo');
+        });
+
+        // Salespeople toggles
+        document.getElementById('btnYearToDate')?.addEventListener('click', function () {
+            setActiveBtn(this);
+            loadSalespeople('YearToDate');
+        });
+        document.getElementById('btnMonthToDate')?.addEventListener('click', function () {
+            setActiveBtn(this);
+            loadSalespeople('MonthToDate');
+        });
+
+        // Product trend toggles
+        document.getElementById('btnProdRegular')?.addEventListener('click', function () {
+            setActiveBtn(this);
+            loadProductTrend(new Date().getFullYear(), 'Regular');
+        });
+        document.getElementById('btnProdPromo')?.addEventListener('click', function () {
+            setActiveBtn(this);
+            loadProductTrend(new Date().getFullYear(), 'Promo');
+        });
+
+        // Apply filters with date validation
+        document.getElementById("generateReportBtn")?.addEventListener("click", () => {
+            const startInput = ui.startDate;
+            const endInput   = ui.endDate;
+
+            if (startInput?.value && endInput?.value) {
+                const start = new Date(startInput.value + "T00:00:00");
+                const end   = new Date(endInput.value + "T00:00:00");
+
+                if (end < start) {
+                    const newStart = new Date(end.getFullYear(), end.getMonth(), 1);
+                    startInput.value = newStart.toISOString().split("T")[0];
+                }
+            }
+
+            loadAll();
+        });
 
         loadAll();
-    });
+    }
 
-    // Initial load
-    loadAll();
-});
+    return { init };
 
-function loadAll() {
-    loadTopKpis();
-    loadTopCustomersChart();
-    loadRepeatCustomersTable();
-    loadSalesChart();
-    loadTopSalespeopleChart();
-    loadSalesTrend();
-    loadStaffCustomerProducts();
-    loadProductTrend(new Date().getFullYear(), "Regular");
-}
+})();
+
+document.addEventListener("DOMContentLoaded", Dashboard.init);
