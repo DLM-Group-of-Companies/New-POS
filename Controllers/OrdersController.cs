@@ -32,53 +32,86 @@ namespace NLI_POS.Controllers
             if (string.IsNullOrEmpty(salesEmail))
                 return BadRequest("Email is required");
 
-            // Get office and its timezone
-            var country = await _context.Country.FirstOrDefaultAsync(c => c.Code == cntryCd);
-            if (country == null) return BadRequest("Invalid country");
-
-            DateTime? localStart = null;
-            DateTime? localEnd = null;
-
-            var officeTimeZone = TimeZoneInfo.FindSystemTimeZoneById(country.TimeZone);
-            if (month.HasValue)
-            {
-                localStart = new DateTime(year, month.Value, 1);
-                localEnd = localStart.Value.AddMonths(1);
-                    
-            }
-            else
-            {
-                localStart = new DateTime(year, 1, 1);
-                localEnd = localStart.Value.AddYears(1);
-            }
-
-            var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart.Value, officeTimeZone);
-            var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd.Value, officeTimeZone);
-
             var user = await _userManager.FindByEmailAsync(salesEmail);
+            if (user == null) return NotFound("User not found");
 
-            var orders = await _context.Orders
-                .Where(o => o.SalesBy == user.UserName &&
-                            o.OrderDate >= utcStart &&
-                            o.OrderDate < utcEnd)
-                .Include(o => o.Customers)
-                .Include(o => o.OrderDetails)
-                    .ThenInclude(od => od.Products)
-                .Select(o => new OrderSummaryDto
-                {
-                    OrderDate = o.OrderDate,
-                    OrderNo = o.OrderNo,
-                    ClientName = o.Customers.FirstName + " " + o.Customers.LastName,
-                    MobileNumber = o.Customers.MobileNo,
-                    OrderType = o.OrderType,
-                    ProductPurchased = string.Join(", ",
-                        o.OrderDetails.Select(oi => oi.Products.ProductName)),
-                    Amount = o.TotAmount,
-                    SalesSource = o.SalesSource
-                })
-                .ToListAsync();
+            var orders = await GetSalesData(year, month, cntryCd, user.UserName);
+            if (orders == null) return BadRequest("Invalid country or date parameters");
 
             return Ok(orders);
+        }
+
+        // GET api/orders/salesby
+        [HttpGet("salesby")]
+        public async Task<IActionResult> GetSalesBy(
+    int year,
+    int? month,
+    string cntryCd)
+        {
+            var orders = await GetSalesData(year, month, cntryCd);
+            if (orders == null) return BadRequest("Invalid country or date parameters");
+
+            return Ok(orders);
+        }
+
+        private async Task<List<OrderSummaryDto>?> GetSalesData(int year, int? month, string cntryCd, string? userName = null)
+        {
+            if (string.IsNullOrEmpty(cntryCd)) return null;
+
+            // Get office and its timezone
+            var country = await _context.Country.FirstOrDefaultAsync(c => c.Code == cntryCd);
+            if (country == null) return null;
+
+            DateTime localStart;
+            DateTime localEnd;
+
+            try
+            {
+                var officeTimeZone = TimeZoneInfo.FindSystemTimeZoneById(country.TimeZone);
+                if (month.HasValue)
+                {
+                    localStart = new DateTime(year, month.Value, 1);
+                    localEnd = localStart.AddMonths(1);
+                }
+                else
+                {
+                    localStart = new DateTime(year, 1, 1);
+                    localEnd = localStart.AddYears(1);
+                }
+
+                var utcStart = TimeZoneInfo.ConvertTimeToUtc(localStart, officeTimeZone);
+                var utcEnd = TimeZoneInfo.ConvertTimeToUtc(localEnd, officeTimeZone);
+
+                var query = _context.Orders
+                    .Where(o => o.OrderDate >= utcStart && o.OrderDate < utcEnd);
+
+                if (!string.IsNullOrEmpty(userName))
+                {
+                    query = query.Where(o => o.SalesBy == userName);
+                }
+
+                return await query
+                    .Include(o => o.Customers)
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.Products)
+                    .Select(o => new OrderSummaryDto
+                    {
+                        OrderDate = o.OrderDate,
+                        OrderNo = o.OrderNo,
+                        ClientName = o.Customers.FirstName + " " + o.Customers.LastName,
+                        MobileNumber = o.Customers.MobileNo,
+                        OrderType = o.OrderType,
+                        ProductPurchased = string.Join(", ",
+                            o.OrderDetails.Select(oi => oi.Products.ProductName)),
+                        Amount = o.TotAmount,
+                        SalesSource = o.SalesSource
+                    })
+                    .ToListAsync();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
     }
