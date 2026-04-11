@@ -9,6 +9,7 @@
         public string OrderType { get; set; } = "";
         public string ProductPurchased { get; set; } = "";
         public decimal Amount { get; set; }
+        public string? SalesSource { get; set; }
     }
 
 }

@@ -73,7 +73,8 @@ namespace NLI_POS.Controllers
                     OrderType = o.OrderType,
                     ProductPurchased = string.Join(", ",
                         o.OrderDetails.Select(oi => oi.Products.ProductName)),
-                    Amount = o.TotAmount
+                    Amount = o.TotAmount,
+                    SalesSource = o.SalesSource
                 })
                 .ToListAsync();
 
