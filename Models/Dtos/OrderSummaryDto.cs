@@ -1,4 +1,4 @@
-﻿namespace NLI_POS.Models.Dtos
+namespace NLI_POS.Models.Dtos
 {
     public class OrderSummaryDto
     {
@@ -10,6 +10,7 @@
         public string ProductPurchased { get; set; } = "";
         public decimal Amount { get; set; }
         public string? SalesSource { get; set; }
+        public string? SalesPersonEmail { get; set; }
     }
 
 }
