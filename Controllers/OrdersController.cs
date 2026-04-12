@@ -104,7 +104,8 @@ namespace NLI_POS.Controllers
                         ProductPurchased = string.Join(", ",
                             o.OrderDetails.Select(oi => oi.Products.ProductName)),
                         Amount = o.TotAmount,
-                        SalesSource = o.SalesSource
+                        SalesSource = o.SalesSource,
+                        SalesPersonEmail = _context.Users.Where(u => u.UserName == o.SalesBy).Select(u => u.Email).FirstOrDefault()
                     })
                     .ToListAsync();
             }
