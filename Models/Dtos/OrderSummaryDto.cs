@@ -11,6 +11,8 @@ namespace NLI_POS.Models.Dtos
         public decimal Amount { get; set; }
         public string? SalesSource { get; set; }
         public string? SalesPersonEmail { get; set; }
+
+        public string? OfficeBranchCode { get;set; }
     }
 
 }

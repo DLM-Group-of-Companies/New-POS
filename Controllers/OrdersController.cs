@@ -90,27 +90,50 @@ namespace NLI_POS.Controllers
                     query = query.Where(o => o.SalesBy == userName);
                 }
 
-                return await query
+                // Execute the main query first
+                var orders = await query
                     .Include(o => o.Customers)
                     .Include(o => o.OrderDetails)
                         .ThenInclude(od => od.Products)
-                    .Select(o => new OrderSummaryDto
-                    {
-                        OrderDate = o.OrderDate,
-                        OrderNo = o.OrderNo,
-                        ClientName = o.Customers.FirstName + " " + o.Customers.LastName,
-                        MobileNumber = o.Customers.MobileNo,
-                        OrderType = o.OrderType,
-                        ProductPurchased = string.Join(", ",
-                            o.OrderDetails.Select(oi => oi.Products.ProductName)),
-                        Amount = o.TotAmount,
-                        SalesSource = o.SalesSource,
-                        SalesPersonEmail = _context.Users.Where(u => u.UserName == o.SalesBy).Select(u => u.Email).FirstOrDefault()
-                    })
+                    .Include(o => o.Office)
                     .ToListAsync();
+
+                // Get distinct sales usernames to avoid N+1 queries
+                var distinctSalesUsernames = orders.Select(o => o.SalesBy).Distinct().ToList();
+                
+                // Fetch all user emails in one query
+                var userEmailMap = await _context.Users
+                    .Where(u => distinctSalesUsernames.Contains(u.UserName))
+                    .ToDictionaryAsync(u => u.UserName, u => u.Email);
+
+                // Project to DTO with mapped user emails
+                return orders.Select(o => new OrderSummaryDto
+                {
+                    OrderDate = o.OrderDate,
+                    OrderNo = o.OrderNo,
+                    ClientName = o.Customers.FirstName + " " + o.Customers.LastName,
+                    MobileNumber = o.Customers.MobileNo,
+                    OrderType = o.OrderType,
+                    ProductPurchased = string.Join(", ",
+                        o.OrderDetails.Select(oi => oi.Products.ProductName)),
+                    Amount = o.TotAmount,
+                    SalesSource = o.SalesSource,
+                    SalesPersonEmail = userEmailMap.ContainsKey(o.SalesBy) ? userEmailMap[o.SalesBy] : null,
+                    OfficeBranchCode = o.Office?.OffCode
+                }).ToList();
             }
-            catch
+            catch (TimeZoneNotFoundException)
             {
+                return null;
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception here if you have logging configured
+                // _logger.LogError(ex, "Error retrieving sales data");
                 return null;
             }
         }
