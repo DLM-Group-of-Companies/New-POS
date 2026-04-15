@@ -169,7 +169,7 @@ See `NLI-POS.csproj` for versions. Highlights:
 
 ## License
 
-Add a `LICENSE` file at the repository root and describe terms there. Until then, all rights are reserved unless you state otherwise.
+> **License:** Proprietary — © 2026 NobleLife International. All rights reserved. Unauthorized use, copying, or distribution is strictly prohibited.
 
 ---
 
