@@ -1,4 +1,4 @@
-﻿@using NLI_POS.Models
+@using NLI_POS.Models
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
@@ -56,6 +56,7 @@
                 <a class="nav-link text-white" asp-page="/Report/DailySales"><i class="fas fa-calendar-day me-2"></i> Daily Sales</a>
                 <a class="nav-link text-white" asp-page="/Report/SalesByDateRange"><i class="fas fa-calendar-week me-2"></i> Sales by Date Range</a>
                 <a class="nav-link text-white" asp-page="/Report/MonthlySales"><i class="fas fa-calendar-alt me-2"></i> Monthly Sales</a>
+                <a class="nav-link text-white" asp-page="/Report/OrderDetailsReport"><i class="fas fa-list-alt me-2"></i> Order Details</a>
                 <a class="nav-link text-white" asp-page="/Report/SalesQuota"><i class="fa-solid fa-bullseye me-2"></i> Sales Quota</a>
             </div>
         </li>

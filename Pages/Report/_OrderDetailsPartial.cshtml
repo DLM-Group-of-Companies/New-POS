@@ -1,0 +1,53 @@
+@model NLI_POS.Models.Order
+
+@if (Model != null)
+{
+    <!-- Order Header Info -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="card-title text-primary">Reference No.: @Model.OrderNo</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Purchased Date:</strong> @Model.OrderDate.ToString("MM-dd-yyyy HH:mm")</p>
+                    <p class="mb-1"><strong>Customer:</strong> @Model.Customers?.FirstName @Model.Customers?.LastName</p>
+                    <p class="mb-1"><strong>Remarks:</strong> @Model.Notes</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Keyer:</strong> @Model.EncodedBy</p>
+                    <p class="mb-1"><strong>Keyed Date:</strong> @Model.EncodeDate?.ToString("MM-dd-yyyy HH:mm")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Items Table -->
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered table-striped">
+            <thead class="table-success">
+                <tr>
+                    <th>Product</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-end">Qty</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detail in Model.OrderDetails)
+                {
+                    <tr>
+                        <td>@detail.Products?.ProductName</td>
+                        <td class="text-end">@detail.Price.ToString("N2")</td>
+                        <td class="text-end">@detail.Quantity</td>
+                        <td class="text-end">@detail.TotalPrice.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-warning fw-bold">
+                <tr>
+                    <td colspan="3" class="text-end">Total Amount:</td>
+                    <td class="text-end">@Model.TotAmount.ToString("N2")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
