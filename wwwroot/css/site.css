@@ -446,13 +446,18 @@ input[type="number"] {
     }
 
     .pos-yearlysales {
-        top: 0;
-        left: 600px;
+        top: 200px;
+        left: 0;
     }
 
     .pos-salesquota {
         top: 200px;
-        left: 100px;
+        left: 200px;
+    }
+
+    .pos-orderdetails {
+        top: 200px;
+        left: 400px;
     }
     /* for modal reports */
     /*end*/
