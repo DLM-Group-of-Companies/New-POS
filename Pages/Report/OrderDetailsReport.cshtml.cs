@@ -12,7 +12,7 @@ namespace NLI_POS.Pages.Report
         private readonly MainProductSalesReportService _reportService;
 
         public OrderDetailsReportModel(
-            ApplicationDbContext context, 
+            ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             MainProductSalesReportService reportService)
             : base(context, userManager)
@@ -48,6 +48,14 @@ namespace NLI_POS.Pages.Report
 
             if (SelectedYear == 0)
                 SelectedYear = DateTime.UtcNow.Year;
+
+            if (!OfficeId.HasValue)
+            {
+                Orders = new List<Order>();
+                TotalSales = 0;
+                SelectedOrder = null;
+                return Page();
+            }
 
             await LoadOrdersAsync();
 
@@ -85,6 +93,14 @@ namespace NLI_POS.Pages.Report
 
         private async Task LoadOrdersAsync()
         {
+            if (!OfficeId.HasValue)
+            {
+                Orders = new List<Order>();
+                TotalSales = 0;
+                SelectedOrder = null;
+                return;
+            }
+
             var (utcStart, utcEnd) = GetUtcRange();
 
             var ordersQuery = _context.Orders
@@ -92,12 +108,8 @@ namespace NLI_POS.Pages.Report
                     .ThenInclude(d => d.Products)
                 .Include(o => o.Customers)
                 .Include(o => o.Office)
-                .Where(o => o.OrderDate >= utcStart && o.OrderDate <= utcEnd && !o.IsVoided);
-
-            if (OfficeId.HasValue)
-            {
-                ordersQuery = ordersQuery.Where(o => o.OfficeId == OfficeId.Value);
-            }
+                .Where(o => o.OrderDate >= utcStart && o.OrderDate <= utcEnd && !o.IsVoided)
+                .Where(o => o.OfficeId == OfficeId.Value);
 
             Orders = await ordersQuery.OrderByDescending(o => o.OrderDate).ToListAsync();
             TotalSales = Orders.Sum(o => o.TotAmount);

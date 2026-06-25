@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model DashboardModel
 @{
     ViewData["Title"] = "Sales Dashboard";
@@ -8,11 +8,12 @@
         <h3 class="text-light mb-0">
             <i class="fas fa-tachometer-alt me-2"></i> Dashboard
         </h3>
-        <i class="fas fa-window-close fa-2xl text-light" role="button" title="Close" onclick="window.location = '../Index';"></i>
+        <i class="fas fa-window-close fa-2xl text-light" role="button" title="Close"
+           onclick="window.location = '../Index';"></i>
     </div>
     <hr class="text-light" />
     <div class="row mb-4" id="topKpis">
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
                 <div class="card-body d-flex align-items-center bg-success bg-gradient text-white">
                     <div class="me-3">
@@ -25,7 +26,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
                 <div class="card-body d-flex align-items-center bg-darkpurple bg-gradient text-white">
                     <div class="me-3">
@@ -33,12 +34,12 @@
                     </div>
                     <div>
                         <small class="text-uppercase fw-bold opacity-75">Orders Today</small>
-                        <h3 class="mb-0 fw-bold" id="orderCountToday">₱0.00</h3>
+                        <h3 class="mb-0 fw-bold" id="orderCountToday">0</h3>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
                 <div class="card-body d-flex align-items-center bg-butterscotch bg-gradient text-white">
                     <div class="me-3">
@@ -51,6 +52,19 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
+                <div class="card-body d-flex align-items-center bg-info bg-gradient text-white">
+                    <div class="me-3">
+                        <i class="fa-solid fa-user-plus fa-2xl"></i>
+                    </div>
+                    <div>
+                        <small class="text-uppercase fw-bold opacity-75">New Customers Today</small>
+                        <h3 class="mb-0 fw-bold" id="newCustomersToday">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <hr class="text-light" />
@@ -59,11 +73,9 @@
         <div class="col-md-3">
             <label asp-for="OfficeId" class="form-label text-light">Office</label>
             <select asp-for="OfficeId" class="form-select form-select-sm" asp-items="ViewBag.Offices">
-                @foreach (var office in Model.OfficeList) // assuming it's assigned to your ViewModel
+                @foreach (var office in Model.OfficeList)
                 {
-                    <option value="@office.Value"
-                            data-locale="@office.Locale"
-                            data-currency="@office.CurrencyCode">
+                    <option value="@office.Value" data-locale="@office.Locale" data-currency="@office.CurrencyCode">
                         @office.Text
                     </option>
                 }
@@ -81,120 +93,146 @@
         </div>
 
         <div class="col-md-3 align-self-end">
-            <button type="button" id="generateReportBtn" class="btn btn-sm btn-primary bg-gradient w-100"><i class="fas fa-filter me-2"></i> Apply Filters</button>
-        </div>
-    </form>
+            <button type="button" id="generateReportBtn" class="btn btn-sm btn-primary bg-gradient w-100"><i
+                class="fas fa-filter me-2"></i> Apply Filters</button>
+            </div>
+        </form>
 
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h2 class="h5 mb-0">Sales Per Products</h2>
-                    <div class="btn-group btn-group-sm" role="group" aria-label="Product Type">
-                        <button type="button" class="btn btn-outline-dark active" id="btnRegular">Regular</button>
-                        <button type="button" class="btn btn-outline-secondary" id="btnPromo">Promo/Package</button>
+        <div class="row">
+            <div class="col-md-6 mb-4 d-flex">
+                <div class="card shadow-sm p-3 flex-fill d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h5 mb-0">Sales Per Products</h2>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Product Type">
+                            <button type="button" class="btn btn-outline-dark active" id="btnRegular">Regular</button>
+                            <button type="button" class="btn btn-outline-secondary" id="btnPromo">Promo/Package</button>
+                        </div>
+                    </div>
+                    <div class="flex-fill">
+                        <canvas id="salesPerProductChart" style="height: 200px; width: 100%;"></canvas>
                     </div>
                 </div>
-                <canvas id="salesPerProductChart" height="100"></canvas>
             </div>
-        </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <div class="card shadow-sm p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h2 class="h5 mb-3">Top Sales People</h2>
-                            <div class="btn-group btn-group-sm" role="group" aria-label="Product Type">
-                                <button type="button" class="btn btn-outline-dark active" id="btnYearToDate">Year to Date</button>
-                                <button type="button" class="btn btn-outline-secondary" id="btnMonthToDate">Month to Date</button>
+            <div class="col-md-6 mb-4 d-flex">
+                <div class="card shadow-sm p-3 flex-fill d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h5 mb-0">Top Sales People</h2>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Product Type">
+                            <button type="button" class="btn btn-outline-dark active" id="btnYearToDate">Year to
+                                Date</button>
+                                <button type="button" class="btn btn-outline-secondary" id="btnMonthToDate">Month to
+                                    Date</button>
+                                </div>
+                            </div>
+                            <div class="flex-fill">
+                                <canvas id="topSalespeopleChart" style="height: 250px; width: 100%;"></canvas>
                             </div>
                         </div>
-                        <canvas id="topSalespeopleChart" style="max-height: 300px;"></canvas>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12 mb-4">
-                    <div class="card shadow-sm p-3">
-                        <div class="chart-container" style="height: 350px;">
-                            <h2 class="h5 mb-3">Sales Trend</h2>
-                            <canvas id="salesTrendChart"></canvas>
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h2 class="h5 mb-0">Sales Trend</h2>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Time Period">
+                                    <button type="button" class="btn btn-outline-dark active" id="btn7Days">7 Days</button>
+                                    <button type="button" class="btn btn-outline-secondary" id="btn30Days">30 Days</button>
+                                </div>
+                            </div>
+                            <canvas id="salesTrendChart" style="max-height: 250px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <h2 class="h5 mb-3">Sales by Office</h2>
+                            <canvas id="salesByOfficeChart" style="max-height: 200px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <h2 class="h5 mb-3">Payment Methods</h2>
+                            <canvas id="paymentMethodsChart" style="max-height: 200px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <h2 class="h5 mb-3">Order Status</h2>
+                            <canvas id="orderStatusChart" style="max-height: 200px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <h2 class="h5 mb-3">This Week vs Last Week</h2>
+                            <div id="thisWeekVsLastWeek" class="text-center">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p class="text-muted mb-1">Last Week</p>
+                                        <h3 class="fw-bold text-secondary" id="lastWeekSales">₱0.00</h3>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="text-muted mb-1">This Week</p>
+                                        <h3 class="fw-bold text-primary" id="thisWeekSales">₱0.00</h3>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <span id="weekChange" class="h4 fw-bold">0%</span>
+                                    <span id="weekChangeIcon" class="ms-2"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <h2 class="h5 mb-3">Low Stock Alerts</h2>
+                            <div id="lowStockAlerts" class="list-group">
+                                <div class="list-group-item list-group-item-warning">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">Product Name</span>
+                                        <span class="badge bg-warning rounded-pill">X left</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <div class="card shadow-sm p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h2 class="h5 mb-0">Recent Orders</h2>
+                                <a href="../Order/Index" class="btn btn-sm btn-outline-primary">View All Orders</a>
+                            </div>
+                            <div class="table-responsive">
+                                <table id="recentOrdersTable" class="table table-hover table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Office</th>
+                                            <th>Amount</th>
+                                            <th>Payment</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-3">
-                <h2 class="h5 mb-3">Top Customers</h2>
-                <div style="height: 428px;">
-                    <canvas id="topCustomersChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-3">
-                <h2 class="h5 mb-3">Repeat Customers</h2>
-                <div class="small">
-                    <table id="repeatCustomersTable" class="table table-striped table-sm ">
-                        <thead>
-                            <tr>
-                                <th>Customer</th>
-                                <th>Orders</th>
-                                <th>Last Order</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-3">
-                <h2 class="h5 mb-3">Product Trend</h2>
-                <div style="height: 428px;">
-                    <div class="btn-group btn-group-sm" role="group" aria-label="Product Type">
-                        <button type="button" class="btn btn-outline-dark active" id="btnProdRegular">Regular</button>
-                        <button type="button" class="btn btn-outline-secondary" id="btnProdPromo">Promo/Package</button>
-                    </div>
-                    <canvas id="productTrendChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-3">
-                <h2 class="h5 mb-3">Staff Purchase</h2>
-                <div class="table-responsive" style="height: 428px;">
-                    <div class="small">
-                        <table id="staffCustomerProductsTable" class="table table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Staff</th>
-                                    <th>Product</th>
-                                    <th>Qty</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-@section Scripts {
-    <script src="~/js/dashboard.js"></script>
-}
+            @section Scripts {
+                <script src="~/js/dashboard.js"></script>
+            }

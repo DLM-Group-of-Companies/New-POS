@@ -31,7 +31,8 @@
         <h3 class="text-primary mb-0">
             <i class="fas fa-list-alt me-2"></i> @ViewData["Title"]
         </h3>
-        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close" onclick="window.location = '../Index';"></i>
+        <i class="fas fa-window-close fa-2xl text-danger" role="button" title="Close"
+           onclick="window.location = '../Index';"></i>
     </div>
 
     <hr />
@@ -40,13 +41,12 @@
         <form method="get" class="row g-2 align-items-end mb-1">
             <div class="col-md-3">
                 <label for="officeFilter" class="form-label">Office</label>
-                <select id="officeFilter" name="OfficeId" class="form-select" required onchange="setTimeZoneFromSelected(this)">
+                <select id="officeFilter" name="OfficeId" class="form-select" required
+                        onchange="setTimeZoneFromSelected(this)">
                     <option value="">Select Office</option>
                     @foreach (var office in Model.OfficeList ?? new List<OfficeSelectItem>())
                     {
-                        <option value="@office.Value"
-                                data-timezone="@office.TimeZone"
-                                data-currency="@office.CurrencyCode"
+                        <option value="@office.Value" data-timezone="@office.TimeZone" data-currency="@office.CurrencyCode"
                                 selected="@(office.Value == Model.OfficeId?.ToString() ? "selected" : null)">
                             @office.Text
                         </option>
@@ -87,12 +87,9 @@
             @if (Model.Orders != null && Model.Orders.Any())
             {
                 <div class="col-md-2">
-                    <a asp-page-handler="Export" 
-                       asp-route-OfficeId="@Model.OfficeId"
-                       asp-route-TimeZoneId="@Model.TimeZoneId"
-                       asp-route-SelectedMonth="@Model.SelectedMonth"
-                       asp-route-SelectedYear="@Model.SelectedYear"
-                       class="btn btn-success w-100">
+                    <a asp-page-handler="Export" asp-route-OfficeId="@Model.OfficeId"
+                       asp-route-TimeZoneId="@Model.TimeZoneId" asp-route-SelectedMonth="@Model.SelectedMonth"
+                       asp-route-SelectedYear="@Model.SelectedYear" class="btn btn-success w-100">
                         <i class="fas fa-file-excel me-2"></i> Export to Excel
                     </a>
                 </div>
@@ -110,10 +107,8 @@
                     @foreach (var order in Model.Orders)
                     {
                         var isSelected = Model.SelectedOrder?.Id == order.Id;
-                        <button type="button" 
-                                class="list-group-item list-group-item-action @(isSelected ? "active" : "")" 
-                                data-order-id="@order.Id"
-                                onclick="selectOrder(@order.Id)">
+                        <button type="button" class="list-group-item list-group-item-action @(isSelected ? "active" : "")"
+                                data-order-id="@order.Id" onclick="selectOrder(@order.Id)">
                             <div class="d-flex w-100 justify-content-between">
                                 <small class="text-muted"># @order.OrderNo</small>
                                 <small class="text-success fw-bold">@order.TotAmount.ToString("N2")</small>
@@ -132,7 +127,8 @@
             </div>
 
             <!-- Right Panel: Order Details -->
-            <div class="col-12 col-md-8 d-flex flex-column border-top border-md-0" id="orderDetailsContainer" style="max-height: 100%;">
+            <div class="col-12 col-md-8 d-flex flex-column border-top border-md-0" id="orderDetailsContainer"
+                 style="max-height: 100%;">
                 <h5 class="text-secondary mb-0 p-2 bg-light rounded-0 border-bottom">Details</h5>
                 <div class="flex-grow-1 overflow-y-auto p-3" id="orderDetailsContent">
                     @if (Model.SelectedOrder != null)
@@ -143,97 +139,107 @@
                                 <h6 class="card-title text-primary">Reference No.: @Model.SelectedOrder.OrderNo</h6>
                                 <div class="row g-3">
                                     <div class="col-12 col-md-6">
-                                        <p class="mb-1"><strong>Purchased Date:</strong> @Model.SelectedOrder.OrderDate.ToString("MM-dd-yyyy HH:mm")</p>
-                                        <p class="mb-1"><strong>Customer:</strong> @Model.SelectedOrder.Customers?.FirstName @Model.SelectedOrder.Customers?.LastName</p>
-                                        <p class="mb-1"><strong>Remarks:</strong> @Model.SelectedOrder.Notes</p>
+                                        <p class="mb-1"><strong>Purchased Date:</strong>
+                                            @Model.SelectedOrder.OrderDate.ToString("MM-dd-yyyy HH:mm")</p>
+                                            <p class="mb-1"><strong>Customer:</strong> @Model.SelectedOrder.Customers?.FirstName
+                                                @Model.SelectedOrder.Customers?.LastName</p>
+                                                <p class="mb-1"><strong>Remarks:</strong> @Model.SelectedOrder.Notes</p>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <p class="mb-1"><strong>Keyer:</strong> @Model.SelectedOrder.EncodedBy</p>
+                                                <p class="mb-1"><strong>Keyed Date:</strong>
+                                                    @Model.SelectedOrder.EncodeDate?.ToString("MM-dd-yyyy HH:mm")</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-12 col-md-6">
-                                        <p class="mb-1"><strong>Keyer:</strong> @Model.SelectedOrder.EncodedBy</p>
-                                        <p class="mb-1"><strong>Keyed Date:</strong> @Model.SelectedOrder.EncodeDate?.ToString("MM-dd-yyyy HH:mm")</p>
+
+                                    <!-- Product Items Table -->
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered table-striped">
+                                            <thead class="table-success">
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th class="text-end">Price</th>
+                                                    <th class="text-end">Qty</th>
+                                                    <th class="text-end">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var detail in Model.SelectedOrder.OrderDetails)
+                                                {
+                                                    <tr>
+                                                        <td>@detail.Products?.ProductName</td>
+                                                        <td class="text-end">@detail.Price.ToString("N2")</td>
+                                                        <td class="text-end">@detail.Quantity</td>
+                                                        <td class="text-end">@detail.TotalPrice.ToString("N2")</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                            <tfoot class="table-warning fw-bold">
+                                                <tr>
+                                                    <td colspan="3" class="text-end">Total Amount:</td>
+                                                    <td class="text-end">@Model.SelectedOrder.TotAmount.ToString("N2")</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
                                     </div>
-                                </div>
+                                }
                             </div>
                         </div>
-
-                        <!-- Product Items Table -->
-                        <div class="table-responsive">
-                            <table class="table table-sm table-bordered table-striped">
-                                <thead class="table-success">
-                                    <tr>
-                                        <th>Product</th>
-                                        <th class="text-end">Price</th>
-                                        <th class="text-end">Qty</th>
-                                        <th class="text-end">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var detail in Model.SelectedOrder.OrderDetails)
-                                    {
-                                        <tr>
-                                            <td>@detail.Products?.ProductName</td>
-                                            <td class="text-end">@detail.Price.ToString("N2")</td>
-                                            <td class="text-end">@detail.Quantity</td>
-                                            <td class="text-end">@detail.TotalPrice.ToString("N2")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                                <tfoot class="table-warning fw-bold">
-                                    <tr>
-                                        <td colspan="3" class="text-end">Total Amount:</td>
-                                        <td class="text-end">@Model.SelectedOrder.TotAmount.ToString("N2")</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-info" role="alert">
-            No orders found for the selected criteria.
-        </div>
-    }
-</div>
-
-@section Scripts {
-    <script>
-        // Set timezone from selected office
-        function setTimeZoneFromSelected(select) {
-            const opt = select.options[select.selectedIndex];
-            const tz = opt?.dataset?.timezone || '';
-            document.getElementById('timeZoneInput').value = tz;
-        }
-
-        // Initialize timezone on page load
-        (function () {
-            const sel = document.getElementById('officeFilter');
-            if (sel) setTimeZoneFromSelected(sel);
-        })();
-
-        // Select order using AJAX - no page refresh!
-        async function selectOrder(orderId) {
-            // Update active state on buttons
-            const buttons = document.querySelectorAll('#orderList .list-group-item');
-            buttons.forEach(btn => {
-                if (btn.dataset.orderId == orderId) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
+                    </div>
                 }
-            });
+    else
+                {
+                    <div class="alert alert-info" role="alert">
+                        @if (!Model.OfficeId.HasValue)
+                        {
+                            <span>Please select an office to display records.</span>
+                        }
+                        else
+                        {
+                            <span>No orders found for the selected criteria.</span>
+                        }
+                    </div>
+                }
+            </div>
 
-            try {
-                // Fetch partial view from server
-                const response = await fetch(`?handler=OrderDetails&orderId=${orderId}`);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const html = await response.text();
-                document.getElementById('orderDetailsContent').innerHTML = html;
-            } catch (error) {
-                console.error('Error loading order details:', error);
+            @section Scripts {
+                <script>
+                    // Set timezone from selected office
+                    function setTimeZoneFromSelected(select) {
+                        const opt = select.options[select.selectedIndex];
+                        const tz = opt?.dataset?.timezone || '';
+                        document.getElementById('timeZoneInput').value = tz;
+                    }
+
+                    // Initialize timezone on page load
+                    (function () {
+                        const sel = document.getElementById('officeFilter');
+                        if (sel) setTimeZoneFromSelected(sel);
+                    })();
+
+                    // Select order using AJAX - no page refresh!
+                    async function selectOrder(orderId) {
+                        // Update active state on buttons
+                        const buttons = document.querySelectorAll('#orderList .list-group-item');
+                        buttons.forEach(btn => {
+                            if (btn.dataset.orderId == orderId) {
+                                btn.classList.add('active');
+                            } else {
+                                btn.classList.remove('active');
+                            }
+                        });
+
+                        try {
+                            // Fetch partial view from server
+                            const response = await fetch(`?handler=OrderDetails&orderId=${orderId}`);
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            const html = await response.text();
+                            document.getElementById('orderDetailsContent').innerHTML = html;
+                        } catch (error) {
+                            console.error('Error loading order details:', error);
+                        }
+                    }
+                </script>
             }
-        }
-    </script>
-}
