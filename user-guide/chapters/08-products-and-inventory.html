@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Products and Inventory — NLI-POS User Guide">
+  <title>Products and Inventory · NLI-POS User Guide</title>
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <script defer src="../assets/js/search-index.js"></script>
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body data-chapter-prefix="./">
+  <a class="skip-link" href="#main">Skip to chapter</a>
+  <header class="mobile-header">
+    <a class="brand" href="../index.html">NLI-POS <span>User Guide</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Chapters</button>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Guide navigation">
+      <a class="brand" href="../index.html">NLI-POS <span>User Guide</span></a>
+      <label class="search-label" for="guide-search">Search this guide</label>
+      <input id="guide-search" type="search" placeholder="Search topics…" autocomplete="off">
+      <div id="search-results" class="search-results" aria-live="polite"></div>
+      <nav aria-label="Chapters"><ol class="chapter-list"><li><a class="chapter-link" href="01-introduction.html"><span>01</span> Introduction</a></li>
+<li><a class="chapter-link" href="02-getting-started.html"><span>02</span> Getting Started</a></li>
+<li><a class="chapter-link" href="03-making-a-sale.html"><span>03</span> Making a Sale</a></li>
+<li><a class="chapter-link" href="04-receipts.html"><span>04</span> Receipts</a></li>
+<li><a class="chapter-link" href="05-voids-refunds-and-returns.html"><span>05</span> Voids, Refunds, and Returns</a></li>
+<li><a class="chapter-link" href="06-holding-and-recalling-transactions.html"><span>06</span> Holding and Recalling Transactions</a></li>
+<li><a class="chapter-link" href="07-shift-and-cash-drawer.html"><span>07</span> Shift and Cash Drawer</a></li>
+<li><a class="chapter-link active" href="08-products-and-inventory.html"><span>08</span> Products and Inventory</a></li>
+<li><a class="chapter-link" href="09-customers.html"><span>09</span> Customers</a></li>
+<li><a class="chapter-link" href="10-reports-and-reading-them.html"><span>10</span> Reports and Reading Them</a></li>
+<li><a class="chapter-link" href="11-users-roles-and-settings.html"><span>11</span> Users, Roles, and Settings</a></li>
+<li><a class="chapter-link" href="12-troubleshooting-and-faq.html"><span>12</span> Troubleshooting and FAQ</a></li>
+<li><a class="chapter-link" href="13-glossary.html"><span>13</span> Glossary</a></li></ol></nav>
+      <a class="home-link" href="../index.html">Guide home</a>
+    </aside>
+    <main id="main" class="main">
+      <div class="article-grid"><nav class="page-toc" aria-label="On this page"><strong>On this page</strong><ol><li><a href="#add-or-update-a-product">Add or update a product</a></li><li><a href="#review-and-record-stock">Review and record stock</a></li><li><a href="#transfer-stock">Transfer stock</a></li><li><a href="#locations-transactions-and-conversions">Locations, transactions, and conversions</a></li></ol></nav>
+        <article class="chapter">
+          <div class="chapter-meta">Chapter 08</div>
+          <p class="chapter-audience">For: Admin, Inventory</p>
+          <h1 id="products-and-inventory">Products and Inventory</h1>
+<p>Product and stock setup affects checkout. Use only the offices and locations assigned to your work. The <strong>Settings</strong> menu is visible to administrators; inventory access may also depend on your role and office access.</p>
+<h2 id="add-or-update-a-product">Add or update a product</h2>
+<p><img src="../images/product-list.png" alt="Products list with live product records concealed" loading="lazy"> Figure: Search the Products list and open a product to view or edit; product records are concealed.</p>
+<ol>
+<li>Open <strong>Settings</strong> &gt; <strong>Products</strong>. <strong>Expected result:</strong> The Products list opens.</li>
+<li>Select <strong>Add New</strong> to create a product, or choose the edit action beside a product. <strong>Expected result:</strong> The product form opens.</li>
+<li>Choose the <strong>Product Class</strong>, <strong>Product Type</strong>, and <strong>Category</strong>. <strong>Expected result:</strong> The product is assigned the appropriate grouping.</li>
+<li>Enter the <strong>Product Code</strong>, <strong>Product Name</strong>, and any description. <strong>Expected result:</strong> The product identity is filled in.</li>
+<li>Choose the price country and enter the applicable price fields, such as <strong>Regular</strong>, <strong>Standard Dist</strong>, <strong>Staff</strong>, <strong>BPP</strong>, or <strong>Med Pack</strong>. <strong>Expected result:</strong> The product has the prices needed by its customer classes.</li>
+<li>Set <strong>Active</strong>, <strong>Freebie Available</strong>, and <strong>Staff Available</strong> as appropriate. <strong>Expected result:</strong> Product availability matches the store&#x27;s setup.</li>
+<li>Select <strong>Save</strong>. <strong>Expected result:</strong> The product or product changes are saved.</li>
+</ol>
+<p>The Products list includes search and export or print actions. <strong>Promo/Package</strong> products may have combinations that identify their component products and quantities.</p>
+<p><img src="../images/product-details.png" alt="Product details form with product and price values concealed" loading="lazy"> Figure: Review product classification, prices, and availability; live product values are concealed.</p>
+<p><img src="../images/product-edit-form.png" alt="Edit Product form with product and price values concealed" loading="lazy"> Figure: Edit product details and customer-class prices; live product values are concealed.</p>
+<p><img src="../images/product-combinations.png" alt="Package product form with product and price values concealed" loading="lazy"> Figure: Review package components and promo settings; live product values are concealed.</p>
+<p><img src="../images/Add-Product.png" alt="New Product form" loading="lazy"> Figure: Set product classification, prices, and availability before saving.</p>
+<h2 id="review-and-record-stock">Review and record stock</h2>
+<ol>
+<li>Open <strong>Settings</strong> &gt; <strong>Inventory</strong>.</li>
+<li>Choose <strong>Warehouse</strong>, <strong>Stockroom</strong>, or <strong>Offices</strong> in the inventory navigation. <strong>Expected result:</strong> The selected location&#x27;s inventory list appears.</li>
+<li>Review the product&#x27;s stock quantity and minimum level.</li>
+<li>To record stock, select <strong>Add New</strong>, choose the <strong>Location</strong> and <strong>Product</strong>, enter <strong>Stock Quantity</strong> and <strong>Minimum Level</strong>, and add <strong>Remarks</strong> if needed. <strong>Expected result:</strong> The stock entry is ready to save.</li>
+<li>Select <strong>Save</strong>. <strong>Expected result:</strong> The stock record is saved for the selected location.</li>
+</ol>
+<p><img src="../images/inventory-stock-list.png" alt="Warehouse inventory list with live stock data concealed" loading="lazy"> Figure: Review warehouse stock and minimum levels; live product and quantity data are concealed.</p>
+<p><img src="../images/inventory-office-inventory.png" alt="Office inventory list with live stock data concealed" loading="lazy"> Figure: Review stock for an office; live product and quantity data are concealed.</p>
+<p><img src="../images/inventory-stockroom.png" alt="Stockroom inventory list with live stock data concealed" loading="lazy"> Figure: Review stock for a stockroom; live product and quantity data are concealed.</p>
+<p><img src="../images/inventory-add-stock.png" alt="Add Inventory Stock form with selected values concealed" loading="lazy"> Figure: Record a stock quantity and minimum level; the example location and product are concealed.</p>
+<h2 id="transfer-stock">Transfer stock</h2>
+<ol>
+<li>Open the relevant inventory list and choose the product&#x27;s transfer action. <strong>Expected result:</strong> The Stock Transfer form opens.</li>
+<li>Choose the <strong>From</strong> and <strong>To</strong> locations. <strong>Expected result:</strong> The transfer identifies the source and destination.</li>
+<li>Enter the <strong>Quantity</strong> and any <strong>Remarks</strong>. <strong>Expected result:</strong> The transfer contains the quantity to move and any note.</li>
+<li>Select <strong>Transfer</strong>. <strong>Expected result:</strong> Stock moves between locations and the transfer is recorded.</li>
+</ol>
+<h2 id="locations-transactions-and-conversions">Locations, transactions, and conversions</h2>
+<ul>
+<li>Use <strong>Locations</strong> to add or edit a location&#x27;s <strong>Name</strong>, <strong>Location Type</strong>, and optional <strong>Office</strong>.</li>
+<li>Use <strong>Transactions</strong> to review recorded stock movements by date, type, product, location, quantity, and user.</li>
+<li>Use <strong>Conversion</strong> to manage rules connecting a <strong>From Product</strong>, <strong>To Product</strong>, and conversion <strong>Quantity</strong>.</li>
+</ul>
+<p><img src="../images/inventory-stock-transfer.png" alt="Stock Transfer form with live location and product values concealed" loading="lazy"> Figure: Choose source and destination locations and enter a quantity; example values are concealed.</p>
+<p><img src="../images/placeholder.png" alt="Screenshot coming soon: Inventory Locations" loading="lazy"> Figure: Review warehouse, stockroom, and office inventory locations (screenshot to be added)</p>
+<p><img src="../images/inventory-transactions.png" alt="Inventory transaction history with live records concealed" loading="lazy"> Figure: Review stock movements by date, product, location, and user; live records are concealed.</p>
+<p><img src="../images/inventory-conversions.png" alt="Product conversion rules with live product values concealed" loading="lazy"> Figure: Review product conversion rules; the example product names and quantities are concealed.</p>
+<p><img src="../images/inventory-conversion-rule.png" alt="Add Conversion Rule form with selected values concealed" loading="lazy"> Figure: Enter a source product, destination product, and conversion quantity; example values are concealed.</p>
+          <nav class="chapter-nav" aria-label="Previous and next chapter"><a rel="prev" href="08-products-and-inventory.html">← Previous: Products and Inventory</a><a rel="next" href="09-customers.html">Next: Customers →</a></nav>
+        </article>
+      </div>
+    </main>
+  </div>
+  <div class="image-viewer" role="dialog" aria-modal="true" aria-label="Expanded screenshot" hidden>
+    <button class="image-viewer-close" type="button" aria-label="Close expanded screenshot">×</button>
+    <img alt="">
+  </div>
+</body>
+</html>
