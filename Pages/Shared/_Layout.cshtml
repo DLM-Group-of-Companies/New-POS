@@ -74,6 +74,7 @@
     <! -- Chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="@((User.Identity?.IsAuthenticated ?? false) ? "with-sidebar" : "no-sidebar")">
 
