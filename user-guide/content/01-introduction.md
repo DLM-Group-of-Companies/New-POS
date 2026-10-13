@@ -28,6 +28,6 @@ The roles configured in the application are **Admin**, **CS**, **Accounting**, a
 
 The application does not provide a cash-drawer shift workflow or a hold-and-recall workflow. See [Voids, Refunds, and Returns](05-voids-refunds-and-returns.html), [Holding and Recalling Transactions](06-holding-and-recalling-transactions.html), and [Shift and Cash Drawer](07-shift-and-cash-drawer.html) for details.
 
-<!-- TODO-SCREENSHOT: help-overview.png -->
-![Screenshot coming soon: NLI-POS Help page and chapter list](../images/placeholder.png)
-Figure: NLI-POS Help page and chapter list (screenshot to be added)
+<!-- TODO-SCREENSHOT: guide-home.png -->
+![Screenshot coming soon: Standalone User Guide home page](../images/placeholder.png)
+Figure: Standalone User Guide home page (screenshot to be added)

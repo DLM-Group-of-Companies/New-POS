@@ -36,6 +36,5 @@ The order form does not provide a general manual discount or tax-entry field. Pr
 
 For receipt and reprint steps, see [Receipts](04-receipts.html).
 
-<!-- TODO-SCREENSHOT: payment-lines.png -->
-![Screenshot coming soon: Payment rows and total amount due](../images/placeholder.png)
-Figure: Review payment methods, amounts, charges, references, and amount due (screenshot to be added)
+![Payment rows with transaction values concealed](../images/payment-lines.png)
+Figure: Review payment methods, amounts, charges, and references; example transaction values are concealed.

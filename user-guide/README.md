@@ -22,7 +22,7 @@ This folder is a standalone, static guide website. Open `index.html` directly in
 3. Reference the image from the Markdown with `../images/filename.png`.
 4. Add a caption on the line immediately after the image.
 
-Use screenshots approved for publication; do not include real customer, account, or live transaction data.
+Use screenshots approved for publication; do not include real customer, account, or live transaction data. The 25 POS screenshots currently included in this guide are redacted copies: customer, employee, transaction, product-price, and stock values are concealed. The raw source screenshots in `docs/screenshots/` remain unchanged and are not published.
 
 ## Regenerate HTML pages and the search index
 

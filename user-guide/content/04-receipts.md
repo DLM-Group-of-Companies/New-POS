@@ -14,13 +14,11 @@ You can open a receipt from an order's details, print it through your browser, o
 4. Select **Print**. **Expected result:** Your browser's print dialog opens.
 5. Choose an available printer and print settings, then confirm printing. **Expected result:** The browser sends the receipt to the selected printer.
 
-<!-- TODO-SCREENSHOT: order-list.png -->
-![Screenshot coming soon: Orders list with search and office filter](../images/placeholder.png)
-Figure: Find the saved order in the Orders list before opening its details (screenshot to be added)
+![Orders list with customer and transaction data concealed](../images/order-list.png)
+Figure: Find a saved order in the Orders list; customer and transaction details are concealed.
 
-<!-- TODO-SCREENSHOT: order-details.png -->
-![Screenshot coming soon: Order Details page](../images/placeholder.png)
-Figure: Review the saved order before opening its receipt (screenshot to be added)
+![Order Details page with customer and transaction data concealed](../images/order-details.png)
+Figure: Review a saved order before opening its receipt; customer and transaction details are concealed.
 
 ## Reprint a receipt
 
@@ -36,6 +34,5 @@ If receipt email reports an error, check the address and ask your administrator 
 
 The application does not provide a receipt-format or printer-setup page. Printing uses the browser's print dialog.
 
-<!-- TODO-SCREENSHOT: receipt-preview.png -->
-![Screenshot coming soon: Receipt preview with Print and Email actions](../images/placeholder.png)
-Figure: Open a saved order's receipt to print it or email it (screenshot to be added)
+![Receipt preview with customer and purchase data concealed](../images/receipt-preview.png)
+Figure: Open a saved order's receipt to print or email it; purchase details are concealed.

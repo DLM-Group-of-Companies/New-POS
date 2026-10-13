@@ -9,9 +9,8 @@ Product and stock setup affects checkout. Use only the offices and locations ass
 
 ## Add or update a product
 
-<!-- TODO-SCREENSHOT: product-list.png -->
-![Screenshot coming soon: Products list](../images/placeholder.png)
-Figure: Search the Products list and open a product to view or edit (screenshot to be added)
+![Products list with live product records concealed](../images/product-list.png)
+Figure: Search the Products list and open a product to view or edit; product records are concealed.
 
 1. Open **Settings** > **Products**. **Expected result:** The Products list opens.
 2. Select **Add New** to create a product, or choose the edit action beside a product. **Expected result:** The product form opens.
@@ -23,13 +22,14 @@ Figure: Search the Products list and open a product to view or edit (screenshot 
 
 The Products list includes search and export or print actions. **Promo/Package** products may have combinations that identify their component products and quantities.
 
-<!-- TODO-SCREENSHOT: product-details-and-prices.png -->
-![Screenshot coming soon: Product details and price fields](../images/placeholder.png)
-Figure: Review a product's classification, prices, and availability (screenshot to be added)
+![Product details form with product and price values concealed](../images/product-details.png)
+Figure: Review product classification, prices, and availability; live product values are concealed.
 
-<!-- TODO-SCREENSHOT: product-combinations.png -->
-![Screenshot coming soon: Package product combinations](../images/placeholder.png)
-Figure: Review the component products and quantities configured for a package (screenshot to be added)
+![Edit Product form with product and price values concealed](../images/product-edit-form.png)
+Figure: Edit product details and customer-class prices; live product values are concealed.
+
+![Package product form with product and price values concealed](../images/product-combinations.png)
+Figure: Review package components and promo settings; live product values are concealed.
 
 ![New Product form](../images/Add-Product.png)
 Figure: Set product classification, prices, and availability before saving.
@@ -42,9 +42,17 @@ Figure: Set product classification, prices, and availability before saving.
 4. To record stock, select **Add New**, choose the **Location** and **Product**, enter **Stock Quantity** and **Minimum Level**, and add **Remarks** if needed. **Expected result:** The stock entry is ready to save.
 5. Select **Save**. **Expected result:** The stock record is saved for the selected location.
 
-<!-- TODO-SCREENSHOT: inventory-stock-list.png -->
-![Screenshot coming soon: Inventory stock list with a selected location](../images/placeholder.png)
-Figure: Review stock quantity and minimum level for a warehouse, stockroom, or office (screenshot to be added)
+![Warehouse inventory list with live stock data concealed](../images/inventory-stock-list.png)
+Figure: Review warehouse stock and minimum levels; live product and quantity data are concealed.
+
+![Office inventory list with live stock data concealed](../images/inventory-office-inventory.png)
+Figure: Review stock for an office; live product and quantity data are concealed.
+
+![Stockroom inventory list with live stock data concealed](../images/inventory-stockroom.png)
+Figure: Review stock for a stockroom; live product and quantity data are concealed.
+
+![Add Inventory Stock form with selected values concealed](../images/inventory-add-stock.png)
+Figure: Record a stock quantity and minimum level; the example location and product are concealed.
 
 ## Transfer stock
 
@@ -59,18 +67,18 @@ Figure: Review stock quantity and minimum level for a warehouse, stockroom, or o
 - Use **Transactions** to review recorded stock movements by date, type, product, location, quantity, and user.
 - Use **Conversion** to manage rules connecting a **From Product**, **To Product**, and conversion **Quantity**.
 
-<!-- TODO-SCREENSHOT: inventory-stock-transfer.png -->
-![Screenshot coming soon: Stock Transfer form](../images/placeholder.png)
-Figure: Choose the source and destination locations and enter the transfer quantity (screenshot to be added)
+![Stock Transfer form with live location and product values concealed](../images/inventory-stock-transfer.png)
+Figure: Choose source and destination locations and enter a quantity; example values are concealed.
 
 <!-- TODO-SCREENSHOT: inventory-locations.png -->
 ![Screenshot coming soon: Inventory Locations](../images/placeholder.png)
 Figure: Review warehouse, stockroom, and office inventory locations (screenshot to be added)
 
-<!-- TODO-SCREENSHOT: inventory-transactions.png -->
-![Screenshot coming soon: Inventory transaction history](../images/placeholder.png)
-Figure: Review stock movement history by date, product, location, and user (screenshot to be added)
+![Inventory transaction history with live records concealed](../images/inventory-transactions.png)
+Figure: Review stock movements by date, product, location, and user; live records are concealed.
 
-<!-- TODO-SCREENSHOT: inventory-conversions.png -->
-![Screenshot coming soon: Product conversion rules](../images/placeholder.png)
-Figure: Review the products and quantities in a conversion rule (screenshot to be added)
+![Product conversion rules with live product values concealed](../images/inventory-conversions.png)
+Figure: Review product conversion rules; the example product names and quantities are concealed.
+
+![Add Conversion Rule form with selected values concealed](../images/inventory-conversion-rule.png)
+Figure: Enter a source product, destination product, and conversion quantity; example values are concealed.

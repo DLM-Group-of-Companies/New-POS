@@ -10,9 +10,8 @@ Reports help you review recorded sales and salesperson targets. Choose the corre
 
 The **Dashboard** shows total sales, order count, average order value, and charts for sales trends, products, salespeople, customers, staff purchases, and payment methods. Choose **Office**, **Start Date**, and **End Date**, then select **Apply Filters**. Use chart controls where shown to change the category or comparison period.
 
-<!-- TODO-SCREENSHOT: sales-dashboard.png -->
-![Screenshot coming soon: Sales Dashboard](../images/placeholder.png)
-Figure: Review sales indicators and charts for the selected office and date range (screenshot to be added)
+![Sales Dashboard with live sales and employee data concealed](../images/sales-dashboard.png)
+Figure: Review sales indicators and charts; live sales and employee data are concealed.
 
 ## Daily Sales
 
@@ -54,9 +53,8 @@ Figure: Choose the office, month, and year before reviewing or exporting Monthly
 3. Select an order in **Purchases**. **Expected result:** **Details** shows the customer, date, remarks, products, quantities, and total.
 4. Select **Export to Excel** to download the filtered report.
 
-<!-- TODO-SCREENSHOT: order-details-report.png -->
-![Screenshot coming soon: Order Details report with Purchases and Details](../images/placeholder.png)
-Figure: Select a purchase to review the order and its line items (screenshot to be added)
+![Order Details report with customer and transaction data concealed](../images/order-details-report.png)
+Figure: Select a purchase to review the order and its line items; live records are concealed.
 
 ## Sales Quota
 

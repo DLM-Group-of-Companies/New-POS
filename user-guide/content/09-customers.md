@@ -13,9 +13,8 @@ Use **Customer** to search for a customer, review their profile, or register a n
 3. Open the customer's details. **Expected result:** The customer profile appears.
 4. Choose **Customer Information** or **Order History** to review the profile or recorded orders.
 
-<!-- TODO-SCREENSHOT: customer-list.png -->
-![Screenshot coming soon: Customers list](../images/placeholder.png)
-Figure: Search or filter customers from the Customers list (screenshot to be added)
+![Customers list with customer records concealed](../images/customer-list.png)
+Figure: Search or filter customers from the Customers list; personal records are concealed.
 
 <!-- TODO-SCREENSHOT: customer-profile-and-order-history.png -->
 ![Screenshot coming soon: Customer profile and Order History](../images/placeholder.png)
@@ -34,8 +33,7 @@ Figure: Complete the required identity, customer class, office, and country fiel
 
 During checkout, you can also open **Search Customer** and select **New Customer**. Search by name, customer ID, email, or mobile number to find an existing record.
 
-<!-- TODO-SCREENSHOT: customer-search.png -->
-![Screenshot coming soon: Search Customer dialog](../images/placeholder.png)
-Figure: Search for an existing customer before creating a new record (screenshot to be added)
+![Search Customer dialog with search text and results concealed](../images/customer-search.png)
+Figure: Search for an existing customer before creating a new record; personal details are concealed.
 
 Use the edit and details actions on the customer list to maintain a profile. Deletion availability depends on the access assigned to your account.

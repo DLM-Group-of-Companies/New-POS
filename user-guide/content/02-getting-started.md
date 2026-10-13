@@ -16,9 +16,8 @@ Use a current web browser on your organization's approved network. Ask your admi
 
 If you cannot sign in, check the web address and account details. Use **Forgot your password?** if it is available for your account, or ask your administrator for help.
 
-<!-- TODO-SCREENSHOT: login.png -->
-![Screenshot coming soon: Sign-in page with empty credentials](../images/placeholder.png)
-Figure: Sign in with the email and password issued for your account (screenshot to be added)
+![NLI-POS sign-in page with account fields concealed](../images/login.png)
+Figure: Enter your account credentials; the example sign-in values are concealed.
 
 ## Find your way around
 
@@ -27,7 +26,7 @@ Figure: Sign in with the email and password issued for your account (screenshot 
 3. Select **Order** to find orders or start a sale, and **Customer** to find customer records.
 4. Open **Reports** to choose a sales report.
 5. If you are an administrator, open **Settings** to manage users and store setup.
-6. Select **Help** at any time to browse this guide. **Expected result:** The Help chapter list appears beside the selected chapter.
+6. Select **Help** at any time to browse this guide. **Expected result:** This guide opens in a new browser tab.
 7. Open the signed-in user menu to select **Manage Account** or **Logout**.
 
 ![NLI-POS home page and navigation](../images/Main.png)
@@ -46,6 +45,5 @@ Figure: Use Home and the left navigation to reach the main work areas.
 2. Confirm that you have access to the office or offices where you work. **Expected result:** Your assigned office appears in the relevant lists.
 3. Ask your administrator to confirm that the required products, prices, stock, customer classes, and payment methods are available. **Expected result:** The options you need are available when you enter an order.
 
-<!-- TODO-SCREENSHOT: manage-account.png -->
-![Screenshot coming soon: Manage Account profile page](../images/placeholder.png)
-Figure: Manage Account shows your profile and account options (screenshot to be added)
+![Manage Account profile page with account details concealed](../images/manage-account.png)
+Figure: Manage Account shows profile and account options; personal details are concealed.

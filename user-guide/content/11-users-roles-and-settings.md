@@ -16,9 +16,14 @@ The **Settings** menu is available to administrators. Your assigned role and off
 
 The configured roles are **Admin**, **CS**, **Accounting**, and **Inventory**. The application does not include a separate **Manager** role.
 
-<!-- TODO-SCREENSHOT: user-roles-and-office-access.png -->
-![Screenshot coming soon: User role and office access settings](../images/placeholder.png)
-Figure: Assign only the role and office access the user needs (screenshot to be added)
+![User role and access settings with account details concealed](../images/user-roles-and-office-access.png)
+Figure: Assign only the role and office access the user needs; account details are concealed.
+
+![User office access with identity and office data concealed](../images/user-office-access.png)
+Figure: Review assigned office access; identity and office names are concealed.
+
+![Users list with personal account records concealed](../images/users-list.png)
+Figure: Open an account from the Users list; personal account data is concealed.
 
 ## Maintain offices and setup lists
 
