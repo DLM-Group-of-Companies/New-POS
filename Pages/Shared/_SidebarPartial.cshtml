@@ -1,8 +1,13 @@
 @using NLI_POS.Models
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject IConfiguration Configuration
 
 @* -- This is where all menus are configured -- *@
+@{
+    var userGuideUrl = Configuration["UserGuide:Url"]
+        ?? throw new InvalidOperationException("The User Guide URL is not configured.");
+}
 
 <a class="navbar-brand mb-4 d-block text-center pt-4" asp-page="/Index">
     <img src="~/images/noblelife-white.png" alt="Logo" width="150" class="mx-auto d-block" />
@@ -42,6 +47,12 @@
         <li class="nav-item">
             <a class="nav-link text-white" asp-page="/Customers/Index">
                 <span class="icon-container"><i class="fas fa-users me-2"></i></span> Customer
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" href="@userGuideUrl" target="_blank" rel="noopener"
+               title="User Guide" data-user-guide-link>
+                <span class="icon-container"><i class="fas fa-question-circle me-2" aria-hidden="true"></i></span> Help
             </a>
         </li>
         <!-- Reports Menu -->

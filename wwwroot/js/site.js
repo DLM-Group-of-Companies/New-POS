@@ -149,6 +149,16 @@ function closeSalesPopup() {
     if (popup) popup.classList.remove("show");
 }
 
+document.addEventListener("click", function (event) {
+    const guideLink = event.target.closest("a[data-user-guide-link]");
+    if (guideLink && !navigator.onLine) {
+        event.preventDefault();
+        window.alert("The User Guide needs an internet connection. Please connect to the internet and try again.");
+    }
+});
+
+
+
 // Submit the office filter form via AJAX
 function submitTodaySalesForm() {
     const form = document.querySelector("#todaySalesContent #salesFilterForm");
